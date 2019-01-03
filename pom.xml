@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.apache.phoenix</groupId>
+    <artifactId>phoenix-queryserver</artifactId>
+    <version>4.15.0-HBase-1.4-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Phoenix Query Server</name>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments/>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org</url>
+    </organization>
+
+    <modules>
+        <module>queryserver</module>
+        <module>queryserver-client</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>apache release</id>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+    <scm>
+        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/phoenix.git</connection>
+        <url>https://git-wip-us.apache.org/repos/asf/phoenix.git</url>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/phoenix.git</developerConnection>
+    </scm>
+
+    <properties>
+        <!-- General Properties -->
+        <top.dir>${project.basedir}</top.dir>
+
+        <!-- Hadoop Versions -->
+        <hbase.version>1.4.0</hbase.version>
+        <hadoop-two.version>2.7.5</hadoop-two.version>
+
+        <!-- Dependency versions -->
+        <commons-cli.version>1.2</commons-cli.version>
+        <hive.version>1.2.1</hive.version>
+        <hadoop.version>2.7.1</hadoop.version>
+        <protobuf-java.version>2.5.0</protobuf-java.version>
+        <sqlline.version>1.2.0</sqlline.version>
+        <guava.version>13.0.1</guava.version>
+        <jline.version>2.11</jline.version>
+        <commons-logging.version>1.2</commons-logging.version>
+        <!-- Do not change jodatime.version until HBASE-15199 is fixed -->
+        <avatica.version>1.12.0</avatica.version>
+        <jettyVersion>8.1.7.v20120910</jettyVersion>
+        <servlet.api.version>3.1.0</servlet.api.version>
+        <!-- Test Dependencies -->
+        <mockito-all.version>1.8.5</mockito-all.version>
+        <junit.version>4.12</junit.version>
+
+        <!-- Plugin versions -->
+        <maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
+        <maven-build-helper-plugin.version>1.9.1</maven-build-helper-plugin.version>
+        <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>2.20</maven-failsafe-plugin.version>
+
+        <maven-dependency-plugin.version>2.1</maven-dependency-plugin.version>
+        <maven.assembly.version>2.5.2</maven.assembly.version>
+
+        <!-- Plugin options -->
+        <numForkedUT>8</numForkedUT>
+        <numForkedIT>7</numForkedIT>
+        <it.failIfNoSpecifiedTests>false</it.failIfNoSpecifiedTests>
+        <surefire.failIfNoSpecifiedTests>false</surefire.failIfNoSpecifiedTests>
+
+        <!-- Set default encoding so multi-byte tests work correctly on the Mac -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <curator.version>2.12.0</curator.version>
+
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                  only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.antlr</groupId>
+                                        <artifactId>antlr3-maven-plugin</artifactId>
+                                        <versionRange>[3.5,)</versionRange>
+                                        <goals>
+                                            <goal>antlr</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <version>${maven-eclipse-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven.assembly.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <!-- Avoid defining exclusions in pluginManagement as they are global.
+                         We already inherit some from the ASF parent pom. -->
+                </plugin>
+                <!-- We put slow-running tests into src/it and run them during the
+                    integration-test phase using the failsafe plugin. This way
+                    developers can run unit tests conveniently from the IDE or via
+                    "mvn package" from the command line without triggering time
+                    consuming integration tests. -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${maven-build-helper-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-test-source</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${basedir}/src/it/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-resource</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>${basedir}/src/it/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>ParallelStatsEnabledTest</id>
+                            <configuration>
+                                <encoding>UTF-8</encoding>
+                                <forkCount>${numForkedIT}</forkCount>
+                                <runOrder>alphabetical</runOrder>
+                                <reuseForks>true</reuseForks>
+                                <runOrder>alphabetical</runOrder>
+                                <!--parallel>methods</parallel>
+                                <threadCount>20</threadCount-->
+                                <argLine>-Xmx2000m -XX:MaxPermSize=256m -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
+                                <redirectTestOutputToFile>${test.output.tofile}</redirectTestOutputToFile>
+                                <shutdown>kill</shutdown>
+                                <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
+                                <groups>org.apache.phoenix.end2end.ParallelStatsEnabledTest</groups>
+                            </configuration>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>create-mrapp-generated-classpath</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>build-classpath</goal>
+                            </goals>
+                            <configuration>
+                                <outputFile>${project.build.directory}/classes/mrapp-generated-classpath
+                                </outputFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.4.3</version>
+                </plugin>
+                <plugin>
+                    <!-- Allows us to get the apache-ds bundle artifacts -->
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.13</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <skip>true</skip>
+                            <configLocation>${top.dir}/src/main/config/checkstyle/checker.xml</configLocation>
+                            <suppressionsLocation>${top.dir}/src/main/config/checkstyle/suppressions.xml</suppressionsLocation>
+                            <consoleOutput>true</consoleOutput>
+                            <headerLocation>${top.dir}/src/main/config/checkstyle/header.txt</headerLocation>
+                            <failOnViolation><!--true-->false</failOnViolation>
+                            <includeTestSourceDirectory><!--true-->false</includeTestSourceDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <quiet>true</quiet>
+                    <links>
+                        <link>http://hbase.apache.org/apidocs/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <!-- TODO turn back on javadocs - disabled now for testing -->
+                            <!-- <goal>jar</goal> -->
+                        </goals>
+                        <configuration>
+                            <additionalparam>${javadoc.opts}</additionalparam>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <forkCount>${numForkedUT}</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-enableassertions -Xmx2250m -XX:MaxPermSize=128m
+                        -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
+                    <redirectTestOutputToFile>${test.output.tofile}</redirectTestOutputToFile>
+                    <shutdown>kill</shutdown>
+                </configuration>
+            </plugin>
+            <!-- All projects create a test jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package
+                        </phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Header on changelog isn't normal -->
+                        <exclude>CHANGES</exclude>
+                        <!-- IDE configuration -->
+                        <exclude>dev/phoenix.importorder</exclude>
+                        <!-- Release L&N -->
+                        <exclude>dev/release_files/LICENSE</exclude>
+                        <exclude>dev/release_files/NOTICE</exclude>
+                        <!-- Exclude data files for examples -->
+                        <exclude>docs/*.csv</exclude>
+                        <exclude>examples/*.csv</exclude>
+                        <!-- Exclude SQL files from rat. Sqlline 1.1.9 doesn't work with
+                             comments on the first line of a file. -->
+                        <exclude>examples/*.sql</exclude>
+                        <exclude>examples/pig/testdata</exclude>
+                        <!-- precommit? -->
+                        <exclude>**/patchprocess/**</exclude>
+                        <!-- Argparse is bundled to work around system Python version
+                             issues, compatibile with ALv2 -->
+                        <exclude>bin/argparse-1.4.0/argparse.py</exclude>
+                        <!-- Not our code -->
+                        <exclude>python/requests-kerberos/**</exclude>
+                        <exclude>python/phoenixdb/phoenixdb/avatica/proto/*</exclude>
+                        <exclude>python/phoenixdb/*.rst</exclude>
+                        <exclude>python/phoenixdb/ci/**</exclude>
+                        <exclude>python/phoenixdb/doc/*.rst</exclude>
+                        <exclude>python/phoenixdb/doc/conf.py</exclude>
+                        <exclude>python/phoenixdb/doc/Makefile</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Allows us to get the apache-ds bundle artifacts -->
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <inherited>true</inherited>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Intra-project dependencies -->
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>phoenix-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>phoenix-core</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>queryserver-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- HBase dependencies -->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-testing-util</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+                <optional>true</optional>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jruby</groupId>
+                        <artifactId>jruby-complete</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-hdfs</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-it</artifactId>
+                <version>${hbase.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jruby</groupId>
+                        <artifactId>jruby-complete</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Hadoop Dependencies -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop-two.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-minicluster</artifactId>
+                <version>${hadoop-two.version}</version>
+                <optional>true</optional>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Required for mini-cluster since hbase built against old version of hadoop -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                <version>${hadoop-two.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop-two.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop-two.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${hadoop-two.version}</version>
+                <type>test-jar</type> <!-- this does not work which is typical for maven.-->
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-minikdc</artifactId>
+                <version>${hadoop-two.version}</version>
+            </dependency>
+
+            <!-- General Dependencies -->
+            <dependency>
+                <groupId>org.apache.pig</groupId>
+                <artifactId>pig</artifactId>
+                <version>${pig.version}</version>
+                <classifier>h2</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.calcite.avatica</groupId>
+                <artifactId>avatica</artifactId>
+                <version>${avatica.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.calcite.avatica</groupId>
+                <artifactId>avatica-core</artifactId>
+                <version>${avatica.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.calcite.avatica</groupId>
+                <artifactId>avatica-server</artifactId>
+                <version>${avatica.version}</version>
+            </dependency>
+
+            <!-- Make sure we have all the antlr dependencies -->
+            <dependency>
+                <groupId>jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>2.11</version>
+            </dependency>
+            <dependency>
+                <groupId>sqlline</groupId>
+                <artifactId>sqlline</artifactId>
+                <version>${sqlline.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito-all.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${servlet.api.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
