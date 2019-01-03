@@ -37,9 +37,9 @@
     </repositories>
 
     <scm>
-        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/phoenix.git</connection>
-        <url>https://git-wip-us.apache.org/repos/asf/phoenix.git</url>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/phoenix.git</developerConnection>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/phoenix-queryserver.git</connection>
+        <url>https://gitbox.apache.org/repos/asf/phoenix-queryserver.git</url>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/phoenix-queryserver.git</developerConnection>
     </scm>
 
     <properties>
