@@ -7,6 +7,10 @@
     </formats>
     <fileSets>
         <fileSet>
+            <directory>${project.basedir}/../bin</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/bin</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/../queryserver/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver</outputDirectory>
             <includes>
