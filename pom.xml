@@ -6,7 +6,7 @@
 
     <groupId>org.apache.phoenix</groupId>
     <artifactId>phoenix-queryserver</artifactId>
-    <version>4.15.0-HBase-1.4-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Phoenix Query Server</name>
 
@@ -27,6 +27,7 @@
     <modules>
         <module>queryserver</module>
         <module>queryserver-client</module>
+        <module>assembly</module>
     </modules>
 
     <repositories>
@@ -49,6 +50,7 @@
         <!-- Hadoop Versions -->
         <hbase.version>1.4.0</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
+        <phoenix.version>4.15.0-HBase-1.4-SNAPSHOT</phoenix.version>
 
         <!-- Dependency versions -->
         <protobuf-java.version>2.5.0</protobuf-java.version>
@@ -385,12 +387,12 @@
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-core</artifactId>
-                <version>${project.version}</version>
+                <version>${phoenix.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-core</artifactId>
-                <version>${project.version}</version>
+                <version>${phoenix.version}</version>
                 <classifier>tests</classifier>
                 <scope>test</scope>
             </dependency>
