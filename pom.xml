@@ -28,6 +28,7 @@
         <module>queryserver</module>
         <module>queryserver-client</module>
         <module>assembly</module>
+        <module>phoenix-client</module>
     </modules>
 
     <repositories>
