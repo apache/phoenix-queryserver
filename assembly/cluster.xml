@@ -1,0 +1,35 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>cluster</id>
+    <baseDirectory>/</baseDirectory>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/../bin</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/bin</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../queryserver/target</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../queryserver-client/target</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver-client/target</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../phoenix-client/target</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/phoenix-client/target</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
