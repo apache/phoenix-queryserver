@@ -27,6 +27,7 @@
     <modules>
         <module>queryserver</module>
         <module>queryserver-client</module>
+        <module>load-balancer</module>
         <module>assembly</module>
         <module>phoenix-client</module>
     </modules>
@@ -51,6 +52,7 @@
         <!-- Hadoop Versions -->
         <hbase.version>1.4.0</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
+        <curator.version>2.12.0</curator.version>
         <phoenix.version>4.15.0-HBase-1.4-SNAPSHOT</phoenix.version>
 
         <!-- Dependency versions -->
@@ -402,11 +404,22 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
+                <artifactId>queryserver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
                 <artifactId>queryserver-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
+
             <!-- HBase dependencies -->
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-common</artifactId>
+                <version>${hbase.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-testing-util</artifactId>
@@ -488,6 +501,16 @@
             </dependency>
 
             <!-- General Dependencies -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.pig</groupId>
                 <artifactId>pig</artifactId>
