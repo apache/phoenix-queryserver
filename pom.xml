@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
  distributed with this work for additional information
@@ -17,12 +16,16 @@
  KIND, either express or implied.  See the License for the
  specific language governing permissions and limitations
  under the License.
-
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+      <groupId>org.apache</groupId>
+      <artifactId>apache</artifactId>
+      <version>21</version>
+    </parent>
 
     <groupId>org.apache.phoenix</groupId>
     <artifactId>phoenix-queryserver</artifactId>
@@ -49,16 +52,8 @@
         <module>queryserver-client</module>
         <module>load-balancer</module>
         <module>assembly</module>
-        <module>phoenix-client</module>
         <module>queryserver-orchestrator</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>apache release</id>
-            <url>https://repository.apache.org/content/repositories/releases/</url>
-        </repository>
-    </repositories>
 
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/phoenix-queryserver.git</connection>
@@ -71,15 +66,13 @@
         <top.dir>${project.basedir}</top.dir>
 
         <!-- Hadoop Versions -->
-        <hbase.version>1.4.0</hbase.version>
+        <hbase.version>1.4.10</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
         <curator.version>2.12.0</curator.version>
-        <phoenix.version>4.15.0-HBase-1.3-SNAPSHOT</phoenix.version>
+        <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
 
         <!-- Dependency versions -->
-        <protobuf-java.version>2.5.0</protobuf-java.version>
         <sqlline.version>1.2.0</sqlline.version>
-        <guava.version>13.0.1</guava.version>
         <jline.version>2.11</jline.version>
         <commons-logging.version>1.2</commons-logging.version>
         <!-- Do not change jodatime.version until HBASE-15199 is fixed -->
@@ -99,15 +92,12 @@
         <maven.assembly.version>2.5.2</maven.assembly.version>
 
         <!-- Plugin options -->
-        <numForkedUT>8</numForkedUT>
-        <numForkedIT>7</numForkedIT>
         <it.failIfNoSpecifiedTests>false</it.failIfNoSpecifiedTests>
         <surefire.failIfNoSpecifiedTests>false</surefire.failIfNoSpecifiedTests>
 
         <!-- Set default encoding so multi-byte tests work correctly on the Mac -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
     </properties>
 
     <build>
@@ -168,11 +158,6 @@
                     <!-- Avoid defining exclusions in pluginManagement as they are global.
                          We already inherit some from the ASF parent pom. -->
                 </plugin>
-                <!-- We put slow-running tests into src/it and run them during the
-                    integration-test phase using the failsafe plugin. This way
-                    developers can run unit tests conveniently from the IDE or via
-                    "mvn package" from the command line without triggering time
-                    consuming integration tests. -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
@@ -212,20 +197,16 @@
                     <version>${maven-failsafe-plugin.version}</version>
                     <executions>
                         <execution>
-                            <id>ParallelStatsEnabledTest</id>
+                            <id>IntegrationTests</id>
                             <configuration>
                                 <encoding>UTF-8</encoding>
-                                <forkCount>${numForkedIT}</forkCount>
                                 <runOrder>alphabetical</runOrder>
-                                <reuseForks>true</reuseForks>
+                                <reuseForks>false</reuseForks>
                                 <runOrder>alphabetical</runOrder>
-                                <!--parallel>methods</parallel>
-                                <threadCount>20</threadCount-->
                                 <argLine>-Xmx2000m -XX:MaxPermSize=256m -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
-                                <redirectTestOutputToFile>${test.output.tofile}</redirectTestOutputToFile>
+                                <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                 <shutdown>kill</shutdown>
                                 <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
-                                <groups>org.apache.phoenix.end2end.ParallelStatsEnabledTest</groups>
                             </configuration>
                             <goals>
                                 <goal>integration-test</goal>
@@ -335,7 +316,7 @@
                     <reuseForks>true</reuseForks>
                     <argLine>-enableassertions -Xmx2250m -XX:MaxPermSize=128m
                         -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
-                    <redirectTestOutputToFile>${test.output.tofile}</redirectTestOutputToFile>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <shutdown>kill</shutdown>
                 </configuration>
             </plugin>
@@ -367,20 +348,6 @@
                 <artifactId>apache-rat-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- Header on changelog isn't normal -->
-                        <exclude>CHANGES</exclude>
-                        <!-- IDE configuration -->
-                        <exclude>dev/phoenix.importorder</exclude>
-                        <!-- Release L&N -->
-                        <exclude>dev/release_files/LICENSE</exclude>
-                        <exclude>dev/release_files/NOTICE</exclude>
-                        <!-- Exclude data files for examples -->
-                        <exclude>docs/*.csv</exclude>
-                        <exclude>examples/*.csv</exclude>
-                        <!-- Exclude SQL files from rat. Sqlline 1.1.9 doesn't work with
-                             comments on the first line of a file. -->
-                        <exclude>examples/*.sql</exclude>
-                        <exclude>examples/pig/testdata</exclude>
                         <!-- precommit? -->
                         <exclude>**/patchprocess/**</exclude>
                         <!-- Argparse is bundled to work around system Python version
@@ -574,7 +541,7 @@
             <dependency>
                 <groupId>jline</groupId>
                 <artifactId>jline</artifactId>
-                <version>2.11</version>
+                <version>${jline.version}</version>
             </dependency>
             <dependency>
                 <groupId>sqlline</groupId>
@@ -605,7 +572,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.8.0-alpha2</version>
+                <version>1.7.26</version>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.argparse4j</groupId>
