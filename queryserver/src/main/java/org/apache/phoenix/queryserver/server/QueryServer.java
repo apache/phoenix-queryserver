@@ -286,18 +286,12 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   }
 
   @VisibleForTesting
-  void configureSpnegoAuthentication(HttpServer.Builder builder, UserGroupInformation ugi) {
+  void configureSpnegoAuthentication(HttpServer.Builder builder, UserGroupInformation ugi) throws IOException {
     String keytabPath = getConf().get(QueryServices.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB);
     File keytab = new File(keytabPath);
     String httpKeytabPath =
             getConf().get(QueryServices.QUERY_SERVER_HTTP_KEYTAB_FILENAME_ATTRIB, null);
-    String httpPrincipal =
-            getConf().get(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
-    // Backwards compat for a configuration key change
-    if (httpPrincipal == null) {
-      httpPrincipal =
-              getConf().get(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
-    }
+    String httpPrincipal = getSpnegoPrincipal(getConf());
     File httpKeytab = null;
     if (null != httpKeytabPath) {
         httpKeytab = new File(httpKeytabPath);
@@ -314,6 +308,26 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       builder.withSpnego(ugi.getUserName(), additionalAllowedRealms)
               .withAutomaticLogin(keytab);
     }
+  }
+
+  /**
+   * Returns the Kerberos principal to use for SPNEGO, substituting {@code _HOST}
+   * if it is present as the "instance" component of the Kerberos principal. It returns
+   * the configured principal as-is if {@code _HOST} is not the "instance".
+   */
+  String getSpnegoPrincipal(Configuration conf) throws IOException {
+    String httpPrincipal = conf.get(
+        QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
+    // Backwards compat for a configuration key change
+    if (httpPrincipal == null) {
+      httpPrincipal = conf.get(
+          QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
+    }
+
+    String hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
+        conf.get(QueryServices.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
+        conf.get(QueryServices.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
+    return SecurityUtil.getServerPrincipal(httpPrincipal, hostname);
   }
 
   @VisibleForTesting
