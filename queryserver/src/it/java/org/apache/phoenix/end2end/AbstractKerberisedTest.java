@@ -44,6 +44,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -98,6 +99,7 @@ public class AbstractKerberisedTest {
         sb.append(System.getProperty("user.dir")).append(File.separator);
         sb.append("target").append(File.separator);
         sb.append(AbstractKerberisedTest.class.getSimpleName());
+        sb.append("-").append(UUID.randomUUID());
         return sb.toString();
     }
 
