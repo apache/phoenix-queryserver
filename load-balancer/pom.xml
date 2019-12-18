@@ -57,13 +57,27 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skipIfEmpty>true</skipIfEmpty>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
+            <id>attach-test-sources</id>
+            <phase>prepare-package</phase>
             <goals>
-              <goal>jar-no-fork</goal>
               <goal>test-jar-no-fork</goal>
             </goals>
           </execution>

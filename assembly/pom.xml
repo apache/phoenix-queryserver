@@ -59,8 +59,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <descriptor>cluster.xml</descriptor>
-                            <finalName>${parent.artifactId}-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>cluster.xml</descriptor>
+                            </descriptors>
+                            <finalName>${project.parent.artifactId}-${project.version}</finalName>
                             <tarLongFileMode>posix</tarLongFileMode>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
