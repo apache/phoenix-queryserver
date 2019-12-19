@@ -23,8 +23,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.phoenix.query.QueryServices;
-import org.apache.phoenix.query.QueryServicesOptions;
+import org.apache.phoenix.queryserver.QueryServerOptions;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -53,30 +53,30 @@ public class LoadBalanceZookeeperConfImpl implements LoadBalanceZookeeperConf {
 
         @Override
         public String getQueryServerBasePath(){
-            return configuration.get(QueryServices.PHOENIX_QUERY_SERVER_CLUSTER_BASE_PATH,
-                    QueryServicesOptions.DEFAULT_PHOENIX_QUERY_SERVER_CLUSTER_BASE_PATH);
+            return configuration.get(QueryServerProperties.PHOENIX_QUERY_SERVER_CLUSTER_BASE_PATH,
+                    QueryServerOptions.DEFAULT_PHOENIX_QUERY_SERVER_CLUSTER_BASE_PATH);
         }
 
         @Override
         public String getServiceName(){
-            return configuration.get(QueryServices.PHOENIX_QUERY_SERVER_SERVICE_NAME,
-                    QueryServicesOptions.DEFAULT_PHOENIX_QUERY_SERVER_SERVICE_NAME);
+            return configuration.get(QueryServerProperties.PHOENIX_QUERY_SERVER_SERVICE_NAME,
+                    QueryServerOptions.DEFAULT_PHOENIX_QUERY_SERVER_SERVICE_NAME);
         }
 
         @Override
         public String getZkConnectString(){
-            return String.format("%s:%s",configuration.get(QueryServices.ZOOKEEPER_QUORUM_ATTRIB,
-                    "localhost"),configuration.get(QueryServices.ZOOKEEPER_PORT_ATTRIB,"2181"));
+            return String.format("%s:%s",configuration.get(QueryServerProperties.ZOOKEEPER_QUORUM_ATTRIB,
+                    "localhost"),configuration.get(QueryServerProperties.ZOOKEEPER_PORT_ATTRIB,"2181"));
         }
 
         private String getZkLbUserName(){
-            return configuration.get(QueryServices.PHOENIX_QUERY_SERVER_ZK_ACL_USERNAME,
-                    QueryServicesOptions.DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_USERNAME);
+            return configuration.get(QueryServerProperties.PHOENIX_QUERY_SERVER_ZK_ACL_USERNAME,
+                    QueryServerOptions.DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_USERNAME);
         }
 
         private String getZkLbPassword(){
-            return configuration.get(QueryServices.PHOENIX_QUERY_SERVER_ZK_ACL_PASSWORD,
-                    QueryServicesOptions.DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_PASSWORD);
+            return configuration.get(QueryServerProperties.PHOENIX_QUERY_SERVER_ZK_ACL_PASSWORD,
+                    QueryServerOptions.DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_PASSWORD);
         }
 
         @Override

@@ -46,6 +46,8 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.jdbc.PhoenixDatabaseMetaData;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.query.QueryServicesOptions;
+import org.apache.phoenix.queryserver.QueryServerOptions;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.Driver;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,7 +76,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         // user1 is allowed to impersonate others, user2 is not
         conf.set("hadoop.proxyuser.user1.groups", "*");
         conf.set("hadoop.proxyuser.user1.hosts", "*");
-        conf.setBoolean(QueryServices.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, true);
+        conf.setBoolean(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, true);
 
         configureAndStartQueryServer(conf, 2);
     }
@@ -85,7 +87,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         final Entry<String,File> user2 = getUser(2);
         // Build the JDBC URL by hand with the doAs
         final String doAsUrlTemplate = Driver.CONNECT_STRING_PREFIX + "url=http://localhost:" + PQS_PORT + "?"
-            + QueryServicesOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
+            + QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
         final String tableName = "POSITIVE_IMPERSONATION";
         final int numRows = 5;
         final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(SERVICE_PRINCIPAL, KEYTAB.getAbsolutePath());
@@ -118,7 +120,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         final Entry<String,File> user2 = getUser(2);
         // Build the JDBC URL by hand with the doAs
         final String doAsUrlTemplate = Driver.CONNECT_STRING_PREFIX + "url=http://localhost:" + PQS_PORT + "?"
-            + QueryServicesOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
+            + QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
         final String tableName = "DISALLOWED_IMPERSONATION";
         final int numRows = 5;
         final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(SERVICE_PRINCIPAL, KEYTAB.getAbsolutePath());

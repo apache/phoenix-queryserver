@@ -54,6 +54,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.apache.phoenix.query.ConfigurationFactory;
 import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.queryserver.server.QueryServer;
 import org.apache.phoenix.util.InstanceResolver;
@@ -234,8 +235,8 @@ public class SecureQueryServerPhoenixDBIT {
         conf.set("phoenix.queryserver.http.keytab.file", KEYTAB.getAbsolutePath());
         conf.set("phoenix.queryserver.kerberos.principal", PQS_PRINCIPAL + "@" + KDC.getRealm());
         conf.set("phoenix.queryserver.keytab.file", KEYTAB.getAbsolutePath());
-        conf.setBoolean(QueryServices.QUERY_SERVER_DISABLE_KERBEROS_LOGIN, true);
-        conf.setInt(QueryServices.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+        conf.setBoolean(QueryServerProperties.QUERY_SERVER_DISABLE_KERBEROS_LOGIN, true);
+        conf.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
         // Required so that PQS can impersonate the end-users to HBase
         conf.set("hadoop.proxyuser.phoenixqs.groups", "*");
         conf.set("hadoop.proxyuser.phoenixqs.hosts", "*");

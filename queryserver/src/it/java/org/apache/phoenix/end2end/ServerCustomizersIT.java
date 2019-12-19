@@ -28,6 +28,7 @@ import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.ServerCustomizersFactory;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -60,7 +61,7 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
     @BeforeClass
     public static void setup() throws Exception {
         Configuration conf = getTestClusterConfig();
-        conf.set(QueryServices.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
+        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         PQS_UTIL = new QueryServerTestUtil(conf);
         PQS_UTIL.startLocalHBaseCluster(ServerCustomizersIT.class);
         // Register a test jetty server customizer

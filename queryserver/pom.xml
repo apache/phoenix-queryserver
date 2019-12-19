@@ -143,6 +143,10 @@
   </build>
 
   <dependencies>
+     <dependency>
+       <groupId>org.apache.hbase</groupId>
+       <artifactId>hbase-common</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.phoenix</groupId>
       <artifactId>queryserver-client</artifactId>
@@ -165,10 +169,6 @@
       <artifactId>avatica-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.phoenix</groupId>
-      <artifactId>phoenix-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
     </dependency>
@@ -178,14 +178,19 @@
     </dependency>
     <!-- for tests -->
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <groupId>org.apache.phoenix</groupId>
+      <artifactId>phoenix-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.phoenix</groupId>
       <artifactId>phoenix-core</artifactId>
+      <scope>test</scope>
       <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

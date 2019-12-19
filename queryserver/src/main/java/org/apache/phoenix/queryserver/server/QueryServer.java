@@ -49,9 +49,9 @@ import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.phoenix.query.QueryServices;
-import org.apache.phoenix.query.QueryServicesOptions;
 import org.apache.phoenix.loadbalancer.service.LoadBalanceZookeeperConf;
+import org.apache.phoenix.queryserver.QueryServerOptions;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.server.Server;
@@ -76,8 +76,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static org.apache.phoenix.query.QueryServicesOptions.DEFAULT_QUERY_SERVER_CUSTOM_AUTH_ENABLED;
 
 /**
  * A query server for Phoenix over Calcite's Avatica.
@@ -116,12 +114,12 @@ public final class QueryServer extends Configured implements Tool, Runnable {
    */
   public static void logProcessInfo(Configuration conf) {
     // log environment variables unless asked not to
-    if (conf == null || !conf.getBoolean(QueryServices.QUERY_SERVER_ENV_LOGGING_ATTRIB, false)) {
+    if (conf == null || !conf.getBoolean(QueryServerProperties.QUERY_SERVER_ENV_LOGGING_ATTRIB, false)) {
       Set<String> skipWords = new HashSet<String>(
-          QueryServicesOptions.DEFAULT_QUERY_SERVER_SKIP_WORDS);
+          QueryServerOptions.DEFAULT_QUERY_SERVER_SKIP_WORDS);
       if (conf != null) {
         String[] confSkipWords = conf.getStrings(
-            QueryServices.QUERY_SERVER_ENV_LOGGING_SKIPWORDS_ATTRIB);
+            QueryServerProperties.QUERY_SERVER_ENV_LOGGING_SKIPWORDS_ATTRIB);
         if (confSkipWords != null) {
           skipWords.addAll(Arrays.asList(confSkipWords));
         }
@@ -192,38 +190,38 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   @Override
   public int run(String[] args) throws Exception {
     logProcessInfo(getConf());
-    final boolean loadBalancerEnabled = getConf().getBoolean(QueryServices.PHOENIX_QUERY_SERVER_LOADBALANCER_ENABLED,
-            QueryServicesOptions.DEFAULT_PHOENIX_QUERY_SERVER_LOADBALANCER_ENABLED);
+    final boolean loadBalancerEnabled = getConf().getBoolean(QueryServerProperties.PHOENIX_QUERY_SERVER_LOADBALANCER_ENABLED,
+            QueryServerOptions.DEFAULT_PHOENIX_QUERY_SERVER_LOADBALANCER_ENABLED);
     try {
       final boolean isKerberos = "kerberos".equalsIgnoreCase(getConf().get(
-          QueryServices.QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB));
-      final boolean disableSpnego = getConf().getBoolean(QueryServices.QUERY_SERVER_SPNEGO_AUTH_DISABLED_ATTRIB,
-              QueryServicesOptions.DEFAULT_QUERY_SERVER_SPNEGO_AUTH_DISABLED);
+          QueryServerProperties.QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB));
+      final boolean disableSpnego = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_SPNEGO_AUTH_DISABLED_ATTRIB,
+              QueryServerOptions.DEFAULT_QUERY_SERVER_SPNEGO_AUTH_DISABLED);
       String hostname;
-      final boolean disableLogin = getConf().getBoolean(QueryServices.QUERY_SERVER_DISABLE_KERBEROS_LOGIN,
-              QueryServicesOptions.DEFAULT_QUERY_SERVER_DISABLE_KERBEROS_LOGIN);
+      final boolean disableLogin = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_DISABLE_KERBEROS_LOGIN,
+              QueryServerOptions.DEFAULT_QUERY_SERVER_DISABLE_KERBEROS_LOGIN);
 
       // handle secure cluster credentials
       if (isKerberos && !disableLogin) {
         hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
-            getConf().get(QueryServices.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
-            getConf().get(QueryServices.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
+            getConf().get(QueryServerProperties.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
+            getConf().get(QueryServerProperties.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
         if (LOG.isDebugEnabled()) {
           LOG.debug("Login to " + hostname + " using " + getConf().get(
-              QueryServices.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB)
+              QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB)
               + " and principal " + getConf().get(
-                  QueryServices.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB) + ".");
+                  QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB) + ".");
         }
-        SecurityUtil.login(getConf(), QueryServices.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
-            QueryServices.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
+        SecurityUtil.login(getConf(), QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
+            QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
         LOG.info("Login successful.");
       } else {
         hostname = InetAddress.getLocalHost().getHostName();
         LOG.info(" Kerberos is off and hostname is : "+hostname);
       }
 
-      int port = getConf().getInt(QueryServices.QUERY_SERVER_HTTP_PORT_ATTRIB,
-          QueryServicesOptions.DEFAULT_QUERY_SERVER_HTTP_PORT);
+      int port = getConf().getInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB,
+          QueryServerOptions.DEFAULT_QUERY_SERVER_HTTP_PORT);
       LOG.debug("Listening on port " + port);
 
       // Update proxyuser configuration for impersonation
@@ -241,8 +239,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       // RemoteUserCallbacks and RemoteUserExtractor are part of AvaticaServerConfiguration
       // Hence they should be customizable when using QUERY_SERVER_CUSTOM_AUTH_ENABLED
       // Handlers should be customized via ServerCustomizers
-      if (getConf().getBoolean(QueryServices.QUERY_SERVER_CUSTOM_AUTH_ENABLED,
-              DEFAULT_QUERY_SERVER_CUSTOM_AUTH_ENABLED)) {
+      if (getConf().getBoolean(QueryServerProperties.QUERY_SERVER_CUSTOM_AUTH_ENABLED,
+          QueryServerOptions.DEFAULT_QUERY_SERVER_CUSTOM_AUTH_ENABLED)) {
         avaticaServerConfiguration = enableCustomAuth(builder, getConf(), ugi);
       } else {
         if (isKerberos) {
@@ -287,17 +285,17 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
   @VisibleForTesting
   void configureSpnegoAuthentication(HttpServer.Builder builder, UserGroupInformation ugi) throws IOException {
-    String keytabPath = getConf().get(QueryServices.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB);
+    String keytabPath = getConf().get(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB);
     File keytab = new File(keytabPath);
     String httpKeytabPath =
-            getConf().get(QueryServices.QUERY_SERVER_HTTP_KEYTAB_FILENAME_ATTRIB, null);
+            getConf().get(QueryServerProperties.QUERY_SERVER_HTTP_KEYTAB_FILENAME_ATTRIB, null);
     String httpPrincipal = getSpnegoPrincipal(getConf());
     File httpKeytab = null;
     if (null != httpKeytabPath) {
         httpKeytab = new File(httpKeytabPath);
     }
 
-    String realmsString = getConf().get(QueryServices.QUERY_SERVER_KERBEROS_ALLOWED_REALMS, null);
+    String realmsString = getConf().get(QueryServerProperties.QUERY_SERVER_KERBEROS_ALLOWED_REALMS, null);
     String[] additionalAllowedRealms = null;
     if (null != realmsString) {
       additionalAllowedRealms = StringUtils.split(realmsString, ',');
@@ -317,16 +315,16 @@ public final class QueryServer extends Configured implements Tool, Runnable {
    */
   String getSpnegoPrincipal(Configuration conf) throws IOException {
     String httpPrincipal = conf.get(
-        QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
+        QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
     // Backwards compat for a configuration key change
     if (httpPrincipal == null) {
       httpPrincipal = conf.get(
-          QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
+          QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
     }
 
     String hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
-        conf.get(QueryServices.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
-        conf.get(QueryServices.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
+        conf.get(QueryServerProperties.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
+        conf.get(QueryServerProperties.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
     return SecurityUtil.getServerPrincipal(httpPrincipal, hostname);
   }
 
@@ -348,7 +346,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
   private void setHandler(String[] args, HttpServer.Builder<Server> builder) throws Exception {
     Class<? extends PhoenixMetaFactory> factoryClass = getConf().getClass(
-            QueryServices.QUERY_SERVER_META_FACTORY_ATTRIB, PhoenixMetaFactoryImpl.class,
+            QueryServerProperties.QUERY_SERVER_META_FACTORY_ATTRIB, PhoenixMetaFactoryImpl.class,
             PhoenixMetaFactory.class);
     PhoenixMetaFactory factory =
             factoryClass.getDeclaredConstructor(Configuration.class).newInstance(getConf());
@@ -424,8 +422,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
    * @return The Serialization method
    */
   Driver.Serialization getSerialization(Configuration conf) {
-    String serializationName = conf.get(QueryServices.QUERY_SERVER_SERIALIZATION_ATTRIB,
-        QueryServicesOptions.DEFAULT_QUERY_SERVER_SERIALIZATION);
+    String serializationName = conf.get(QueryServerProperties.QUERY_SERVER_SERIALIZATION_ATTRIB,
+        QueryServerOptions.DEFAULT_QUERY_SERVER_SERIALIZATION);
 
     Driver.Serialization serialization;
     // Otherwise, use what was provided in the configuration
@@ -450,8 +448,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   // add remoteUserExtractor to builder if enabled
   @VisibleForTesting
   public void setRemoteUserExtractorIfNecessary(HttpServer.Builder builder, Configuration conf) {
-    if (conf.getBoolean(QueryServices.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB,
-            QueryServicesOptions.DEFAULT_QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR)) {
+    if (conf.getBoolean(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB,
+            QueryServerOptions.DEFAULT_QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR)) {
       builder.withRemoteUserExtractor(createRemoteUserExtractor(conf));
     }
   }
@@ -459,8 +457,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   @VisibleForTesting
   public void enableServerCustomizersIfNecessary(HttpServer.Builder<Server> builder,
                                                  Configuration conf, AvaticaServerConfiguration avaticaServerConfiguration) {
-    if (conf.getBoolean(QueryServices.QUERY_SERVER_CUSTOMIZERS_ENABLED,
-            QueryServicesOptions.DEFAULT_QUERY_SERVER_CUSTOMIZERS_ENABLED)) {
+    if (conf.getBoolean(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED,
+            QueryServerOptions.DEFAULT_QUERY_SERVER_CUSTOMIZERS_ENABLED)) {
       builder.withServerCustomizers(createServerCustomizers(conf, avaticaServerConfiguration), Server.class);
     }
   }
@@ -513,8 +511,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
     public PhoenixRemoteUserExtractor(Configuration conf) {
       this.requestRemoteUserExtractor = new HttpRequestRemoteUserExtractor();
-      this.userExtractParam = conf.get(QueryServices.QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM,
-              QueryServicesOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM);
+      this.userExtractParam = conf.get(QueryServerProperties.QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM,
+              QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM);
       this.paramRemoteUserExtractor = new HttpQueryStringParameterRemoteUserExtractor(userExtractParam);
     }
 
@@ -553,12 +551,12 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     public PhoenixDoAsCallback(UserGroupInformation serverUgi, Configuration conf) {
       this.serverUgi = Objects.requireNonNull(serverUgi);
       this.ugiCache = CacheBuilder.newBuilder()
-          .initialCapacity(conf.getInt(QueryServices.QUERY_SERVER_UGI_CACHE_INITIAL_SIZE,
-                  QueryServicesOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_INITIAL_SIZE))
-          .concurrencyLevel(conf.getInt(QueryServices.QUERY_SERVER_UGI_CACHE_CONCURRENCY,
-                  QueryServicesOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_CONCURRENCY))
-          .maximumSize(conf.getLong(QueryServices.QUERY_SERVER_UGI_CACHE_MAX_SIZE,
-                  QueryServicesOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_MAX_SIZE))
+          .initialCapacity(conf.getInt(QueryServerProperties.QUERY_SERVER_UGI_CACHE_INITIAL_SIZE,
+                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_INITIAL_SIZE))
+          .concurrencyLevel(conf.getInt(QueryServerProperties.QUERY_SERVER_UGI_CACHE_CONCURRENCY,
+                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_CONCURRENCY))
+          .maximumSize(conf.getLong(QueryServerProperties.QUERY_SERVER_UGI_CACHE_MAX_SIZE,
+                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_MAX_SIZE))
           .build(new UgiCacheLoader(this.serverUgi));
     }
 
