@@ -17,10 +17,9 @@
 package org.apache.phoenix.end2end;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
@@ -44,18 +43,22 @@ import org.apache.hadoop.hbase.security.access.Permission.Action;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.jdbc.PhoenixDatabaseMetaData;
-import org.apache.phoenix.query.QueryServices;
-import org.apache.phoenix.query.QueryServicesOptions;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.Driver;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 @Category(NeedsOwnMiniClusterTest.class)
-public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest {
+public class HttpParamImpersonationQueryServerIT {
+
     private static final Log LOG = LogFactory.getLog(HttpParamImpersonationQueryServerIT.class);
+    private static QueryServerEnvironment environment;
 
     private static final List<TableName> SYSTEM_TABLE_NAMES = Arrays.asList(PhoenixDatabaseMetaData.SYSTEM_CATALOG_HBASE_TABLE_NAME,
         PhoenixDatabaseMetaData.SYSTEM_MUTEX_HBASE_TABLE_NAME,
@@ -63,12 +66,19 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         PhoenixDatabaseMetaData.SYSTEM_SCHEMA_HBASE_TABLE_NAME,
         PhoenixDatabaseMetaData.SYSTEM_SEQUENCE_HBASE_TABLE_NAME,
         PhoenixDatabaseMetaData.SYSTEM_STATS_HBASE_TABLE_NAME);
-    /**
-     * Setup and start kerberos, hbase
-     */
-    @BeforeClass
-    public static void setUp() throws Exception {
-        final Configuration conf = UTIL.getConfiguration();
+
+    @Parameters(name = "tls = {0}")
+    public static Iterable<Boolean> data() {
+        return Arrays.asList(new Boolean[] {false, true});
+    }
+
+    public HttpParamImpersonationQueryServerIT(Boolean tls) throws Exception {
+        //Clean up previous environment if any (Junit 4.13 @BeforeParam / @AfterParam would be an alternative)
+        if(environment != null) {
+            stopEnvironment();
+        }
+
+        final Configuration conf = new Configuration();
         conf.setStrings(CoprocessorHost.MASTER_COPROCESSOR_CONF_KEY, AccessController.class.getName());
         conf.setStrings(CoprocessorHost.REGIONSERVER_COPROCESSOR_CONF_KEY, AccessController.class.getName());
         conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY, AccessController.class.getName(), TokenProvider.class.getName());
@@ -77,20 +87,34 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         conf.set("hadoop.proxyuser.user1.groups", "*");
         conf.set("hadoop.proxyuser.user1.hosts", "*");
         conf.setBoolean(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, true);
+        environment = new QueryServerEnvironment(conf, 2, tls);
+    }
 
-        configureAndStartQueryServer(conf, 2);
+    @AfterClass
+    public static void stopEnvironment() throws Exception {
+        environment.stop();
+    }
+
+    private String getUrlTemplate() {
+        String url = Driver.CONNECT_STRING_PREFIX + "url=%s://localhost:" + environment.getPqsPort() + "?"
+                + QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF%s";
+        if(environment.getTls()) {
+            return String.format(url, "https", "%s", ";truststore=" +TlsUtil.getTrustStoreFile().getAbsolutePath() 
+                + ";truststore_password="+TlsUtil.getTrustStorePassword());
+        } else {
+            return String.format(url, "http", "%s", "");
+        }
     }
 
     @Test
     public void testSuccessfulImpersonation() throws Exception {
-        final Entry<String,File> user1 = getUser(1);
-        final Entry<String,File> user2 = getUser(2);
+        final Entry<String,File> user1 = environment.getUser(1);
+        final Entry<String,File> user2 = environment.getUser(2);
         // Build the JDBC URL by hand with the doAs
-        final String doAsUrlTemplate = Driver.CONNECT_STRING_PREFIX + "url=http://localhost:" + PQS_PORT + "?"
-            + QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
+        final String doAsUrlTemplate = getUrlTemplate();
         final String tableName = "POSITIVE_IMPERSONATION";
         final int numRows = 5;
-        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(SERVICE_PRINCIPAL, KEYTAB.getAbsolutePath());
+        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal(), environment.getServiceKeytab().getAbsolutePath());
         serviceUgi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 createTable(tableName, numRows);
@@ -102,7 +126,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         user1Ugi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 // This user should not be able to read the table
-                readAndExpectPermissionError(PQS_URL, tableName, numRows);
+                readAndExpectPermissionError(environment.getPqsUrl(), tableName, numRows);
                 // Run the same query with the same credentials, but with a doAs. We should be permitted since the user we're impersonating can run the query
                 final String doAsUrl = String.format(doAsUrlTemplate, serviceUgi.getShortUserName());
                 try (Connection conn = DriverManager.getConnection(doAsUrl);
@@ -117,13 +141,12 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
 
     @Test
     public void testDisallowedImpersonation() throws Exception {
-        final Entry<String,File> user2 = getUser(2);
+        final Entry<String,File> user2 = environment.getUser(2);
         // Build the JDBC URL by hand with the doAs
-        final String doAsUrlTemplate = Driver.CONNECT_STRING_PREFIX + "url=http://localhost:" + PQS_PORT + "?"
-            + QueryServerOptions.DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM + "=%s;authentication=SPNEGO;serialization=PROTOBUF";
+        final String doAsUrlTemplate = getUrlTemplate();
         final String tableName = "DISALLOWED_IMPERSONATION";
         final int numRows = 5;
-        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(SERVICE_PRINCIPAL, KEYTAB.getAbsolutePath());
+        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal(), environment.getServiceKeytab().getAbsolutePath());
         serviceUgi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 createTable(tableName, numRows);
@@ -135,7 +158,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         user2Ugi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 // This user is disallowed to read this table
-                readAndExpectPermissionError(PQS_URL, tableName, numRows);
+                readAndExpectPermissionError(environment.getPqsUrl(), tableName, numRows);
                 // This user is also not allowed to impersonate
                 final String doAsUrl = String.format(doAsUrlTemplate, serviceUgi.getShortUserName());
                 try (Connection conn = DriverManager.getConnection(doAsUrl);
@@ -152,7 +175,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
     }
 
     void createTable(String tableName, int numRows) throws Exception {
-        try (Connection conn = DriverManager.getConnection(PQS_URL);
+        try (Connection conn = DriverManager.getConnection(environment.getPqsUrl());
             Statement stmt = conn.createStatement()) {
             conn.setAutoCommit(true);
             assertFalse(stmt.execute("CREATE TABLE " + tableName + "(pk integer not null primary key)"));
@@ -168,7 +191,7 @@ public class HttpParamImpersonationQueryServerIT extends AbstractKerberisedTest 
         try {
             for (String user : usersToGrant) {
                 for (TableName tn : SYSTEM_TABLE_NAMES) {
-                    AccessControlClient.grant(UTIL.getConnection(), tn, user, null, null, Action.READ, Action.EXEC);
+                    AccessControlClient.grant(environment.getUtil().getConnection(), tn, user, null, null, Action.READ, Action.EXEC);
                 }
             }
         } catch (Throwable e) {

@@ -34,6 +34,7 @@ import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.security.Constraint;
@@ -123,9 +124,12 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
         @Override
         public void customize(Server server) {
             LOG.debug("Customizing server to allow requests for {}", USER_AUTHORIZED);
+
+            UserStore store = new UserStore();
+            store.addUser(USER_AUTHORIZED, Credential.getCredential(USER_PW), new String[] {"users"});
             HashLoginService login = new HashLoginService();
-            login.putUser(USER_AUTHORIZED, Credential.getCredential(USER_PW), new String[] {"users"});
             login.setName("users");
+            login.setUserStore(store);
 
             Constraint constraint = new Constraint();
             constraint.setName(Constraint.__BASIC_AUTH);

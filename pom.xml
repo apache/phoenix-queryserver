@@ -78,7 +78,7 @@
         <jline.version>2.11</jline.version>
         <commons-logging.version>1.2</commons-logging.version>
         <!-- Do not change jodatime.version until HBASE-15199 is fixed -->
-        <avatica.version>1.12.0</avatica.version>
+        <avatica.version>1.16.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
         <!-- Test Dependencies -->
         <mockito-all.version>1.8.5</mockito-all.version>
@@ -371,13 +371,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-minicluster</artifactId>
-                <version>${hadoop-two.version}</version>
-                <optional>true</optional>
-                <scope>test</scope>
-            </dependency>
 
             <!-- General Dependencies -->
             <dependency>
@@ -477,27 +470,9 @@
             <!-- Required for mini-cluster since hbase built against old version of hadoop -->
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+                <artifactId>hadoop-minicluster</artifactId>
                 <version>${hadoop-two.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
-                <version>${hadoop-two.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-hdfs</artifactId>
-                <version>${hadoop-two.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-hdfs</artifactId>
-                <version>${hadoop-two.version}</version>
-                <type>test-jar</type> <!-- this does not work which is typical for maven.-->
+                <optional>true</optional>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -506,7 +481,6 @@
                 <version>${hadoop-two.version}</version>
                 <scope>test</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
