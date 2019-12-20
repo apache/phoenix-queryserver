@@ -30,6 +30,7 @@ import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.DoAsRemoteUserCallback;
 import org.apache.calcite.avatica.server.HttpServer;
+import org.apache.calcite.avatica.server.HttpServer.Builder;
 import org.apache.calcite.avatica.server.RemoteUserExtractor;
 import org.apache.calcite.avatica.server.RemoteUserExtractionException;
 import org.apache.calcite.avatica.server.HttpRequestRemoteUserExtractor;
@@ -248,6 +249,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
           configureClientAuthentication(builder, disableSpnego, ugi);
         }
         setRemoteUserExtractorIfNecessary(builder, getConf());
+        //Avatica doesn't support TLS with custom auth (Why?), hence we only set it in this branch
+        setTlsIfNeccessary(builder, getConf());
         setHandler(args, builder);
       }
 
@@ -273,7 +276,26 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     }
   }
 
-  @VisibleForTesting
+  private void setTlsIfNeccessary(Builder<Server> builder, Configuration conf) throws Exception {
+    final boolean useTls = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_ENABLED);
+    if(useTls) {
+      final String tlsKeystore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE);
+      final String tlsKeystorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD);
+      final String tlsTruststore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE);
+      final String tlsTruststorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD);
+      if(tlsKeystore == null) {
+        throw new Exception(String.format("if %s is enabled, %s must be specfified" , QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE));
+      }
+      final File tlsKeystoreFile = new File(tlsKeystore);
+      if(tlsTruststore == null) {
+        throw new Exception(String.format("if %s is enabled, %s must be specfified" , QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE));
+      }
+      final File tlsTruststoreFile = new File(tlsTruststore);
+      builder.withTLS(tlsKeystoreFile, tlsKeystorePassword, tlsTruststoreFile, tlsTruststorePassword);
+    }
+}
+
+@VisibleForTesting
   void configureClientAuthentication(final HttpServer.Builder builder, boolean disableSpnego, UserGroupInformation ugi) throws IOException {
 
     // Enable SPNEGO for client authentication unless it's explicitly disabled
@@ -372,9 +394,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     } catch(Throwable ex){
       LOG.debug("Caught an error trying to register with the load balancer", ex);
       success = false;
-    } finally {
-      return success;
     }
+    return success;
   }
 
 
@@ -386,9 +407,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         zookeeperConfig = serviceLocator.iterator().next();
     } catch(ServiceConfigurationError ex) {
       LOG.debug("Unable to locate the service provider for load balancer configuration", ex);
-    } finally {
-      return zookeeperConfig;
     }
+    return zookeeperConfig;
   }
 
   public Registry getRegistry()  {
@@ -399,9 +419,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         registry = serviceLocator.iterator().next();
     } catch(ServiceConfigurationError ex) {
       LOG.debug("Unable to locate the zookeeper registry for the load balancer", ex);
-    } finally {
-      return registry;
     }
+    return registry;
   }
 
   public boolean unRegister()  {
@@ -411,9 +430,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     }catch(Throwable ex) {
       LOG.debug("Caught an error while de-registering the query server from the load balancer",ex);
       success = false;
-    } finally {
-      return success;
     }
+    return success;
   }
   /**
    * Parses the serialization method from the configuration.

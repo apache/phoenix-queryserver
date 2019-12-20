@@ -39,6 +39,11 @@ public class QueryServerOptions {
     public static final boolean DEFAULT_QUERY_SERVER_DISABLE_KERBEROS_LOGIN = false;
     public static final boolean DEFAULT_QUERY_SERVER_CUSTOMIZERS_ENABLED = false;
 
+    public static final boolean DEFAULT_QUERY_SERVER_TLS_ENABLED = false;
+    //We default to empty *store password
+    public static final String DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD = "";
+    public static final String DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD = "";
+
     @SuppressWarnings("serial")
     public static final Set<String> DEFAULT_QUERY_SERVER_SKIP_WORDS = new HashSet<String>() {
         {

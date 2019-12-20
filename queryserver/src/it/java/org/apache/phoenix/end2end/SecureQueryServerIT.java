@@ -18,7 +18,6 @@ package org.apache.phoenix.end2end;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -26,6 +25,7 @@ import java.security.PrivilegedExceptionAction;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
@@ -34,34 +34,51 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 @Category(NeedsOwnMiniClusterTest.class)
-public class SecureQueryServerIT extends AbstractKerberisedTest {
+public class SecureQueryServerIT {
     private static final Log LOG = LogFactory.getLog(SecureQueryServerIT.class);
+    private static QueryServerEnvironment environment;
 
-    /**
-     * Setup and start kerberos, hbase
-     */
-    @BeforeClass
-    public static void setUp() throws Exception {
-        final Configuration conf = UTIL.getConfiguration();
+    @Parameters(name = "tls = {0}")
+    public static Iterable<Boolean> data() {
+        return Arrays.asList(new Boolean[] {false, true});
+    }
+
+    public SecureQueryServerIT(Boolean tls) throws Exception {
+        //Clean up previous environment if any (Junit 4.13 @BeforeParam / @AfterParam would be an alternative)
+        if(environment != null) {
+            stopEnvironment();
+        }
+
+        final Configuration conf = new Configuration();
         conf.setStrings(CoprocessorHost.REGION_COPROCESSOR_CONF_KEY,
                     TokenProvider.class.getName());
-        configureAndStartQueryServer(conf, 3);
+        environment = new QueryServerEnvironment(conf, 3, tls);
+    }
+
+
+    @AfterClass
+    public static void stopEnvironment() throws Exception {
+        environment.stop();
     }
 
     @Test
     public void testBasicReadWrite() throws Exception {
-        final Entry<String,File> user1 = getUser(1);
+        final Entry<String,File> user1 = environment.getUser(1);
         UserGroupInformation user1Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user1.getKey(), user1.getValue().getAbsolutePath());
         user1Ugi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 // Phoenix
                 final String tableName = "phx_table1";
-                try (java.sql.Connection conn = DriverManager.getConnection(PQS_URL);
+                try (java.sql.Connection conn = DriverManager.getConnection(environment.getPqsUrl());
                         Statement stmt = conn.createStatement()) {
                     conn.setAutoCommit(true);
                     assertFalse(stmt.execute("CREATE TABLE " + tableName + "(pk integer not null primary key)"));

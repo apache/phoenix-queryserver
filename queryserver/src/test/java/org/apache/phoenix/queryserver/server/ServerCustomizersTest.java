@@ -25,6 +25,7 @@ import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
@@ -72,7 +73,7 @@ public class ServerCustomizersTest {
             }
         });
         Configuration conf = new Configuration(false);
-        conf.set(QueryServices.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
+        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         QueryServer queryServer = new QueryServer();
         List<ServerCustomizer<Server>> actual = queryServer.createServerCustomizers(conf, avaticaServerConfiguration);
         Assert.assertEquals("Customizers are different", expected, actual);
@@ -84,7 +85,7 @@ public class ServerCustomizersTest {
         AvaticaServerConfiguration avaticaServerConfiguration = null;
         HttpServer.Builder builder = mock(HttpServer.Builder.class);
         Configuration conf = new Configuration(false);
-        conf.set(QueryServices.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
+        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         QueryServer queryServer = new QueryServer();
         queryServer.enableServerCustomizersIfNecessary(builder, conf, avaticaServerConfiguration);
         verify(builder).withServerCustomizers(anyList(), any(Class.class));
