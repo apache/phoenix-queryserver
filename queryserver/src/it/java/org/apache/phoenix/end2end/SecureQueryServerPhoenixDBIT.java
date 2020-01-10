@@ -194,7 +194,7 @@ public class SecureQueryServerPhoenixDBIT {
      * Setup and start kerberos, hbase
      */
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static synchronized void setUp() throws Exception {
         checkForCommandOnPath("python");
         checkForCommandOnPath("virtualenv");
         checkForCommandOnPath("kinit");
@@ -295,7 +295,7 @@ public class SecureQueryServerPhoenixDBIT {
     }
 
     @AfterClass
-    public static void stopKdc() throws Exception {
+    public static synchronized void stopKdc() throws Exception {
         // Remove our custom ConfigurationFactory for future tests
         InstanceResolver.clearSingletons();
         if (PQS_EXECUTOR != null) {

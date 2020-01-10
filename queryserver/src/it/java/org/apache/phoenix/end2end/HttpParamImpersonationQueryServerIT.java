@@ -68,7 +68,7 @@ public class HttpParamImpersonationQueryServerIT {
         PhoenixDatabaseMetaData.SYSTEM_STATS_HBASE_TABLE_NAME);
 
     @Parameters(name = "tls = {0}")
-    public static Iterable<Boolean> data() {
+    public static synchronized Iterable<Boolean> data() {
         return Arrays.asList(new Boolean[] {false, true});
     }
 
@@ -91,7 +91,7 @@ public class HttpParamImpersonationQueryServerIT {
     }
 
     @AfterClass
-    public static void stopEnvironment() throws Exception {
+    public static synchronized void stopEnvironment() throws Exception {
         environment.stop();
     }
 

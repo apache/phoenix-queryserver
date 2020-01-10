@@ -60,7 +60,7 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
     public ExpectedException expected = ExpectedException.none();
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static synchronized void setup() throws Exception {
         Configuration conf = getTestClusterConfig();
         conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         PQS_UTIL = new QueryServerTestUtil(conf);
@@ -78,7 +78,7 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
     }
 
     @AfterClass
-    public static void teardown() throws Exception {
+    public static synchronized void teardown() throws Exception {
         // Remove custom singletons for future tests
         InstanceResolver.clearSingletons();
         if (PQS_UTIL != null) {
