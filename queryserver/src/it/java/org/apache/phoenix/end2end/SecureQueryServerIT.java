@@ -48,7 +48,7 @@ public class SecureQueryServerIT {
     private static QueryServerEnvironment environment;
 
     @Parameters(name = "tls = {0}")
-    public static Iterable<Boolean> data() {
+    public static synchronized Iterable<Boolean> data() {
         return Arrays.asList(new Boolean[] {false, true});
     }
 
@@ -66,7 +66,7 @@ public class SecureQueryServerIT {
 
 
     @AfterClass
-    public static void stopEnvironment() throws Exception {
+    public static synchronized void stopEnvironment() throws Exception {
         environment.stop();
     }
 

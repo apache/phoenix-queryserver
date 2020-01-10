@@ -66,7 +66,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   public TestName name = new TestName();
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static synchronized void beforeClass() throws Exception {
     CONF = getTestClusterConfig();
     CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
     String url = getUrl();
@@ -81,7 +81,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   }
 
   @AfterClass
-  public static void afterClass() throws Exception {
+  public static synchronized void afterClass() throws Exception {
     if (AVATICA_SERVER != null) {
       AVATICA_SERVER.join(TimeUnit.MINUTES.toMillis(1));
       Throwable t = AVATICA_SERVER.getQueryServer().getThrowable();

@@ -52,7 +52,7 @@ public class LoadBalancerEnd2EndIT {
     public static Registry registry;
 
     @BeforeClass
-    public  static void setup() throws Exception{
+    public static synchronized void setup() throws Exception{
 
         registry = new ZookeeperRegistry();
         zkConnectString = LOAD_BALANCER_CONFIGURATION.getZkConnectString();
@@ -70,7 +70,7 @@ public class LoadBalancerEnd2EndIT {
     }
 
     @AfterClass
-    public  static void tearDown() throws Exception {
+    public static synchronized void tearDown() throws Exception {
         CloseableUtils.closeQuietly(curatorFramework);
         CloseableUtils.closeQuietly(testingServer);
     }
