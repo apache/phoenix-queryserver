@@ -56,6 +56,9 @@ parser.add_argument('-s', '--serialization', help='Serialization type for HTTP A
 # Avatica authentication
 parser.add_argument('-au', '--auth-user', help='Username for HTTP authentication.')
 parser.add_argument('-ap', '--auth-password', help='Password for HTTP authentication.')
+# Avatica HTTPS truststore
+parser.add_argument('-t', '--truststore', help='Truststore file that contains the TLS certificate of the server.')
+parser.add_argument('-tp', '--truststore-password', help='Password for the server TLS certificate truststore')
 # Common arguments across sqlline.py and sqlline-thin.py
 phoenix_utils.common_sqlline_args(parser)
 # Parse the args
@@ -161,6 +164,10 @@ if args.auth_user:
     jdbc_url += ';avatica_user=' + args.auth_user
 if args.auth_password:
     jdbc_url += ';avatica_password=' + args.auth_password
+if args.truststore:
+    jdbc_url += ';truststore=' + args.truststore
+if args.truststore_password:
+    jdbc_url += ';truststore_password=' + args.truststore_password
 
 java_cmd = java + ' $PHOENIX_OPTS ' + \
     ' -cp "' + phoenix_utils.hbase_conf_dir + os.pathsep + phoenix_utils.phoenix_thin_client_jar + \
