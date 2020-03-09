@@ -32,7 +32,7 @@ public class SqllineWrapper {
   public static final String QUERY_SERVER_SPNEGO_AUTH_DISABLED_ATTRIB = "phoenix.queryserver.spnego.auth.disabled";
   public static final boolean DEFAULT_QUERY_SERVER_SPNEGO_AUTH_DISABLED = false;
 
-  static UserGroupInformation loginIfNecessary(Configuration conf) {
+  static UserGroupInformation tryLogin(Configuration conf) {
     // Try to avoid HBase dependency too. Sadly, we have to bring in all of hadoop-common for this..
     if ("kerberos".equalsIgnoreCase(conf.get(HBASE_AUTHENTICATION_ATTR))) {
       // sun.security.krb5.principal is the property for setting the principal name, if that
@@ -42,7 +42,8 @@ public class SqllineWrapper {
         // We got hadoop-auth via hadoop-common, so might as well use it.
         return UserGroupInformation.getUGIFromTicketCache(null, principal);
       } catch (Exception e) {
-        throw new RuntimeException("Kerberos login failed using ticket cache. Did you kinit?", e);
+        //Fall through
+        System.err.println("Kerberos login failed using ticket cache. Did you kinit?");
       }
     }
     return null;
@@ -78,7 +79,7 @@ public class SqllineWrapper {
       SqlLine.main(args);
     }
 
-    UserGroupInformation ugi = loginIfNecessary(conf);
+    UserGroupInformation ugi = tryLogin(conf);
 
     if (null != ugi) {
       final String[] updatedArgs = updateArgsForKerberos(args);
