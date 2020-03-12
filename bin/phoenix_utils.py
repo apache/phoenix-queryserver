@@ -68,13 +68,14 @@ def findClasspath(command_name):
     return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
 
 def setPath():
-    PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*-client.jar"
+    PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*[!n]-client.jar"
     PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-*-thin-client.jar"
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-*-queryserver.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "phoenix-load-balancer-*[!t][!e][!s][!t][!s].jar"
     PHOENIX_TRACESERVER_JAR_PATTERN = "phoenix-tracing-webapp-*-runnable.jar"
     PHOENIX_TESTS_JAR_PATTERN = "phoenix-core-*-tests*.jar"
     PHOENIX_PHERF_JAR_PATTERN = "phoenix-pherf-*-minimal*.jar"
+    SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
 
     # Backward support old env variable PHOENIX_LIB_DIR replaced by PHOENIX_CLASS_PATH
     global phoenix_class_path
@@ -111,7 +112,7 @@ def setPath():
     phoenix_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
 
     global phoenix_client_jar
-    phoenix_client_jar = find("phoenix-*-client.jar", phoenix_jar_path)
+    phoenix_client_jar = find("phoenix-*[!n]-client.jar", phoenix_jar_path)
     if phoenix_client_jar == "":
         phoenix_client_jar = findFileInPathWithoutRecursion(PHOENIX_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
     if phoenix_client_jar == "":
@@ -133,18 +134,18 @@ def setPath():
 
     global hadoop_classpath
     if (os.name != 'nt'):
-        hadoop_classpath = findClasspath('hadoop')
+        hadoop_classpath = findClasspath('hadoop').rstrip()
     else:
-        hadoop_classpath = os.getenv('HADOOP_CLASSPATH', '')
+        hadoop_classpath = os.getenv('HADOOP_CLASSPATH', '').rstrip()
 
     global hadoop_common_jar_path
-    hadoop_common_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
+    hadoop_common_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
 
     global hadoop_common_jar
     hadoop_common_jar = find("hadoop-common*.jar", hadoop_common_jar_path)
 
     global hadoop_hdfs_jar_path
-    hadoop_hdfs_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
+    hadoop_hdfs_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
 
     global hadoop_hdfs_jar
     hadoop_hdfs_jar = find("hadoop-hdfs*.jar", hadoop_hdfs_jar_path)
@@ -189,6 +190,9 @@ def setPath():
     if phoenix_thin_client_jar == "":
         phoenix_thin_client_jar = findFileInPathWithoutRecursion(PHOENIX_THIN_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
 
+    global sqlline_with_deps_jar
+    sqlline_with_deps_jar = findFileInPathWithoutRecursion(SQLLINE_WITH_DEPS_PATTERN, os.path.join(current_dir, "..","lib"))
+
     return ""
 
 def shell_quote(args):
@@ -229,3 +233,4 @@ if __name__ == "__main__":
     print "phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar
     print "phoenix_thin_client_jar:", phoenix_thin_client_jar
     print "hadoop_classpath:", hadoop_classpath 
+    print "sqlline_with_deps_jar", sqlline_with_deps_jar

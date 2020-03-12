@@ -39,10 +39,6 @@
             <artifactId>queryserver-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.calcite.avatica</groupId>
-            <artifactId>avatica-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>

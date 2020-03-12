@@ -107,70 +107,6 @@
                   </excludes>
                 </filter>
               </filters>
-
-              <relocations>
-
-                <!-- COM relocation -->
-
-                <relocation>
-                  <pattern>com.fasterxml</pattern>
-                  <shadedPattern>${shaded.package}.com.fasterxml</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.google.collect</pattern>
-                  <shadedPattern>${shaded.package}.com.google.collect</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.google.protobuf</pattern>
-                  <shadedPattern>${shaded.package}.com.google.protobuf</shadedPattern>
-                </relocation>
-                <!-- ORG relocation -->
-                <relocation>
-                  <pattern>org.apache.calcite.avatica</pattern>
-                  <shadedPattern>${shaded.package}.org.apache.calcite.avatica</shadedPattern>
-                  <!-- The protobuf messages can't be relocated due to a limitation
-                       in the Avatica protocol. -->
-                  <excludes>
-                    <exclude>org.apache.calcite.avatica.proto.*</exclude>
-                  </excludes>
-                </relocation>
-                <relocation>
-                  <pattern>org.apache.commons</pattern>
-                  <shadedPattern>${shaded.package}.org.apache.commons</shadedPattern>
-                  <excludes>
-                    <exclude>org.apache.commons.logging.**</exclude>
-                  </excludes>
-                </relocation>
-                <relocation>
-                  <pattern>org.apache.http</pattern>
-                  <shadedPattern>${shaded.package}.org.apache.http</shadedPattern>
-                </relocation>
-
-                <relocation>
-                  <pattern>org.fusesource</pattern>
-                  <shadedPattern>${shaded.package}.org.fusesource</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.hamcrest</pattern>
-                  <shadedPattern>${shaded.package}.org.hamcrest</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.junit</pattern>
-                  <shadedPattern>${shaded.package}.org.junit</shadedPattern>
-                </relocation>
-
-                <!-- MISC relocations -->
-
-                <relocation>
-                  <pattern>jline</pattern>
-                  <shadedPattern>${shaded.package}.jline</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>junit</pattern>
-                  <shadedPattern>${shaded.package}.junit</shadedPattern>
-                </relocation>
-
-              </relocations>
             </configuration>
           </execution>
         </executions>
@@ -190,16 +126,13 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.calcite.avatica</groupId>
-      <artifactId>avatica-core</artifactId>
+      <artifactId>avatica</artifactId>
     </dependency>
     <dependency>
-      <!-- a dependency for the thin-client uberjar -->
       <groupId>sqlline</groupId>
       <artifactId>sqlline</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
+      <scope>provided</scope>
+      <classifier>jar-with-dependencies</classifier>
     </dependency>
   </dependencies>
 </project>

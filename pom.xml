@@ -74,8 +74,7 @@
         <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
 
         <!-- Dependency versions -->
-        <sqlline.version>1.2.0</sqlline.version>
-        <jline.version>2.11</jline.version>
+        <sqlline.version>1.9.0</sqlline.version>
         <commons-logging.version>1.2</commons-logging.version>
         <!-- Do not change jodatime.version until HBASE-15199 is fixed -->
         <avatica.version>1.16.0</avatica.version>
@@ -403,23 +402,13 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.calcite.avatica</groupId>
-                <artifactId>avatica-core</artifactId>
-                <version>${avatica.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.calcite.avatica</groupId>
                 <artifactId>avatica-server</artifactId>
                 <version>${avatica.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>jline</groupId>
-                <artifactId>jline</artifactId>
-                <version>${jline.version}</version>
             </dependency>
             <dependency>
                 <groupId>sqlline</groupId>
                 <artifactId>sqlline</artifactId>
+                <classifier>jar-with-dependencies</classifier>
                 <version>${sqlline.version}</version>
             </dependency>
             <dependency>

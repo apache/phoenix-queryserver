@@ -44,9 +44,9 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.apache.phoenix.query.ConfigurationFactory;
 import org.apache.phoenix.queryserver.QueryServerProperties;
-import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.queryserver.server.QueryServer;
 import org.apache.phoenix.util.InstanceResolver;
+import org.apache.phoenix.util.ThinClientUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

@@ -56,6 +56,9 @@ parser.add_argument('-s', '--serialization', help='Serialization type for HTTP A
 # Avatica authentication
 parser.add_argument('-au', '--auth-user', help='Username for HTTP authentication.')
 parser.add_argument('-ap', '--auth-password', help='Password for HTTP authentication.')
+# Avatica principal and keytab
+parser.add_argument('-p', '--principal', help='Kerberos principal for SPNEGO authenction from keytab.')
+parser.add_argument('-kt', '--keytab', help='Kerberos keytab file for SPNEGO authenction from keytab.')
 # Avatica HTTPS truststore
 parser.add_argument('-t', '--truststore', help='Truststore file that contains the TLS certificate of the server.')
 parser.add_argument('-tp', '--truststore-password', help='Password for the server TLS certificate truststore')
@@ -68,7 +71,13 @@ phoenix_utils.setPath()
 
 url = args.url
 sqlfile = args.sqlfile
+
 serialization_key = 'phoenix.queryserver.serialization'
+default_serialization='PROTOBUF'
+hbase_authentication_key = 'hbase.security.authentication'
+default_hbase_authentication = ''
+spnego_auth_disabled_key = 'phoenix.queryserver.spnego.auth.disabled'
+default_spnego_auth_disabled = 'false'
 
 def cleanup_url(url):
     parsed = urlparse.urlparse(url)
@@ -79,8 +88,7 @@ def cleanup_url(url):
         url = url + ":8765"
     return url
 
-def get_serialization():
-    default_serialization='PROTOBUF'
+def get_hbase_param(key, default):
     env=os.environ.copy()
     if os.name == 'posix':
       hbase_exec_name = 'hbase'
@@ -92,24 +100,33 @@ def get_serialization():
 
     hbase_cmd = phoenix_utils.which(hbase_exec_name)
     if hbase_cmd is None:
-        print 'Failed to find hbase executable on PATH, defaulting serialization to %s.' % default_serialization
-        return default_serialization
+        print 'Failed to find hbase executable on PATH, defaulting %s to %s.' % key, default
+        return default
 
     env['HBASE_CONF_DIR'] = phoenix_utils.hbase_conf_dir
-    proc = subprocess.Popen([hbase_cmd, 'org.apache.hadoop.hbase.util.HBaseConfTool', serialization_key],
+    proc = subprocess.Popen([hbase_cmd, 'org.apache.hadoop.hbase.util.HBaseConfTool', key],
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdout, stderr) = proc.communicate()
     if proc.returncode != 0:
-        print 'Failed to extract serialization from hbase-site.xml, defaulting to %s.' % default_serialization
-        return default_serialization
+        print 'Failed to extract %s from hbase-site.xml, defaulting to %s.' % key, default
+        return default
     # Don't expect this to happen, but give a default value just in case
     if stdout is None:
-        return default_serialization
+        return default
 
     stdout = stdout.strip()
     if stdout == 'null':
-        return default_serialization
+        return default
     return stdout
+
+def get_serialization():
+    return get_hbase_param(serialization_key, default_serialization)
+
+def get_hbase_authentication():
+    return get_hbase_param(hbase_authentication_key, default_hbase_authentication)
+
+def get_spnego_auth_disabled():
+    return get_hbase_param(spnego_auth_disabled_key, default_spnego_auth_disabled)
 
 url = cleanup_url(url)
 
@@ -164,15 +181,27 @@ if args.auth_user:
     jdbc_url += ';avatica_user=' + args.auth_user
 if args.auth_password:
     jdbc_url += ';avatica_password=' + args.auth_password
+if args.principal:
+    jdbc_url += ';principal=' + args.principal
+if args.keytab:
+    jdbc_url += ';keytab=' + args.keytab
 if args.truststore:
     jdbc_url += ';truststore=' + args.truststore
 if args.truststore_password:
     jdbc_url += ';truststore_password=' + args.truststore_password
 
+
+# Add SPENGO auth if this cluster uses it, and there are no conflicting HBase parameters
+if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == 'false'
+   and 'authentication=' not in jdbc_url and 'avatica_user=' not in jdbc_url):
+    jdbc_url += ';authentication=SPNEGO'
+
 java_cmd = java + ' $PHOENIX_OPTS ' + \
-    ' -cp "' + phoenix_utils.hbase_conf_dir + os.pathsep + phoenix_utils.phoenix_thin_client_jar + \
-    os.pathsep + phoenix_utils.hadoop_conf + os.pathsep + phoenix_utils.hadoop_classpath + '" -Dlog4j.configuration=file:' + \
+    ' -cp "' + phoenix_utils.sqlline_with_deps_jar \
+    + os.pathsep + phoenix_utils.phoenix_thin_client_jar + \
+    '" -Dlog4j.configuration=file:' + \
     os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
+    ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
     ' -u "' + jdbc_url + '"' + " -n none -p none " + \
     " --color=" + colorSetting + " --fastConnect=" + args.fastconnect + " --verbose=" + args.verbose + \
