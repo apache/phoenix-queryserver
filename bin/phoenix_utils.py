@@ -75,6 +75,7 @@ def setPath():
     PHOENIX_TRACESERVER_JAR_PATTERN = "phoenix-tracing-webapp-*-runnable.jar"
     PHOENIX_TESTS_JAR_PATTERN = "phoenix-core-*-tests*.jar"
     PHOENIX_PHERF_JAR_PATTERN = "phoenix-pherf-*-minimal*.jar"
+    SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
 
     # Backward support old env variable PHOENIX_LIB_DIR replaced by PHOENIX_CLASS_PATH
     global phoenix_class_path
@@ -133,18 +134,18 @@ def setPath():
 
     global hadoop_classpath
     if (os.name != 'nt'):
-        hadoop_classpath = findClasspath('hadoop')
+        hadoop_classpath = findClasspath('hadoop').rstrip()
     else:
-        hadoop_classpath = os.getenv('HADOOP_CLASSPATH', '')
+        hadoop_classpath = os.getenv('HADOOP_CLASSPATH', '').rstrip()
 
     global hadoop_common_jar_path
-    hadoop_common_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
+    hadoop_common_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
 
     global hadoop_common_jar
     hadoop_common_jar = find("hadoop-common*.jar", hadoop_common_jar_path)
 
     global hadoop_hdfs_jar_path
-    hadoop_hdfs_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
+    hadoop_hdfs_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
 
     global hadoop_hdfs_jar
     hadoop_hdfs_jar = find("hadoop-hdfs*.jar", hadoop_hdfs_jar_path)
@@ -189,6 +190,9 @@ def setPath():
     if phoenix_thin_client_jar == "":
         phoenix_thin_client_jar = findFileInPathWithoutRecursion(PHOENIX_THIN_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
 
+    global sqlline_with_deps_jar
+    sqlline_with_deps_jar = findFileInPathWithoutRecursion(SQLLINE_WITH_DEPS_PATTERN, os.path.join(current_dir, "..","lib"))
+
     return ""
 
 def shell_quote(args):
@@ -229,3 +233,4 @@ if __name__ == "__main__":
     print "phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar
     print "phoenix_thin_client_jar:", phoenix_thin_client_jar
     print "hadoop_classpath:", hadoop_classpath 
+    print "sqlline_with_deps_jar", sqlline_with_deps_jar

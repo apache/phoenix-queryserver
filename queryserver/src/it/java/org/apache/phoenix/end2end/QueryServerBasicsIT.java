@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
-import org.apache.phoenix.queryserver.client.ThinClientUtil;
+import org.apache.phoenix.util.ThinClientUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;

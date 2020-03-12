@@ -17,8 +17,8 @@
  */
 package org.apache.phoenix;
 
-import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.util.QueryUtil;
+import org.apache.phoenix.util.ThinClientUtil;
 import org.junit.Test;
 
 import java.sql.Driver;

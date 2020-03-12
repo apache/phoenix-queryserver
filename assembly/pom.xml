@@ -44,10 +44,15 @@
             <artifactId>queryserver-client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>sqlline</groupId>
+            <artifactId>sqlline</artifactId>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
     </dependencies>
 
     <build>
-        <directory>${project.basedir}/../target</directory>
+        <directory>target</directory>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

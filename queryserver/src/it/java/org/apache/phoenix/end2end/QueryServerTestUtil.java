@@ -31,9 +31,9 @@ import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.util.FSUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.query.ConfigurationFactory;
-import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.queryserver.server.QueryServer;
 import org.apache.phoenix.util.InstanceResolver;
+import org.apache.phoenix.util.ThinClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

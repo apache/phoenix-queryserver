@@ -15,15 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.phoenix.queryserver.client;
+package org.apache.phoenix.util;
 
 /**
- * Utilities for thin clients.
+ * Utilities for thin client tests
  */
 public final class ThinClientUtil {
-  // The default serialization is also defined in QueryServerOptions. phoenix-queryserver-client
-  // currently doesn't depend on phoenix-core so we have to deal with the duplication.
+  // Duplicating constants from phoenix-core and queryserver-client
+  // to avoid having to depend on them
   private static final String DEFAULT_SERIALIZATION = "PROTOBUF";
+  public static final String CONNECT_STRING_PREFIX = "jdbc:phoenix:thin:";
 
   private ThinClientUtil() {}
 
@@ -36,7 +37,7 @@ public final class ThinClientUtil {
   }
 
   public static String getConnectionUrl(String protocol, String hostname, int port, String serialization) {
-    String urlFmt = Driver.CONNECT_STRING_PREFIX + "url=%s://%s:%s;serialization=%s";
+    String urlFmt = CONNECT_STRING_PREFIX + "url=%s://%s:%s;serialization=%s";
     return String.format(urlFmt, protocol, hostname, port, serialization);
   }
 }

@@ -148,8 +148,8 @@
        <artifactId>hbase-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.phoenix</groupId>
-      <artifactId>queryserver-client</artifactId>
+      <groupId>org.apache.calcite.avatica</groupId>
+      <artifactId>avatica-server</artifactId>
       <exclusions>
         <!-- Being pulled in via avatica to avoid pb2/pb3 issues.
              When we use the "pre-shaded" avatica artifact, we don't
@@ -165,10 +165,6 @@
       <artifactId>avatica</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.calcite.avatica</groupId>
-      <artifactId>avatica-server</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
     </dependency>
@@ -177,6 +173,11 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- for tests -->
+    <dependency>
+      <groupId>org.apache.phoenix</groupId>
+      <artifactId>queryserver-client</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.phoenix</groupId>
       <artifactId>phoenix-core</artifactId>
