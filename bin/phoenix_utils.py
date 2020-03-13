@@ -68,7 +68,7 @@ def findClasspath(command_name):
     return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read()
 
 def setPath():
-    PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*-client.jar"
+    PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*[!n]-client.jar"
     PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-*-thin-client.jar"
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-*-queryserver.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "phoenix-load-balancer-*[!t][!e][!s][!t][!s].jar"
@@ -112,7 +112,7 @@ def setPath():
     phoenix_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
 
     global phoenix_client_jar
-    phoenix_client_jar = find("phoenix-*-client.jar", phoenix_jar_path)
+    phoenix_client_jar = find("phoenix-*[!n]-client.jar", phoenix_jar_path)
     if phoenix_client_jar == "":
         phoenix_client_jar = findFileInPathWithoutRecursion(PHOENIX_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
     if phoenix_client_jar == "":
