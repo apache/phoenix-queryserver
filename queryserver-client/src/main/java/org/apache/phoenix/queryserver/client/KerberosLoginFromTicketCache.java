@@ -65,7 +65,7 @@ public class KerberosLoginFromTicketCache {
             if(IS_IBM_JAVA) {
                 //Also see https://www.ibm.com/support/pages/how-enable-strong-encryption-128-bit
 
-                // This is inferior to the sun class, as it won't work if the kerberos and unix 
+                // This is inferior to the sun class, as it won't work if the kerberos and unix
                 // users don't match, while that one take any principal from the cache
                 options.put("principal", System.getProperty("user.name"));
                 options.put("useDefaultCcache", "true");
