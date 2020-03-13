@@ -194,13 +194,7 @@ if args.truststore_password:
 # Add SPENGO auth if this cluster uses it, and there are no conflicting HBase parameters
 if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == 'false'
    and 'authentication=' not in jdbc_url and 'avatica_user=' not in jdbc_url):
-    # For some bizarre reason Avatica doesn't seem to accept authentication as the last parameter
-    first_semicolon_index = jdbc_url.find(';')
-    if (first_semicolon_index == -1):
-        jdbc_url += ';authentication=SPNEGO'
-    else:
-        jdbc_url = jdbc_url[:first_semicolon_index] + \
-        ';authentication=SPNEGO' + jdbc_url[first_semicolon_index:]
+    jdbc_url += ';authentication=SPNEGO'
 
 java_cmd = java + ' $PHOENIX_OPTS ' + \
     ' -cp "' + phoenix_utils.sqlline_with_deps_jar \

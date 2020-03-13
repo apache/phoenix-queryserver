@@ -63,7 +63,7 @@ public class SqllineWrapper {
   public static void main(String[] args) throws Exception {
     String url = getUrl(args);
 
-    if(url.contains("authentication=SPNEGO;") && !url.contains("principal=")) {
+    if(url.contains(";authentication=SPNEGO") && !url.contains(";principal=")) {
       try {
         Subject subject = login();
         System.out.println("Kerberos login from ticket cache successful");
