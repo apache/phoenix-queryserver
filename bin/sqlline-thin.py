@@ -201,8 +201,7 @@ java_cmd = java + ' $PHOENIX_OPTS ' + \
     + os.pathsep + phoenix_utils.phoenix_thin_client_jar + \
     '" -Dlog4j.configuration=file:' + \
     os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
-    ' -Djava.security.auth.login.config=' + \
-    os.path.join(phoenix_utils.current_dir, "thin_client_jaas.conf") + \
+    ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
     ' -u "' + jdbc_url + '"' + " -n none -p none " + \
     " --color=" + colorSetting + " --fastConnect=" + args.fastconnect + " --verbose=" + args.verbose + \

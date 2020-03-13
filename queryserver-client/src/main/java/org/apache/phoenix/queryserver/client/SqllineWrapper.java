@@ -16,14 +16,9 @@
  */
 package org.apache.phoenix.queryserver.client;
 
-import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import sqlline.SqlLine;
@@ -33,21 +28,6 @@ import sqlline.SqlLine;
  * make a pre-populated ticket cache (via kinit before launching) transparently work.
  */
 public class SqllineWrapper {
-
-  static Subject login() throws LoginException {
-    Subject subject = new Subject();
-
-    LoginContext lc;
-    lc = new LoginContext("ThinClient", subject, new CallbackHandler() {
-      @Override
-      public void handle(Callback[] callbacks)
-          throws IOException, UnsupportedCallbackException {
-        throw new UnsupportedCallbackException(callbacks[0], "Only ticket cache is supported");
-      }
-    });
-    lc.login();
-    return subject;
-  }
 
   public static String getUrl(String[] args) {
     for (int i = 0; i < args.length; i++) {
@@ -65,7 +45,7 @@ public class SqllineWrapper {
 
     if(url.contains(";authentication=SPNEGO") && !url.contains(";principal=")) {
       try {
-        Subject subject = login();
+        Subject subject = KerberosLoginFromTicketCache.login();
         System.out.println("Kerberos login from ticket cache successful");
         Subject.doAs(subject, new PrivilegedExceptionAction<Void>() {
           @Override
