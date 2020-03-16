@@ -17,6 +17,13 @@
  */
 package org.apache.phoenix.queryserver.server;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -26,13 +33,11 @@ import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import static org.mockito.Mockito.*;
 
 public class QueryServerConfigurationTest {
   private static final Configuration CONF = HBaseConfiguration.create();
@@ -81,7 +86,7 @@ public class QueryServerConfigurationTest {
 
   private void setupKeytabForSpnego() throws IOException {
     File keytabFile = testFolder.newFile("test.keytab");
-    CONF.set(QueryServices.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB, keytabFile.getAbsolutePath());
+    CONF.set(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB, keytabFile.getAbsolutePath());
   }
 
   private void configureAndVerifyImpersonation(HttpServer.Builder builder, boolean disableSpnego)

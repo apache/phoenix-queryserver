@@ -53,7 +53,6 @@ import org.apache.hadoop.minikdc.MiniKdc;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.apache.phoenix.query.ConfigurationFactory;
-import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.queryserver.server.QueryServer;
@@ -231,10 +230,14 @@ public class SecureQueryServerPhoenixDBIT {
             TokenProvider.class.getName());
 
         // Secure Phoenix setup
-        conf.set("phoenix.queryserver.kerberos.http.principal", SPNEGO_PRINCIPAL + "@" + KDC.getRealm());
-        conf.set("phoenix.queryserver.http.keytab.file", KEYTAB.getAbsolutePath());
-        conf.set("phoenix.queryserver.kerberos.principal", PQS_PRINCIPAL + "@" + KDC.getRealm());
-        conf.set("phoenix.queryserver.keytab.file", KEYTAB.getAbsolutePath());
+        conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY,
+            SPNEGO_PRINCIPAL + "@" + KDC.getRealm());
+        conf.set(QueryServerProperties.QUERY_SERVER_HTTP_KEYTAB_FILENAME_ATTRIB,
+            KEYTAB.getAbsolutePath());
+        conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB,
+            PQS_PRINCIPAL + "@" + KDC.getRealm());
+        conf.set(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
+            KEYTAB.getAbsolutePath());
         conf.setBoolean(QueryServerProperties.QUERY_SERVER_DISABLE_KERBEROS_LOGIN, true);
         conf.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
         // Required so that PQS can impersonate the end-users to HBase
