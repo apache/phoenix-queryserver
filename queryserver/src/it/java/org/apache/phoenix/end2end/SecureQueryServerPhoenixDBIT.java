@@ -43,7 +43,6 @@ import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
-import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.hbase.util.FSUtils;
@@ -53,7 +52,6 @@ import org.apache.hadoop.minikdc.MiniKdc;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.apache.phoenix.query.ConfigurationFactory;
-import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.ThinClientUtil;
 import org.apache.phoenix.queryserver.server.QueryServer;
@@ -154,8 +152,8 @@ public class SecureQueryServerPhoenixDBIT {
         // Generate SSL certs
         File keystoresDir = new File(UTIL.getDataTestDir("keystore").toUri().getPath());
         keystoresDir.mkdirs();
-        String sslConfDir = KeyStoreTestUtil.getClasspathDir(SecureQueryServerPhoenixDBIT.class);
-        KeyStoreTestUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
+        String sslConfDir = TlsUtil.getClasspathDir(SecureQueryServerPhoenixDBIT.class);
+        TlsUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
 
         // Magic flag to tell hdfs to not fail on using ports above 1024
         conf.setBoolean("ignore.secure.ports.for.testing", true);

@@ -34,7 +34,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.LocalHBaseCluster;
-import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.util.FSUtils;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -180,8 +179,8 @@ public class QueryServerEnvironment {
         // Generate SSL certs
         File keystoresDir = new File(UTIL.getDataTestDir("keystore").toUri().getPath());
         keystoresDir.mkdirs();
-        String sslConfDir = KeyStoreTestUtil.getClasspathDir(QueryServerEnvironment.class);
-        KeyStoreTestUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
+        String sslConfDir = TlsUtil.getClasspathDir(QueryServerEnvironment.class);
+        TlsUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
 
         // Magic flag to tell hdfs to not fail on using ports above 1024
         conf.setBoolean("ignore.secure.ports.for.testing", true);
