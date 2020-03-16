@@ -17,25 +17,23 @@
 package org.apache.phoenix.queryserver.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.avatica.server.RemoteUserExtractionException;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.security.authorize.ProxyUsers;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.QueryServer.PhoenixRemoteUserExtractor;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Tests for the RemoteUserExtractor Method Avatica provides for Phoenix to implement.
@@ -53,7 +51,7 @@ public class PhoenixRemoteUserExtractorTest {
     Configuration conf = new Configuration(false);
     conf.set("hadoop.proxyuser.proxyserver.groups", "*");
     conf.set("hadoop.proxyuser.proxyserver.hosts", "*");
-    conf.set("phoenix.queryserver.withRemoteUserExtractor", "true");
+    conf.set(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, "true");
     ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
 
     PhoenixRemoteUserExtractor extractor = new PhoenixRemoteUserExtractor(conf);
@@ -73,7 +71,7 @@ public class PhoenixRemoteUserExtractorTest {
     Configuration conf = new Configuration(false);
     conf.set("hadoop.proxyuser.proxyserver.groups", "*");
     conf.set("hadoop.proxyuser.proxyserver.hosts", "*");
-    conf.set("phoenix.queryserver.withRemoteUserExtractor", "true");
+    conf.set(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, "true");
     ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
 
     PhoenixRemoteUserExtractor extractor = new PhoenixRemoteUserExtractor(conf);
@@ -99,7 +97,7 @@ public class PhoenixRemoteUserExtractorTest {
 
     HttpServer.Builder builder = mock(HttpServer.Builder.class);
     Configuration conf = new Configuration(false);
-    conf.set("phoenix.queryserver.withRemoteUserExtractor", "true");
+    conf.set(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB, "true");
     QueryServer queryServer = new QueryServer();
     queryServer.setRemoteUserExtractorIfNecessary(builder, conf);
     verify(builder).withRemoteUserExtractor(any(PhoenixRemoteUserExtractor.class));

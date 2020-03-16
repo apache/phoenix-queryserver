@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.phoenix.query.QueryServices;
+import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,23 +51,23 @@ public class QueryServerTest {
 
   @Test
   public void testHostExpansion() throws IOException {
-    conf.set(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, getSpnegoPrincipal("_HOST"));
+    conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, getSpnegoPrincipal("_HOST"));
 
     assertEquals(getSpnegoPrincipal(EXPECTED_HOSTNAME), qs.getSpnegoPrincipal(conf));
   }
 
   @Test
   public void testHostExpansionWithOldName() throws IOException {
-    conf.set(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, getSpnegoPrincipal("_HOST"));
+    conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, getSpnegoPrincipal("_HOST"));
 
     assertEquals(getSpnegoPrincipal(EXPECTED_HOSTNAME), qs.getSpnegoPrincipal(conf));
   }
 
   @Test
   public void testHostExpansionWithOldAndNewNames() throws IOException {
-    conf.set(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, getSpnegoPrincipal("_HOST"));
+    conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, getSpnegoPrincipal("_HOST"));
     // When we provide both names, the new property should take priority
-    conf.set(QueryServices.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, "fake_" + getSpnegoPrincipal("_HOST"));
+    conf.set(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, "fake_" + getSpnegoPrincipal("_HOST"));
 
     assertEquals(getSpnegoPrincipal(EXPECTED_HOSTNAME), qs.getSpnegoPrincipal(conf));
   }
