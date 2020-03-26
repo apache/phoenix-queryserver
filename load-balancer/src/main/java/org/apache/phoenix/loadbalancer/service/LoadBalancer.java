@@ -21,8 +21,6 @@ package org.apache.phoenix.loadbalancer.service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.net.HostAndPort;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.UnhandledErrorListener;
@@ -32,6 +30,8 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class LoadBalancer {
 
     private static final LoadBalanceZookeeperConf CONFIG = new LoadBalanceZookeeperConfImpl(HBaseConfiguration.create());
     private static CuratorFramework curaFramework = null;
-    protected static final Log LOG = LogFactory.getLog(LoadBalancer.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(LoadBalancer.class);
     private static PathChildrenCache   cache = null;
     private static final LoadBalancer loadBalancer = new LoadBalancer();
     private ConnectionStateListener connectionStateListener = null;

@@ -19,8 +19,6 @@
 package org.apache.phoenix.end2end;
 
 import com.google.common.net.HostAndPort;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -34,6 +32,8 @@ import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.queryserver.register.ZookeeperRegistry;
 import org.apache.zookeeper.KeeperException;
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
 public class LoadBalancerEnd2EndIT {
     private static TestingServer testingServer;
     private static CuratorFramework curatorFramework;
-    private static final Log LOG = LogFactory.getLog(LoadBalancerEnd2EndIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoadBalancerEnd2EndIT.class);
     private static final LoadBalanceZookeeperConf LOAD_BALANCER_CONFIGURATION = new LoadBalanceZookeeperConfImpl();
     private static  String path;
     private static LoadBalancer loadBalancer;
