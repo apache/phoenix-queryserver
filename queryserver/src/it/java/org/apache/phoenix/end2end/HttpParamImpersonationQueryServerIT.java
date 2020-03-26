@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
@@ -52,12 +50,14 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Category(NeedsOwnMiniClusterTest.class)
 public class HttpParamImpersonationQueryServerIT {
 
-    private static final Log LOG = LogFactory.getLog(HttpParamImpersonationQueryServerIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpParamImpersonationQueryServerIT.class);
     private static QueryServerEnvironment environment;
 
     private static final List<TableName> SYSTEM_TABLE_NAMES = Arrays.asList(PhoenixDatabaseMetaData.SYSTEM_CATALOG_HBASE_TABLE_NAME,

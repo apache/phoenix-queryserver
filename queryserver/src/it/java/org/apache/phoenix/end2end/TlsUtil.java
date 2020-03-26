@@ -16,9 +16,9 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TlsUtil {
 
@@ -31,7 +31,7 @@ public class TlsUtil {
     protected static final File KEYSTORE = new File(TARGET_DIR, "avatica-test-ks.jks");
     protected static final File TRUSTSTORE = new File(TARGET_DIR, "avatica-test-ts.jks");
 
-    private static final Log LOG = LogFactory.getLog(QueryServerBasicsIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QueryServerBasicsIT.class);
 
     public static File getTrustStoreFile() {
         return TRUSTSTORE;

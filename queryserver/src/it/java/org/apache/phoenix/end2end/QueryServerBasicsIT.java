@@ -22,7 +22,6 @@ import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CAT;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CATALOG;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_SCHEM;
 import static org.apache.phoenix.query.QueryConstants.SYSTEM_SCHEMA_NAME;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -39,8 +38,6 @@ import java.sql.Statement;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
@@ -50,13 +47,15 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Smoke test for query server.
  */
 public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
 
-  private static final Log LOG = LogFactory.getLog(QueryServerBasicsIT.class);
+  private static final Logger LOG = LoggerFactory.getLogger(QueryServerBasicsIT.class);
 
   private static QueryServerThread AVATICA_SERVER;
   private static Configuration CONF;
@@ -96,7 +95,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   @Test
   public void testCatalogs() throws Exception {
     try (final Connection connection = DriverManager.getConnection(CONN_STRING)) {
-      assertThat(connection.isClosed(), is(false));
+      assertFalse(connection.isClosed());
       try (final ResultSet resultSet = connection.getMetaData().getCatalogs()) {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         assertFalse("unexpected populated resultSet", resultSet.next());
@@ -112,7 +111,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
       props.setProperty(QueryServices.IS_NAMESPACE_MAPPING_ENABLED, Boolean.toString(true));
       try (final Connection connection = DriverManager.getConnection(CONN_STRING, props)) {
       connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS " + SYSTEM_SCHEMA_NAME);
-      assertThat(connection.isClosed(), is(false));
+      assertFalse(connection.isClosed());
       try (final ResultSet resultSet = connection.getMetaData().getSchemas()) {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         assertTrue("unexpected empty resultset", resultSet.next());
@@ -132,7 +131,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   public void smokeTest() throws Exception {
     final String tableName = name.getMethodName();
     try (final Connection connection = DriverManager.getConnection(CONN_STRING)) {
-      assertThat(connection.isClosed(), is(false));
+      assertFalse(connection.isClosed());
       connection.setAutoCommit(true);
       try (final Statement stmt = connection.createStatement()) {
         assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));

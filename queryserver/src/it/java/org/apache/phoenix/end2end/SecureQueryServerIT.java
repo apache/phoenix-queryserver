@@ -28,8 +28,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
@@ -40,11 +38,13 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 @Category(NeedsOwnMiniClusterTest.class)
 public class SecureQueryServerIT {
-    private static final Log LOG = LogFactory.getLog(SecureQueryServerIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecureQueryServerIT.class);
     private static QueryServerEnvironment environment;
 
     @Parameters(name = "tls = {0}")

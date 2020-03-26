@@ -36,8 +36,6 @@ import org.apache.calcite.avatica.server.RemoteUserExtractionException;
 import org.apache.calcite.avatica.server.HttpRequestRemoteUserExtractor;
 import org.apache.calcite.avatica.server.HttpQueryStringParameterRemoteUserExtractor;
 import org.apache.calcite.avatica.server.ServerCustomizer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -56,6 +54,8 @@ import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +83,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class QueryServer extends Configured implements Tool, Runnable {
 
-  protected static final Log LOG = LogFactory.getLog(QueryServer.class);
+  protected static final Logger LOG = LoggerFactory.getLogger(QueryServer.class);
 
   private final String[] argv;
   private final CountDownLatch runningLatch = new CountDownLatch(1);
@@ -266,7 +266,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       server.join();
       return 0;
     } catch (Throwable t) {
-      LOG.fatal("Unrecoverable service error. Shutting down.", t);
+      LOG.error("Unrecoverable service error. Shutting down.", t);
       this.t = t;
       return -1;
     } finally {

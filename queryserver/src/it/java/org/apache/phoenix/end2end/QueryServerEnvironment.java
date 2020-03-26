@@ -27,8 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
@@ -47,6 +45,8 @@ import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.QueryServer;
 import org.apache.phoenix.util.InstanceResolver;
 import org.apache.phoenix.util.ThinClientUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -62,7 +62,7 @@ import com.google.common.collect.Maps;
  * https://access.redhat.com/solutions/57330
  */
 public class QueryServerEnvironment {
-    private static final Log LOG = LogFactory.getLog(QueryServerEnvironment.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QueryServerEnvironment.class);
 
     private final File TEMP_DIR = new File(getTempDir());
     private final File KEYTAB_DIR = new File(TEMP_DIR, "keytabs");
