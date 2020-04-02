@@ -169,6 +169,7 @@
                             -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <shutdown>kill</shutdown>
+                        <trimStackTraces>false</trimStackTraces>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -186,6 +187,7 @@
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                 <shutdown>kill</shutdown>
                                 <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
+                                <trimStackTraces>false</trimStackTraces>
                             </configuration>
                             <goals>
                                 <goal>integration-test</goal>
