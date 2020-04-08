@@ -51,6 +51,7 @@
 
     <modules>
         <module>queryserver</module>
+        <module>queryserver-it</module>
         <module>queryserver-client</module>
         <module>load-balancer</module>
         <module>assembly</module>
@@ -67,7 +68,7 @@
         <!-- General Properties -->
         <top.dir>${project.basedir}</top.dir>
 
-        <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
+        <phoenix.version>4.15.0-HBase-1.4</phoenix.version>
 
         <!-- Hadoop/Hbase Versions -->
         <hbase.version>1.4.10</hbase.version>
@@ -372,6 +373,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-server</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
 
             <!-- Hadoop Dependencies -->
             <dependency>
@@ -421,6 +428,11 @@
                     <artifactId>slf4j-log4j12</artifactId>
                   </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-util</artifactId>
+              <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>
@@ -480,6 +492,14 @@
                 <version>0.8.1</version>
             </dependency>
 
+            <!-- Phoenix test dependencies -->
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>queryserver</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+            </dependency>
+
             <!-- Hbase test dependencies -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -493,12 +513,6 @@
                         <artifactId>jruby-complete</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-server</artifactId>
-                <version>${hbase.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -533,15 +547,8 @@
             <!-- Other test dependencies -->
             <dependency>
               <groupId>org.eclipse.jetty</groupId>
-              <artifactId>jetty-util</artifactId>
-              <version>${jetty.version}</version>
-              <scope>test</scope>
-            </dependency>
-            <dependency>
-              <groupId>org.eclipse.jetty</groupId>
               <artifactId>jetty-security</artifactId>
               <version>${jetty.version}</version>
-              <scope>test</scope>
             </dependency>
             <dependency>
               <groupId>org.eclipse.jetty</groupId>
@@ -587,5 +594,28 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    <profiles>
+        <profile>
+            <id>package-phoenix-client</id>
+            <activation>
+              <property>
+                <name>package.phoenix.client</name>
+              </property>
+            </activation>
+            <properties>
+                <!-- Not necessary for Phoenix <4.16.0 -->
+                <phoenix.hbase.classifier></phoenix.hbase.classifier>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.phoenix</groupId>
+                        <artifactId>phoenix-client</artifactId>
+                        <version>${phoenix.version}</version>
+                        <classifier>${phoenix.hbase.classifier}</classifier>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+    </profiles>
 </project>

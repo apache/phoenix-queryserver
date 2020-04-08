@@ -73,21 +73,8 @@ public class ServerCustomizersTest {
             }
         });
         Configuration conf = new Configuration(false);
-        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         QueryServer queryServer = new QueryServer();
         List<ServerCustomizer<Server>> actual = queryServer.createServerCustomizers(conf, avaticaServerConfiguration);
         Assert.assertEquals("Customizers are different", expected, actual);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testEnableCustomizers() {
-        AvaticaServerConfiguration avaticaServerConfiguration = null;
-        HttpServer.Builder builder = mock(HttpServer.Builder.class);
-        Configuration conf = new Configuration(false);
-        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
-        QueryServer queryServer = new QueryServer();
-        queryServer.enableServerCustomizersIfNecessary(builder, conf, avaticaServerConfiguration);
-        verify(builder).withServerCustomizers(anyList(), any(Class.class));
     }
 }

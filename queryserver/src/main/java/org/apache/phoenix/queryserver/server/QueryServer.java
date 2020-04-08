@@ -475,9 +475,11 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   @VisibleForTesting
   public void enableServerCustomizersIfNecessary(HttpServer.Builder<Server> builder,
                                                  Configuration conf, AvaticaServerConfiguration avaticaServerConfiguration) {
-    if (conf.getBoolean(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED,
-            QueryServerOptions.DEFAULT_QUERY_SERVER_CUSTOMIZERS_ENABLED)) {
-      builder.withServerCustomizers(createServerCustomizers(conf, avaticaServerConfiguration), Server.class);
+    // Always try to enable the "provided" ServerCustomizers. The expectation is that the Factory implementation
+    // will have toggles for each provided customizer, rather than a global toggle to enable customizers.
+    List<ServerCustomizer<Server>> customizers = createServerCustomizers(conf, avaticaServerConfiguration);
+    if (customizers != null && !customizers.isEmpty()) {
+      builder.withServerCustomizers(customizers, Server.class);
     }
   }
 

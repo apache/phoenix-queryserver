@@ -37,7 +37,6 @@ public class QueryServerOptions {
     public static final boolean DEFAULT_QUERY_SERVER_CUSTOM_AUTH_ENABLED = false;
     public static final String DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM = "doAs";
     public static final boolean DEFAULT_QUERY_SERVER_DISABLE_KERBEROS_LOGIN = false;
-    public static final boolean DEFAULT_QUERY_SERVER_CUSTOMIZERS_ENABLED = false;
 
     public static final boolean DEFAULT_QUERY_SERVER_TLS_ENABLED = false;
     //We default to empty *store password
@@ -60,6 +59,11 @@ public class QueryServerOptions {
     public static final String DEFAULT_PHOENIX_QUERY_SERVER_SERVICE_NAME = "queryserver";
     public static final String DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_USERNAME = "phoenix";
     public static final String DEFAULT_PHOENIX_QUERY_SERVER_ZK_ACL_PASSWORD = "phoenix";
+
+    // Maven repo defaults
+    public static final boolean DEFAULT_CLIENT_JARS_ENABLED = false;
+    public static final String DEFAULT_CLIENT_JARS_REPO = "";
+    public static final String DEFAULT_CLIENT_JARS_CONTEXT = "/maven";
 
     // Common defaults
     public static final String DEFAULT_EXTRA_JDBC_ARGUMENTS = "";

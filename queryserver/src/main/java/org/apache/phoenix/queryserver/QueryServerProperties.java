@@ -50,8 +50,6 @@ public class QueryServerProperties {
             "phoenix.queryserver.spnego.auth.disabled";
     public static final String QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB =
             "phoenix.queryserver.withRemoteUserExtractor";
-    public static final String QUERY_SERVER_CUSTOMIZERS_ENABLED =
-            "phoenix.queryserver.customizers.enabled";
     public static final String QUERY_SERVER_CUSTOM_AUTH_ENABLED =
             "phoenix.queryserver.custom.auth.enabled";
     public static final String QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM =
@@ -86,4 +84,7 @@ public class QueryServerProperties {
     public static final String ZOOKEEPER_PORT_ATTRIB = "hbase.zookeeper.property.clientPort";
     public static final String EXTRA_JDBC_ARGUMENTS_ATTRIB = "phoenix.jdbc.extra.arguments";
 
+    public static final String CLIENT_JARS_ENABLED_ATTRIB = "phoenix.queryserver.client.jars.enabled";
+    public static final String CLIENT_JARS_REPO_ATTRIB = "phoenix.queryserver.client.jars.repo";
+    public static final String CLIENT_JARS_CONTEXT_ATTRIB = "phoenix.queryserver.client.jars.context";
 }

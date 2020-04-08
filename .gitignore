@@ -2,6 +2,7 @@
 *.class
 *.war
 *.jar
+dependency-reduced-pom.xml
 
 # python
 *.pyc

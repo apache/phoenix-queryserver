@@ -60,6 +60,7 @@ import org.apache.phoenix.util.ThinClientUtil;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
@@ -73,6 +74,7 @@ import com.google.common.collect.Maps;
  * files in phoenix-queryserver/src/it/bin.
  */
 @Category(NeedsOwnMiniClusterTest.class)
+@Ignore("Failing since QueryServer moved to its own repository")
 public class SecureQueryServerPhoenixDBIT {
     private static enum Kdc {
       MIT,

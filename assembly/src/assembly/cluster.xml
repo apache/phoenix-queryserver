@@ -33,22 +33,21 @@
             <directory>${project.basedir}/../queryserver/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>phoenix*.jar</include>
+                <include>queryserver*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../queryserver-client/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver-client/target</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>phoenix*.jar</include>
+                <include>queryserver*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../phoenix-client/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/phoenix-client/target</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
+          <directory>${project.build.directory}/maven-repo</directory>
+          <outputDirectory>${project.parent.artifactId}-${project.parent.version}/maven</outputDirectory>
         </fileSet>
     </fileSets>
     <dependencySets>
@@ -58,6 +57,32 @@
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
         </includes>
+      </dependencySet>
+      <dependencySet>
+        <unpack>false</unpack>
+        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
+        <includes>
+          <include>org.apache.phoenix:phoenix-client</include>
+        </includes>
+        <!-- Unwind the name from phoenix-client-$version to phonix-$version-client -->
+        <outputFileNameMapping>phoenix-${artifact.version}${dashClassifier}-client.${artifact.extension}</outputFileNameMapping>
+      </dependencySet>
+      <dependencySet>
+        <unpack>false</unpack>
+        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
+        <includes>
+          <include>org.apache.phoenix:queryserver</include>
+        </includes>
+        <outputFileNameMapping>phoenix-${project.parent.version}-queryserver.${artifact.extension}</outputFileNameMapping>
+      </dependencySet>
+      <!-- Unwind the name from queryserver-client-$version to phoenix-$version-thin-client -->
+      <dependencySet>
+        <unpack>false</unpack>
+        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver-client/target</outputDirectory>
+        <includes>
+          <include>org.apache.phoenix:queryserver-client</include>
+        </includes>
+        <outputFileNameMapping>phoenix-${project.parent.version}-thin-client.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
     </dependencySets>
 </assembly>
