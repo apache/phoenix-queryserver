@@ -72,6 +72,9 @@
         <!-- Hadoop/Hbase Versions -->
         <hbase.version>1.4.10</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
+        <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
+        <!-- Placeholder -->
+        <phoenix.hbase.classifier></phoenix.hbase.classifier>
 
         <!-- Dependency versions -->
         <zookeeper.version>3.4.10</zookeeper.version>
@@ -84,6 +87,7 @@
         <commons-collections.version>3.2.2</commons-collections.version>
         <sqlline.version>1.9.0</sqlline.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <jetty.version>9.4.27.v20200227</jetty.version>
         <avatica.version>1.16.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
 
@@ -358,6 +362,12 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-common</artifactId>
                 <version>${hbase.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -369,6 +379,22 @@
                     <exclusion>
                         <groupId>org.jruby</groupId>
                         <artifactId>jruby-complete</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-server</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -386,6 +412,10 @@
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -421,6 +451,11 @@
                     <artifactId>slf4j-log4j12</artifactId>
                   </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-util</artifactId>
+              <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>
@@ -492,13 +527,11 @@
                         <groupId>org.jruby</groupId>
                         <artifactId>jruby-complete</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-server</artifactId>
-                <version>${hbase.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -506,6 +539,12 @@
                 <version>${hbase.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Hadoop test dependencies -->
@@ -514,6 +553,12 @@
                 <artifactId>hadoop-hdfs</artifactId>
                 <version>${hadoop-two.version}</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -521,6 +566,12 @@
                 <version>${hadoop-two.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -528,15 +579,15 @@
                 <version>${hadoop-two.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mortbay.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Other test dependencies -->
-            <dependency>
-              <groupId>org.eclipse.jetty</groupId>
-              <artifactId>jetty-util</artifactId>
-              <version>${jetty.version}</version>
-              <scope>test</scope>
-            </dependency>
             <dependency>
               <groupId>org.eclipse.jetty</groupId>
               <artifactId>jetty-security</artifactId>
@@ -566,6 +617,12 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>phoenix-client</artifactId>
+                <version>${phoenix.version}</version>
+                <classifier>${phoenix.hbase.classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

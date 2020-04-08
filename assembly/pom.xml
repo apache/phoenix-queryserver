@@ -45,6 +45,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.phoenix</groupId>
+            <artifactId>phoenix-client</artifactId>
+            <classifier>${phoenix.hbase.classifier}</classifier>
+        </dependency>
+        <dependency>
             <groupId>sqlline</groupId>
             <artifactId>sqlline</artifactId>
             <classifier>jar-with-dependencies</classifier>
@@ -65,7 +70,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>cluster.xml</descriptor>
+                                <descriptor>src/assembly/cluster.xml</descriptor>
                             </descriptors>
                             <finalName>${project.parent.artifactId}-${project.version}</finalName>
                             <tarLongFileMode>posix</tarLongFileMode>
@@ -73,6 +78,26 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <!-- Create a mini Maven repository so PQS can serve these jars like a Maven repo -->
+                <execution>
+                  <id>prepare-client-repo</id>
+                    <!-- Make sure we build this before making the assembly -->
+                  <phase>prepare-package</phase>
+                  <goals>
+                    <goal>copy-dependencies</goal>
+                  </goals>
+                  <configuration>
+                    <includeArtifactIds>phoenix-client,queryserver-client</includeArtifactIds>
+                    <outputDirectory>${project.build.directory}/maven-repo</outputDirectory>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                    <useRepositoryLayout>true</useRepositoryLayout>
+                  </configuration>
+                 </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>

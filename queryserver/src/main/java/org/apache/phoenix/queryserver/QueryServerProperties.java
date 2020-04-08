@@ -86,4 +86,7 @@ public class QueryServerProperties {
     public static final String ZOOKEEPER_PORT_ATTRIB = "hbase.zookeeper.property.clientPort";
     public static final String EXTRA_JDBC_ARGUMENTS_ATTRIB = "phoenix.jdbc.extra.arguments";
 
+    public static final String CLIENT_JARS_ENABLED_ATTRIB = "phoenix.queryserver.client.jars.enabled";
+    public static final String CLIENT_JARS_REPO_ATTRIB = "phoenix.queryserver.client.jars.repo";
+    public static final String CLIENT_JARS_CONTEXT_ATTRIB = "phoenix.queryserver.client.jars.context";
 }

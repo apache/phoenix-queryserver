@@ -17,13 +17,20 @@
  */
 package org.apache.phoenix.queryserver.server;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.phoenix.queryserver.QueryServerOptions;
+import org.apache.phoenix.queryserver.QueryServerProperties;
+import org.apache.phoenix.queryserver.server.customizers.HostedClientJarsServerCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates customizers for the underlying Avatica HTTP server.
@@ -42,11 +49,29 @@ public interface ServerCustomizersFactory {
      * Factory that creates an empty list of customizers.
      */
     class ServerCustomizersFactoryImpl implements ServerCustomizersFactory {
-        private static final List<ServerCustomizer<Server>> EMPTY_LIST = Collections.emptyList();
+        private static final Logger LOG = LoggerFactory.getLogger(ServerCustomizersFactoryImpl.class);
         @Override
         public List<ServerCustomizer<Server>> createServerCustomizers(Configuration conf,
                                                                       AvaticaServerConfiguration avaticaServerConfiguration) {
-            return EMPTY_LIST;
+            List<ServerCustomizer<Server>> customizers = new ArrayList<>();
+            if (conf.getBoolean(QueryServerProperties.CLIENT_JARS_ENABLED_ATTRIB, QueryServerOptions.DEFAULT_CLIENT_JARS_ENABLED)) {
+                String repoLocation = conf.get(QueryServerProperties.CLIENT_JARS_REPO_ATTRIB,
+                    QueryServerOptions.DEFAULT_CLIENT_JARS_REPO);
+                if (repoLocation != null && !repoLocation.isEmpty()) {
+                    File repo = new File(repoLocation);
+                    if (!repo.isDirectory()) {
+                        throw new IllegalArgumentException("Provided maven repository is not a directory. " + repo);
+                    }
+                    String contextPath = conf.get(QueryServerProperties.CLIENT_JARS_CONTEXT_ATTRIB,
+                        QueryServerOptions.DEFAULT_CLIENT_JARS_CONTEXT);
+                    LOG.info("Creating ServerCustomizer to host client jars from {} at HTTP endpoint {}", repo, contextPath);
+                    HostedClientJarsServerCustomizer customizer = new HostedClientJarsServerCustomizer(repo, contextPath);
+                    customizers.add(customizer);
+                } else {
+                    LOG.warn("Empty value provided for {}, ignoring", QueryServerProperties.CLIENT_JARS_REPO_ATTRIB);
+                }
+            }
+            return Collections.unmodifiableList(customizers);
         }
     }
 }
