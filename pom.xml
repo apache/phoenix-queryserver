@@ -73,8 +73,6 @@
         <hbase.version>1.4.10</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
         <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
-        <!-- Placeholder -->
-        <phoenix.hbase.classifier></phoenix.hbase.classifier>
 
         <!-- Dependency versions -->
         <zookeeper.version>3.4.10</zookeeper.version>
@@ -619,12 +617,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.phoenix</groupId>
-                <artifactId>phoenix-client</artifactId>
-                <version>${phoenix.version}</version>
-                <classifier>${phoenix.hbase.classifier}</classifier>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
@@ -644,5 +636,23 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    <profiles>
+        <profile>
+            <id>package-phoenix-client</id>
+            <properties>
+                <!-- Used for HBase 2/Phoenix 5 only -->
+                <phoenix.hbase.classifier></phoenix.hbase.classifier>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.phoenix</groupId>
+                        <artifactId>phoenix-client</artifactId>
+                        <version>${phoenix.version}</version>
+                        <classifier>${phoenix.hbase.classifier}</classifier>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+    </profiles>
 </project>

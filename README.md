@@ -17,6 +17,35 @@ limitations under the License.
 
 ![logo](https://phoenix.apache.org/images/phoenix-logo-small.png)
 
-<b>[Apache Phoenix](http://phoenix.apache.org/)</b> enables OLTP and operational analytics in Hadoop for low latency applications. Visit the Apache Phoenix website <b>[here](http://phoenix.apache.org/)</b>. This is the repo for the Query Server. 
+<b>[Apache Phoenix](http://phoenix.apache.org/)</b> enables OLTP and operational analytics in Hadoop for low latency applications. Visit the Apache Phoenix website <b>[here](http://phoenix.apache.org/)</b>. This is the repo for the Phoenix Query Server (PQS).
 
-Copyright ©2019 [Apache Software Foundation](http://www.apache.org/). All Rights Reserved. 
+Copyright ©2020 [Apache Software Foundation](http://www.apache.org/). All Rights Reserved.
+
+## Introduction
+
+The Phoenix Query Server is an JDBC over HTTP abstraction. The Phoenix Query Server proxies the standard
+Phoenix JDBC driver and provides a backwards-compatible wire protocol to invoke that JDBC driver. This is
+all done via the Apache Avatica project (sub-project of Apache Calcite).
+
+The reference client implementation for PQS is a "thin" JDBC driver which can communicate with PQS. There
+are drivers in other languages which exist in varying levels of maturity including Python, Golang, and .NET.
+
+## Building
+
+This repository will build a tarball which is capable of running the Phoenix Query Server.
+
+By default, this tarball does not contain a Phoenix client jar as it is meant to be agnostic
+of Phoenix version (one PQS release can be used against any Phoenix version).
+
+```
+$ mvn package
+```
+
+### Bundle a Phoenix Client
+
+To build a release of PQS which packages a specific version of Phoenix, enable the `package-phoenix-client` profile
+and specify properties to indicate a specific Phoenix version.
+
+```
+$ mvn package -Ppackage-phoenix-client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.hbase.classifier=hbase-2.2
+```

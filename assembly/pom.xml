@@ -45,11 +45,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-client</artifactId>
-            <classifier>${phoenix.hbase.classifier}</classifier>
-        </dependency>
-        <dependency>
             <groupId>sqlline</groupId>
             <artifactId>sqlline</artifactId>
             <classifier>jar-with-dependencies</classifier>
@@ -57,7 +52,6 @@
     </dependencies>
 
     <build>
-        <directory>target</directory>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -101,5 +95,16 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>package-phoenix-client</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.phoenix</groupId>
+                    <artifactId>phoenix-client</artifactId>
+                    <classifier>${phoenix.hbase.classifier}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
