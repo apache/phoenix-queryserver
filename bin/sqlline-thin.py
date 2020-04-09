@@ -100,7 +100,7 @@ def get_hbase_param(key, default):
 
     hbase_cmd = phoenix_utils.which(hbase_exec_name)
     if hbase_cmd is None:
-        print 'Failed to find hbase executable on PATH, defaulting %s to %s.' % key, default
+        print 'Failed to find hbase executable on PATH, defaulting %s to %s.' % (key, default)
         return default
 
     env['HBASE_CONF_DIR'] = phoenix_utils.hbase_conf_dir
@@ -108,7 +108,7 @@ def get_hbase_param(key, default):
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdout, stderr) = proc.communicate()
     if proc.returncode != 0:
-        print 'Failed to extract %s from hbase-site.xml, defaulting to %s.' % key, default
+        print 'Failed to extract %s from hbase-site.xml, defaulting to %s.' % (key, default)
         return default
     # Don't expect this to happen, but give a default value just in case
     if stdout is None:
