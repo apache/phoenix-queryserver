@@ -34,7 +34,7 @@
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
             <includes>
                 <include>phoenix*.jar</include>
-                <include>queryserver**.jar</include>
+                <include>queryserver*.jar</include>
             </includes>
         </fileSet>
         <fileSet>
