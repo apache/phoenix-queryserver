@@ -65,5 +65,13 @@
         <!-- Unwind the name from phoenix-client-$version to phonix-$version-client -->
         <outputFileNameMapping>phoenix-${artifact.version}${dashClassifier}-client.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
+      <dependencySet>
+        <unpack>false</unpack>
+        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
+        <includes>
+          <include>org.apache.phoenix:queryserver</include>
+        </includes>
+        <outputFileNameMapping>phoenix-${project.parent.version}-queryserver.${artifact.extension}</outputFileNameMapping>
+      </dependencySet>
     </dependencySets>
 </assembly>

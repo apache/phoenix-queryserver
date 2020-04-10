@@ -51,6 +51,7 @@
 
     <modules>
         <module>queryserver</module>
+        <module>queryserver-it</module>
         <module>queryserver-client</module>
         <module>load-balancer</module>
         <module>assembly</module>
@@ -67,12 +68,11 @@
         <!-- General Properties -->
         <top.dir>${project.basedir}</top.dir>
 
-        <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
+        <phoenix.version>4.15.0-HBase-1.4</phoenix.version>
 
         <!-- Hadoop/Hbase Versions -->
         <hbase.version>1.4.10</hbase.version>
         <hadoop-two.version>2.7.5</hadoop-two.version>
-        <phoenix.version>4.14.2-HBase-1.4</phoenix.version>
 
         <!-- Dependency versions -->
         <zookeeper.version>3.4.10</zookeeper.version>
@@ -85,7 +85,6 @@
         <commons-collections.version>3.2.2</commons-collections.version>
         <sqlline.version>1.9.0</sqlline.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <jetty.version>9.4.27.v20200227</jetty.version>
         <avatica.version>1.16.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
 
@@ -121,39 +120,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
                     <version>${maven-eclipse-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${maven-build-helper-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>add-test-source</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>add-test-source</goal>
-                            </goals>
-                            <configuration>
-                                <sources>
-                                    <source>${basedir}/src/it/java</source>
-                                </sources>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>add-test-resource</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>add-test-resource</goal>
-                            </goals>
-                            <configuration>
-                                <resources>
-                                    <resource>
-                                        <directory>${basedir}/src/it/resources</directory>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
@@ -281,10 +247,6 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
@@ -346,6 +308,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
+                <artifactId>queryserver</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
                 <artifactId>queryserver-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -360,12 +328,6 @@
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-common</artifactId>
                 <version>${hbase.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -378,10 +340,6 @@
                         <groupId>org.jruby</groupId>
                         <artifactId>jruby-complete</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -389,12 +347,6 @@
                 <artifactId>hbase-server</artifactId>
                 <version>${hbase.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Hadoop Dependencies -->
@@ -410,10 +362,6 @@
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -525,10 +473,6 @@
                         <groupId>org.jruby</groupId>
                         <artifactId>jruby-complete</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -537,12 +481,6 @@
                 <version>${hbase.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Hadoop test dependencies -->
@@ -551,12 +489,6 @@
                 <artifactId>hadoop-hdfs</artifactId>
                 <version>${hadoop-two.version}</version>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -564,12 +496,6 @@
                 <version>${hadoop-two.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -577,12 +503,6 @@
                 <version>${hadoop-two.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Other test dependencies -->
@@ -590,7 +510,6 @@
               <groupId>org.eclipse.jetty</groupId>
               <artifactId>jetty-security</artifactId>
               <version>${jetty.version}</version>
-              <scope>test</scope>
             </dependency>
             <dependency>
               <groupId>org.eclipse.jetty</groupId>
