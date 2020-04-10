@@ -49,7 +49,6 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
     @BeforeClass
     public static synchronized void setup() throws Exception {
         Configuration conf = getTestClusterConfig();
-        conf.set(QueryServerProperties.QUERY_SERVER_CUSTOMIZERS_ENABLED, "true");
         PQS_UTIL = new QueryServerTestUtil(conf);
         PQS_UTIL.startLocalHBaseCluster(ServerCustomizersIT.class);
         // Register a test jetty server customizer

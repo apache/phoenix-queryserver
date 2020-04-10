@@ -69,5 +69,5 @@ public class HostedClientJarsServerCustomizer implements ServerCustomizer<Server
         newHandlers[0] = ctx;
         System.arraycopy(realHandlers, 0, newHandlers, 1, realHandlers.length);
         server.setHandler(new HandlerList(newHandlers));
-  }
+    }
 }
