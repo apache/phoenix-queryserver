@@ -23,6 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.zookeeper.ZKConfig;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.zookeeper.ZooDefs;
@@ -65,8 +66,8 @@ public class LoadBalanceZookeeperConfImpl implements LoadBalanceZookeeperConf {
 
         @Override
         public String getZkConnectString(){
-            return String.format("%s:%s",configuration.get(QueryServerProperties.ZOOKEEPER_QUORUM_ATTRIB,
-                    "localhost"),configuration.get(QueryServerProperties.ZOOKEEPER_PORT_ATTRIB,"2181"));
+            return ZKConfig.standardizeZKQuorumServerString(configuration.get(QueryServerProperties.ZOOKEEPER_QUORUM_ATTRIB,
+                    "localhost"), configuration.get(QueryServerProperties.ZOOKEEPER_PORT_ATTRIB, "2181"));
         }
 
         private String getZkLbUserName(){
