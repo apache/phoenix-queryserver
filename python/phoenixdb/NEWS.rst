@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Unreleased
+----------
+- Replaced bundled requests_kerberos with request_gssapi library
+- Refactor authentication code
+- Support for specifying server certificate
+- Support for BASIC and DIGEST authentication
+- Fix HTTP error parsing
+
 Version 0.7
 -----------
 
