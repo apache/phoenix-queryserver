@@ -53,31 +53,6 @@ EOF > test-client.py
 $ python test-client.py
 ```
 
-When using a PQS instance secured via SPNEGO with Kerberos-based authentication, you must also install the custom
-release of requests-kerberos provided with PhoenixDB.
-
-
-```bash
-$ virtualenv e
-$ source e/bin/activate
-$ pip install file:///path/to/phoenix-x.y.z/phoenix/python/phoenixdb
-$ pip install file:///path/to/phoenix-x.y.z/phoenix/python/requests-kerberos
-$ cat <<EOF
-import phoenixdb
-import phoenixdb.cursor
-
-if __name__ == '__main__':
-  database_url = 'http://localhost:8765/'
-  conn = phoenixdb.connect(database_url, autocommit=True, auth="SPNEGO")
-  cursor = conn.cursor()
-  cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username VARCHAR)")
-  cursor.execute("UPSERT INTO users VALUES (?, ?)", (1, 'admin'))
-  cursor.execute("SELECT * FROM users")
-  print(cursor.fetchall())
-EOF > test-client.py
-$ python test-client.py
-```
-
 Please see the README included with PhoenixDB for more information on using the Python driver.
 
 ## Kerberos support in testing

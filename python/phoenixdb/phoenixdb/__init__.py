@@ -19,6 +19,10 @@ from phoenixdb.connection import Connection
 from phoenixdb.errors import *  # noqa: F401,F403
 from phoenixdb.types import *  # noqa: F401,F403
 
+from requests_gssapi import HTTPSPNEGOAuth, OPTIONAL
+from gssapi import mechs;
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+
 __all__ = ['connect', 'apilevel', 'threadsafety', 'paramstyle'] + types.__all__ + errors.__all__
 
 
@@ -42,7 +46,8 @@ For example::
 """
 
 
-def connect(url, max_retries=None, auth=None, **kwargs):
+def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=None, avatica_password=None,
+            truststore=None, verify=None, **kwargs):
     """Connects to a Phoenix query server.
 
     :param url:
@@ -58,15 +63,56 @@ def connect(url, max_retries=None, auth=None, **kwargs):
         The maximum number of retries in case there is a connection error.
 
     :param cursor_factory:
-        If specified, the connection's :attr:`~phoenixdb.connection.Connection.cursor_factory` is set to it.
+        If specified, the connection's :attr:`~phoenixdb.connection.Connection.cursor_factory`
+        is set to it.
 
-    :param auth
-        If specified a specific auth type will be used, otherwise connection will be unauthenticated
-        Currently only SPNEGO is supported
+    :param auth:
+        Authentication configuration object as expected by the underlying python_requests and
+        python_requests_gssapi library
+
+    :param authentication:
+        Alternative way to specify the authentication mechanism that mimics
+        the semantics of the JDBC drirver
+
+    :param avatica_user:
+        Username for BASIC or DIGEST authentication. Use in conjunction with the
+        `~authentication' option.
+
+    :param avatica_password:
+        Password for BASIC or DIGEST authentication. Use in conjunction with the
+        `~authentication' option.
+
+    :param verify:
+        The path to the PEM file for verifying the server's certificate. It is passed directly to
+        the `~verify` parameter of the underlying python_requests library.
+        Setting it to false disables the server certificate verification.
+
+    :param truststore:
+        Alias for verify
 
     :returns:
         :class:`~phoenixdb.connection.Connection` object.
     """
-    client = AvaticaClient(url, max_retries=max_retries, auth=auth)
+
+    spnego = mechs.Mechanism.from_sasl_name("SPNEGO")
+
+    if auth == "SPNEGO":
+        #Special case for backwards compatibility
+        auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego)
+    elif auth is None and authentication is not None:
+        if authentication == "SPNEGO":
+            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego)
+        elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
+            auth = HTTPBasicAuth(avatica_user, avatica_password)
+        elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:
+            auth = HTTPDigestAuth(avatica_user, avatica_password)
+
+    if verify is None and truststore is not None:
+        verify = truststore
+
+    client = AvaticaClient(url, max_retries=max_retries,
+                           auth=auth,
+                           verify=verify
+                           )
     client.connect()
     return Connection(client, **kwargs)

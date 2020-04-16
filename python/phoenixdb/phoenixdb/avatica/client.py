@@ -24,9 +24,6 @@ from phoenixdb import errors
 from phoenixdb.avatica.proto import requests_pb2, common_pb2, responses_pb2
 
 import requests
-#from requests_gssapi import HTTPSPNEGOAuth, OPTIONAL
-from requests_kerberos import HTTPKerberosAuth, OPTIONAL
-import kerberos
 
 try:
     import urlparse
@@ -138,7 +135,7 @@ class AvaticaClient(object):
     to a server using :func:`phoenixdb.connect`.
     """
 
-    def __init__(self, url, max_retries=None, auth=None):
+    def __init__(self, url, max_retries=None, auth=None, verify=None):
         """Constructs a new client object.
 
         :param url:
@@ -147,6 +144,7 @@ class AvaticaClient(object):
         self.url = parse_url(url)
         self.max_retries = max_retries if max_retries is not None else 3
         self.auth = auth
+        self.verify = verify
         self.connection = None
 
     def connect(self):
@@ -162,12 +160,17 @@ class AvaticaClient(object):
         retry_count = self.max_retries
         while True:
             logger.debug("POST %s %r %r", self.url.geturl(), body, headers)
+
+            requestArgs = {'data':body, 'stream':True, 'headers':headers}
+
+            if self.auth is not None:
+                requestArgs.update(auth = self.auth)
+
+            if self.verify is not None:
+                requestArgs.update(verify = self.verify)
+
             try:
-                if self.auth == "SPNEGO":
-                    #response = requests.request('post', self.url.geturl(), data=body, stream=True, headers=headers, auth=HTTPSPNEGOAuth(mutual_authentication=OPTIONAL))
-                    response = requests.request('post', self.url.geturl(), data=body, stream=True, headers=headers, auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL, mech_oid=kerberos.GSS_MECH_OID_SPNEGO))
-                else:
-                    response = requests.request('post', self.url.geturl(), data=body, stream=True, headers=headers)
+                response = requests.request('post', self.url.geturl(), **requestArgs)
 
             except requests.HTTPError as e:
                 if retry_count > 0:
@@ -203,7 +206,7 @@ class AvaticaClient(object):
         if response.status_code != requests.codes.ok:
             logger.debug("Received response\n%s", response_body)
             if b'<html>' in response_body:
-                parse_error_page(response_body)
+                parse_error_page(response_body.decode(response.encoding))
             else:
                 # assume the response is in protobuf format
                 parse_error_protobuf(response_body)
