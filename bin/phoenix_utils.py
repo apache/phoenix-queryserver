@@ -71,7 +71,7 @@ def setPath():
     PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*[!n]-client.jar"
     PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-*-thin-client.jar"
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-*-queryserver.jar"
-    PHOENIX_LOADBALANCER_JAR_PATTERN = "phoenix-load-balancer-*[!t][!e][!s][!t][!s].jar"
+    PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     PHOENIX_TRACESERVER_JAR_PATTERN = "phoenix-tracing-webapp-*-runnable.jar"
     PHOENIX_TESTS_JAR_PATTERN = "phoenix-core-*-tests*.jar"
     PHOENIX_PHERF_JAR_PATTERN = "phoenix-pherf-*-minimal*.jar"
@@ -101,6 +101,9 @@ def setPath():
 
     global current_dir
     current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    global phoenix_queryserver_classpath
+    phoenix_queryserver_classpath = os.path.join(current_dir, "../lib/*")
 
     global pherf_conf_path
     pherf_conf_path = os.path.join(current_dir, "config")
@@ -165,7 +168,7 @@ def setPath():
         phoenix_queryserver_jar = findFileInPathWithoutRecursion(PHOENIX_QUERYSERVER_JAR_PATTERN, os.path.join(current_dir, ".."))
 
     global phoenix_loadbalancer_jar
-    phoenix_loadbalancer_jar = find(PHOENIX_LOADBALANCER_JAR_PATTERN, os.path.join(current_dir, "..", "phoenix-loadbalancer", "target", "*"))
+    phoenix_loadbalancer_jar = find(PHOENIX_LOADBALANCER_JAR_PATTERN, os.path.join(current_dir, "..", "load-balancer", "target", "*"))
     if phoenix_loadbalancer_jar == "":
         phoenix_loadbalancer_jar = findFileInPathWithoutRecursion(PHOENIX_LOADBALANCER_JAR_PATTERN, os.path.join(current_dir, "..", "lib"))
     if phoenix_loadbalancer_jar == "":
@@ -231,6 +234,7 @@ if __name__ == "__main__":
     print "testjar:", testjar
     print "phoenix_queryserver_jar:", phoenix_queryserver_jar
     print "phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar
+    print "phoenix_queryserver_classpath", phoenix_queryserver_classpath
     print "phoenix_thin_client_jar:", phoenix_thin_client_jar
     print "hadoop_classpath:", hadoop_classpath 
     print "sqlline_with_deps_jar", sqlline_with_deps_jar
