@@ -419,6 +419,16 @@
               <version>${jetty.version}</version>
             </dependency>
             <dependency>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-security</artifactId>
+              <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-http</artifactId>
+              <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
@@ -545,16 +555,6 @@
             </dependency>
 
             <!-- Other test dependencies -->
-            <dependency>
-              <groupId>org.eclipse.jetty</groupId>
-              <artifactId>jetty-security</artifactId>
-              <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.eclipse.jetty</groupId>
-              <artifactId>jetty-http</artifactId>
-              <version>${jetty.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-core</artifactId>

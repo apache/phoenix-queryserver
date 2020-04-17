@@ -49,6 +49,13 @@
           <directory>${project.build.directory}/maven-repo</directory>
           <outputDirectory>${project.parent.artifactId}-${project.parent.version}/maven</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../load-balancer/target</directory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/load-balancer/target</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <dependencySets>
       <dependencySet>
@@ -56,6 +63,7 @@
         <outputDirectory>${project.parent.artifactId}-${project.parent.version}/lib</outputDirectory>
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
+          <include>com.google.guava:guava</include>
         </includes>
       </dependencySet>
       <dependencySet>
