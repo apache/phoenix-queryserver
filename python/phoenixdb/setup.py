@@ -64,6 +64,6 @@ setup(
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
-        'requests-kerberos'
+        'requests-gssapi'
     ]
 )
