@@ -87,8 +87,12 @@ SQLSTATE_ERROR_CLASSES = [
 
 # Relevant properties as defined by https://calcite.apache.org/avatica/docs/client_reference.html
 OPEN_CONNECTION_PROPERTIES = (
-    'user',  # User for the database connection
-    'password',  # Password for the user
+    'avatica_user',  # User for the database connection
+    'avatica_password',  # Password for the user
+    'auth',
+    'authentication',
+    'truststore',
+    'verify'
 )
 
 
@@ -503,3 +507,23 @@ class AvaticaClient(object):
         response = responses_pb2.FetchResponse()
         response.ParseFromString(response_data)
         return response.frame
+
+    def commit(self, connection_id):
+        """TODO Commits the transaction
+
+        :param connection_id:
+            ID of the current connection.
+        """
+        request = requests_pb2.CommitRequest()
+        request.connection_id = connection_id
+        return self._apply(request)
+
+    def rollback(self, connection_id):
+        """TODO Rolls back the transaction
+
+        :param connection_id:
+            ID of the current connection.
+        """
+        request = requests_pb2.RollbackRequest()
+        request.connection_id = connection_id
+        return self._apply(request)

@@ -18,11 +18,12 @@ import time
 import datetime
 from decimal import Decimal
 from phoenixdb.avatica.proto import common_pb2
+from builtins import staticmethod
 
 __all__ = [
     'Date', 'Time', 'Timestamp', 'DateFromTicks', 'TimeFromTicks', 'TimestampFromTicks',
     'Binary', 'STRING', 'BINARY', 'NUMBER', 'DATETIME', 'ROWID', 'BOOLEAN',
-    'JAVA_CLASSES', 'JAVA_CLASSES_MAP', 'TypeHelper',
+    'TypeHelper',
 ]
 
 
@@ -89,7 +90,7 @@ def datetime_to_java_sql_timestamp(d):
     td = d - datetime.datetime(1970, 1, 1)
     return td.microseconds // 1000 + (td.seconds + td.days * 24 * 3600) * 1000
 
-
+#FIXME This doesn't seem to be used anywhere in the code
 class ColumnType(object):
 
     def __init__(self, eq_types):
@@ -129,62 +130,150 @@ ROWID = ColumnType([])
 BOOLEAN = ColumnType(['BOOLEAN'])
 """Type object that can be used to describe boolean columns. This is a phoenixdb-specific extension."""
 
-
-# XXX ARRAY
-
 if sys.version_info[0] < 3:
     _long = long  # noqa: F821
 else:
     _long = int
 
-JAVA_CLASSES = {
+FIELD_MAP = {
     'bool_value': [
-        ('java.lang.Boolean', common_pb2.BOOLEAN, None, None),
+        (common_pb2.BOOLEAN, None, None),
+        (common_pb2.PRIMITIVE_BOOLEAN, None, None),
     ],
     'string_value': [
-        ('java.lang.Character', common_pb2.CHARACTER, None, None),
-        ('java.lang.String', common_pb2.STRING, None, None),
-        ('java.math.BigDecimal', common_pb2.BIG_DECIMAL, str, Decimal),
+        (common_pb2.CHARACTER, None, None),
+        (common_pb2.PRIMITIVE_CHAR, None, None),
+        (common_pb2.STRING, None, None),
+        (common_pb2.BIG_DECIMAL, str, Decimal),
     ],
     'number_value': [
-        ('java.lang.Integer', common_pb2.INTEGER, None, int),
-        ('java.lang.Short', common_pb2.SHORT, None, int),
-        ('java.lang.Long', common_pb2.LONG, None, _long),
-        ('java.lang.Byte', common_pb2.BYTE, None, int),
-        ('java.sql.Time', common_pb2.JAVA_SQL_TIME, time_to_java_sql_time, time_from_java_sql_time),
-        ('java.sql.Date', common_pb2.JAVA_SQL_DATE, date_to_java_sql_date, date_from_java_sql_date),
-        ('java.sql.Timestamp', common_pb2.JAVA_SQL_TIMESTAMP, datetime_to_java_sql_timestamp, datetime_from_java_sql_timestamp),
+        (common_pb2.INTEGER, None, int),
+        (common_pb2.PRIMITIVE_INT, None, int),
+        (common_pb2.SHORT, None, int),
+        (common_pb2.PRIMITIVE_SHORT, None, int),
+        (common_pb2.LONG, None, _long),
+        (common_pb2.PRIMITIVE_LONG, None, _long),
+        (common_pb2.BYTE, None, int),
+        (common_pb2.JAVA_SQL_TIME, time_to_java_sql_time, time_from_java_sql_time),
+        (common_pb2.JAVA_SQL_DATE, date_to_java_sql_date, date_from_java_sql_date),
+        (common_pb2.JAVA_SQL_TIMESTAMP, datetime_to_java_sql_timestamp, datetime_from_java_sql_timestamp),
     ],
     'bytes_value': [
-        ('[B', common_pb2.BYTE_STRING, Binary, None),
+        (common_pb2.BYTE_STRING, Binary, None),
     ],
     'double_value': [
-        # if common_pb2.FLOAT is used, incorrect values are sent
-        ('java.lang.Float', common_pb2.DOUBLE, float, float),
-        ('java.lang.Double', common_pb2.DOUBLE, float, float),
+        (common_pb2.DOUBLE, float, float),
+        (common_pb2.PRIMITIVE_DOUBLE, float, float)
     ]
 }
-"""Groups of Java classes."""
+"""The master map that describes how to handle types, keyed by TypedData field"""
 
-JAVA_CLASSES_MAP = dict((v[0], (k, v[1], v[2], v[3])) for k in JAVA_CLASSES for v in JAVA_CLASSES[k])
-"""Flips the available types to allow for faster lookup by Java class.
+REP_MAP = dict((v[0], (k, v[0], v[1], v[2])) for k in FIELD_MAP for v in FIELD_MAP[k])
+"""Flips the available types to allow for faster lookup by protobuf Rep
 
 This mapping should be structured as:
     {
-        'java.math.BigDecimal': ('string_value', common_pb2.BIG_DECIMAL, str, Decimal),),
+        'common_pb2.BIG_DECIMAL': ('string_value', common_pb2.BIG_DECIMAL, str, Decimal),),
         ...
-        '<java class>': (<field_name>, <Rep enum>, <mutate_to function>, <cast_from function>),
+        '<Rep enum>': (<field_name>, <mutate_to function>, <cast_from function>),
     }
 """
 
+JDBC_TO_REP = dict([
+    # These are the standard types that are used in Phoenix
+    (-6, common_pb2.BYTE), #TINYINT
+    (5, common_pb2.SHORT), #SMALLINT
+    (4, common_pb2.INTEGER), #INTEGER
+    (-5, common_pb2.LONG), #BIGINT
+    (6, common_pb2.DOUBLE), #FLOAT
+    (8, common_pb2.DOUBLE), #DOUBLE
+    (2, common_pb2.BIG_DECIMAL), #NUMERIC
+    (1, common_pb2.STRING), #CHAR
+    (91, common_pb2.JAVA_SQL_DATE), #DATE
+    (93, common_pb2.JAVA_SQL_TIMESTAMP), #TIME
+    (-2, common_pb2.BYTE_STRING), #BINARY
+    (-3, common_pb2.BYTE_STRING), #VARBINARY
+    (16, common_pb2.BOOLEAN), #BOOLEAN
+    # These are the Non-standard types defined by Phoenix
+    (19, common_pb2.JAVA_SQL_DATE), #UNSIGNED_DATE
+    (15, common_pb2.DOUBLE), #UNSIGNED_DOUBLE
+    (14, common_pb2.DOUBLE), #UNSIGNED_FLOAT
+    (9, common_pb2.INTEGER), #UNSIGNED_INT
+    (10, common_pb2.LONG), #UNSIGNED_LONG
+    (13, common_pb2.SHORT), #UNSIGNED_SMALLINT
+    (20, common_pb2.JAVA_SQL_TIMESTAMP), #UNSIGNED_TIMESTAMP
+    (11, common_pb2.BYTE), #UNSIGNED_TINYINT
+    # The following are not used by Phoenix, but some of these are used by Avaticafor
+    # parameter types
+    (-7, common_pb2.BOOLEAN), #BIT
+    (7, common_pb2.DOUBLE), #REAL
+    (3, common_pb2.BIG_DECIMAL), #DECIMAL
+    (12, common_pb2.STRING), #VARCHAR
+    (-1, common_pb2.STRING), #LONGVARCHAR
+    (-4, common_pb2.BYTE_STRING), #LONGVARBINARY
+    (2004, common_pb2.BYTE_STRING), #BLOB
+    (2005, common_pb2.STRING), #CLOB
+    (-15, common_pb2.STRING), #NCHAR
+    (-9, common_pb2.STRING), #NVARCHAR
+    (-16, common_pb2.STRING), #LONGNVARCHAR
+    (2011, common_pb2.STRING), #NCLOB
+    (2009, common_pb2.STRING), #SQLXML
+    # These are defined by JDBC, but cannot be mapped
+    #NULL
+    #OTHER
+    #JAVA_OBJECT
+    #DISTINCT
+    #STRUCT
+    #ARRAY 2003 - We are handling this as a special case
+    #REF
+    #DATALINK
+    #ROWID
+    #REF_CURSOR
+    #TIME WITH TIMEZONE
+    #TIMESTAMP WITH TIMEZONE
 
+    ])
+"""Maps the JDBC Type IDs to Protobuf Reps """
+
+JDBC_MAP = {}
+for k,v in JDBC_TO_REP.items():
+    JDBC_MAP[k & 0xffffffff] = REP_MAP[v]
+"""Flips the available types to allow for faster lookup by JDBC type ID
+
+It has the same format as REP_MAP, but is keyed by JDBC type ID
+"""
 class TypeHelper(object):
-    @staticmethod
-    def from_class(klass):
-        """Retrieves a Rep and functions to cast to/from based on the Java class.
 
-        :param klass:
-            The string of the Java class for the column or parameter.
+    @staticmethod
+    def from_param(param):
+        """Retrieves a field name and functions to cast to/from based on an AvaticaParameter object
+
+        :param param:
+            Protobuf AvaticaParameter object
+
+        :returns: tuple ``(field_name, rep, mutate_to, cast_from, is_array)``
+            WHERE
+            ``field_name`` is the attribute in ``common_pb2.TypedValue``
+            ``rep`` is the common_pb2.Rep enum
+            ``mutate_to`` is the function to cast values into Phoenix values, if any
+            ``cast_from`` is the function to cast from the Phoenix value to the Python value, if any
+            ``is_array`` the param expects an array instead of scalar
+
+        :raises:
+            NotImplementedError
+        """
+        jdbc_code = param.parameter_type
+        if jdbc_code > 2900 and jdbc_code < 3100:
+            return TypeHelper._from_jdbc(jdbc_code-3000) + (True,)
+        else:
+            return TypeHelper._from_jdbc(jdbc_code) + (False,)
+
+    @staticmethod
+    def from_column(column):
+        """Retrieves a field name and functions to cast to/from based on a TypedValue object
+
+        :param column:
+            Protobuf TypedValue object
 
         :returns: tuple ``(field_name, rep, mutate_to, cast_from)``
             WHERE
@@ -196,7 +285,15 @@ class TypeHelper(object):
         :raises:
             NotImplementedError
         """
-        if klass not in JAVA_CLASSES_MAP:
-            raise NotImplementedError('type {} is not supported'.format(klass))
+        if column.type.id == 2003:
+            return TypeHelper._from_jdbc(column.type.component.id)
+        else:
+            return TypeHelper._from_jdbc(column.type.id)
 
-        return JAVA_CLASSES_MAP[klass]
+    @staticmethod
+    def _from_jdbc(jdbc_code):
+        if jdbc_code not in JDBC_MAP:
+            #This should not happen. It's either a bug, or Avatica has added new types
+            raise NotImplementedError('JDBC TYPE CODE {} is not supported'.format(jdbc_code))
+
+        return JDBC_MAP[jdbc_code]

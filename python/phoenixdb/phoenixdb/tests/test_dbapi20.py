@@ -17,12 +17,14 @@ import unittest
 import phoenixdb
 from . import dbapi20
 from phoenixdb.tests import TEST_DB_URL
+from phoenixdb.tests import httpArgs
 
 
 @unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")
 class PhoenixDatabaseAPI20Test(dbapi20.DatabaseAPI20Test):
     driver = phoenixdb
-    connect_args = (TEST_DB_URL, )
+    connect_args = (TEST_DB_URL,)
+    connect_kw_args = httpArgs
 
     ddl1 = 'create table %sbooze (name varchar(20) primary key)' % dbapi20.DatabaseAPI20Test.table_prefix
     ddl2 = 'create table %sbarflys (name varchar(20) primary key, drink varchar(30))' % dbapi20.DatabaseAPI20Test.table_prefix

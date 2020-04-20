@@ -16,16 +16,35 @@
 import os
 import unittest
 import phoenixdb
+import time
 
 TEST_DB_URL = os.environ.get('PHOENIXDB_TEST_DB_URL')
+#TEST_DB_URL = "http://localhost:8765"
+TEST_DB_TRUSTSTORE = os.environ.get('PHOENIXDB_TEST_DB_TRUSTSTORE')
+TEST_DB_AUTHENTICATION = os.environ.get('PHOENIXDB_TEST_DB_AUTHENTICATION')
+TEST_DB_AVATICA_USER = os.environ.get('PHOENIXDB_TEST_DB_AVATICA_USER')
+TEST_DB_AVATICA_PASSWORD = os.environ.get('PHOENIXDB_TEST_DB_AVATICA_PASSWORD')
 
+httpArgs = {}
+if TEST_DB_TRUSTSTORE is not None:
+    httpArgs.update(verify = TEST_DB_TRUSTSTORE)
+if TEST_DB_AUTHENTICATION is not None:
+    httpArgs.update(authentication = TEST_DB_AUTHENTICATION)
+if TEST_DB_AVATICA_USER is not None:
+    httpArgs.update(avatica_user = TEST_DB_AVATICA_USER)
+if TEST_DB_AVATICA_PASSWORD is not None:
+    httpArgs.update(avatica_password = TEST_DB_AVATICA_PASSWORD)
 
 @unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")
 class DatabaseTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.conn = phoenixdb.connect(TEST_DB_URL, autocommit=True)
+        self.conn = phoenixdb.connect(TEST_DB_URL, autocommit=True, **httpArgs)
         self.cleanup_tables = []
+
+    def reopen(self, **avaticaArgs):
+        self.conn.close()
+        self.conn = phoenixdb.connect(TEST_DB_URL, **avaticaArgs, **httpArgs)
 
     def tearDown(self):
         self.doCleanups()
@@ -34,11 +53,11 @@ class DatabaseTestCase(unittest.TestCase):
     def addTableCleanup(self, name):
         def dropTable():
             with self.conn.cursor() as cursor:
-                cursor.execute("DROP TABLE IF EXISTS {}".format(name))
+                cursor.execute("DROP TABLE IF EXISTS {table}".format(table = name))
         self.addCleanup(dropTable)
 
-    def createTable(self, name, columns):
+    def createTable(self, name, statement):
         with self.conn.cursor() as cursor:
-            cursor.execute("DROP TABLE IF EXISTS {}".format(name))
-            cursor.execute("CREATE TABLE {} ({})".format(name, columns))
+            cursor.execute("DROP TABLE IF EXISTS {table}".format(table = name))
+            cursor.execute(statement.format(table = name))
             self.addTableCleanup(name)

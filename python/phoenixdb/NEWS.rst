@@ -8,6 +8,10 @@ Unreleased
 - Support for specifying server certificate
 - Support for BASIC and DIGEST authentication
 - Fix HTTP error parsing
+- Add transaction support
+- Add list support
+- Rewrite type handling
+- Refactor test suite
 
 Version 0.7
 -----------

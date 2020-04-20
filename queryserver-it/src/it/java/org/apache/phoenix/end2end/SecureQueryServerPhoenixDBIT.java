@@ -324,6 +324,18 @@ public class SecureQueryServerPhoenixDBIT {
 
     @Test
     public void testBasicReadWrite() throws Exception {
+        File file = new File(".");
+        runShellScript("python", Paths.get(file.getAbsolutePath(), "src", "it", "bin", "test_phoenixdb.py").toString());
+    }
+
+    @Test
+    @Ignore
+    public void testFullSuite() throws Exception {
+        File file = new File(".");
+        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python", "phoenixdb").toString());
+    }
+
+    public void runShellScript(String ... testCli) throws Exception {
         final Entry<String,File> user1 = getUser(1);
         String currentDirectory;
         File file = new File(".");
@@ -400,7 +412,7 @@ public class SecureQueryServerPhoenixDBIT {
         }
 
         cmdList.add(Integer.toString(PQS_PORT));
-        cmdList.add(Paths.get(currentDirectory, "src", "it", "bin", "test_phoenixdb.py").toString());
+        cmdList.addAll(Arrays.asList(testCli));
 
         Process runPythonProcess = new ProcessBuilder(cmdList).start();
         BufferedReader processOutput = new BufferedReader(new InputStreamReader(runPythonProcess.getInputStream()));

@@ -43,7 +43,8 @@ PRINC=$2
 KEYTAB_LOC=$3
 KRB5_CFG_FILE=$4
 PQS_PORT=$5
-PYTHON_SCRIPT=$6
+
+shift 5
 
 PY_ENV_PATH=$( mktemp -d )
 
@@ -74,5 +75,7 @@ unset https_proxy
 
 echo "Working Directory is ${PWD}"
 
-echo "RUN PYTHON TEST on port $PQS_PORT"
-python $PYTHON_SCRIPT $PQS_PORT
+export PHOENIXDB_TEST_DB_URL="http://localhost:$PQS_PORT"
+
+echo "RUN test: $@"
+"$@"

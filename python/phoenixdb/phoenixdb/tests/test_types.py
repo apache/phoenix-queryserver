@@ -24,7 +24,7 @@ from phoenixdb.tests import DatabaseTestCase
 class TypesTest(DatabaseTestCase):
 
     def checkIntType(self, type_name, min_value, max_value):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val {}".format(type_name))
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val {})".format(type_name, table="{table}"))
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 1)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -73,7 +73,7 @@ class TypesTest(DatabaseTestCase):
         self.checkIntType("unsigned_smallint", 0, 32767)
 
     def checkFloatType(self, type_name, min_value, max_value):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val {}".format(type_name))
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val {})".format(type_name, table="{table}"))
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 1)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -105,7 +105,7 @@ class TypesTest(DatabaseTestCase):
         self.checkFloatType("unsigned_double", 0, 1.7976931348623158E+308)
 
     def test_decimal(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val decimal(8,3)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val decimal(8,3))")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 33333.333)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -129,7 +129,7 @@ class TypesTest(DatabaseTestCase):
                 "UPSERT INTO phoenixdb_test_tbl1 VALUES (101, ?)", [Decimal('123456.789')])
 
     def test_boolean(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val boolean")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val boolean)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, TRUE)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, FALSE)")
@@ -141,8 +141,9 @@ class TypesTest(DatabaseTestCase):
             self.assertEqual(cursor.description[1].type_code, phoenixdb.BOOLEAN)
             self.assertEqual(cursor.fetchall(), [[1, True], [2, False], [3, None], [4, True], [5, False], [6, None]])
 
+    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_time(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val time")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val time)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '1970-01-01 12:01:02')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -160,7 +161,7 @@ class TypesTest(DatabaseTestCase):
 
     @unittest.skip("https://issues.apache.org/jira/browse/CALCITE-797")
     def test_time_full(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val time")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val time)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12 13:01:02.123')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)])
@@ -170,8 +171,9 @@ class TypesTest(DatabaseTestCase):
                 [2, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
             ])
 
+    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_date(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val date")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val date)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12 00:00:00')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, ?)", [phoenixdb.Date(2015, 7, 12)])
@@ -185,7 +187,7 @@ class TypesTest(DatabaseTestCase):
 
     @unittest.skip("https://issues.apache.org/jira/browse/CALCITE-798")
     def test_date_full(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val date")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val date)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12 13:01:02.123')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)])
@@ -196,7 +198,7 @@ class TypesTest(DatabaseTestCase):
             ])
 
     def test_date_null(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val date")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val date)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, NULL)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [None])
@@ -206,8 +208,9 @@ class TypesTest(DatabaseTestCase):
                 [2, None],
             ])
 
+    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_timestamp(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val timestamp")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val timestamp)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12 13:01:02.123')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -225,7 +228,7 @@ class TypesTest(DatabaseTestCase):
 
     @unittest.skip("https://issues.apache.org/jira/browse/CALCITE-796")
     def test_timestamp_full(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val timestamp")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val timestamp)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12 13:01:02.123456789')")
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
@@ -234,7 +237,7 @@ class TypesTest(DatabaseTestCase):
             ])
 
     def test_varchar(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val varchar")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val varchar)")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 'abc')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -246,7 +249,7 @@ class TypesTest(DatabaseTestCase):
             self.assertEqual(cursor.fetchall(), [[1, 'abc'], [2, None], [3, 'abc'], [4, None], [5, None], [6, None]])
 
     def test_varchar_very_long(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val varchar")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val varchar)")
         with self.conn.cursor() as cursor:
             value = '1234567890' * 1000
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, ?)", [value])
@@ -254,7 +257,7 @@ class TypesTest(DatabaseTestCase):
             self.assertEqual(cursor.fetchall(), [[1, value]])
 
     def test_varchar_limited(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val varchar(2)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val varchar(2))")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 'ab')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
@@ -267,7 +270,7 @@ class TypesTest(DatabaseTestCase):
             self.assertRaises(self.conn.DataError, cursor.execute, "UPSERT INTO phoenixdb_test_tbl1 VALUES (100, 'abc')")
 
     def test_char_null(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val char(2)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val char(2))")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (4, ?)", [None])
@@ -278,7 +281,7 @@ class TypesTest(DatabaseTestCase):
             self.assertRaises(self.conn.DataError, cursor.execute, "UPSERT INTO phoenixdb_test_tbl1 VALUES (100, 'abc')")
 
     def test_char(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val char(2)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val char(2))")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 'ab')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", ['ab'])
@@ -289,7 +292,7 @@ class TypesTest(DatabaseTestCase):
             self.assertRaises(self.conn.DataError, cursor.execute, "UPSERT INTO phoenixdb_test_tbl1 VALUES (100, 'abc')")
 
     def test_binary(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val binary(2)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val binary(2))")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, 'ab')")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [phoenixdb.Binary(b'ab')])
@@ -304,7 +307,7 @@ class TypesTest(DatabaseTestCase):
             ])
 
     def test_binary_all_bytes(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val binary(256)")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val binary(256))")
         with self.conn.cursor() as cursor:
             if sys.version_info[0] < 3:
                 value = ''.join(map(chr, range(256)))
@@ -314,14 +317,32 @@ class TypesTest(DatabaseTestCase):
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
             self.assertEqual(cursor.fetchall(), [[1, value]])
 
-    @unittest.skip("https://issues.apache.org/jira/browse/CALCITE-1050 https://issues.apache.org/jira/browse/PHOENIX-2585")
     def test_array(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key, val integer[]")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val integer[])")
         with self.conn.cursor() as cursor:
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, ARRAY[1, 2])")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [[2, 3]])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, ?)", [[4]])
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
             self.assertEqual(cursor.fetchall(), [
                 [1, [1, 2]],
                 [2, [2, 3]],
+                [3, [4]],
+            ])
+
+    def test_array_boolean(self):
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val boolean[])")
+        with self.conn.cursor() as cursor:
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, ARRAY[TRUE, TRUE, FALSE])")
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, ?)", ((1, 0, 1),))
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (4, ?)", [[True, True, True]])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (5, ?)", [[]])
+            cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [
+                [1, [True, True, False]],
+                [2, None],
+                [3, [True, False, True]],
+                [4, [True, True, True]],
+                [5, None]
             ])

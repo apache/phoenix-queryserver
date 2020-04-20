@@ -24,7 +24,6 @@ import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_SCHEM;
 import static org.apache.phoenix.query.QueryConstants.SYSTEM_SCHEMA_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -35,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +44,7 @@ import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.util.ThinClientUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -342,5 +343,47 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
     select.setString(1, null);
     rs = select.executeQuery();
     assertFalse(rs.next());
+  }
+
+  @Ignore
+  @Test
+  //This is the java reproducer for PHOENIX-4664
+  //This test only works as intended when the system timezone is NOT GMT
+  public void testTimezoneLess() throws Exception {
+
+    try (Connection conn = DriverManager.getConnection(CONN_STRING);
+         Statement stmt = conn.createStatement();
+    ) {
+      final String tableName = generateUniqueName();
+
+      stmt.execute(
+          "CREATE TABLE " + tableName + " (k VARCHAR NOT NULL PRIMARY KEY, i TIMESTAMP)");
+      conn.commit();
+
+      LocalDateTime now = LocalDateTime.now();
+      try(PreparedStatement upsert = conn.prepareStatement(
+          "UPSERT INTO " + tableName + " VALUES (?, ?)")
+      ) {
+        upsert.setString(1, "1");
+        upsert.setTimestamp(2, java.sql.Timestamp.valueOf(now));
+        upsert.executeUpdate();
+        conn.commit();
+        ResultSet rs = stmt.executeQuery("select * from " + tableName);
+        assertTrue(rs.next());
+        LocalDateTime fromDB = rs.getTimestamp("i").toLocalDateTime();
+        assertTrue("Timestamps do not match. inserted:" + now.toString() + "returned:" + fromDB.toString(), fromDB.compareTo(now) == 0);
+      }
+    }
+  }
+
+  @Ignore
+  @Test
+  //Quick and dirty way start up a local Phoenix+PQS instance
+  public void startLocalPQS() throws Exception {
+      System.out.println("CONN STRING:" + CONN_STRING);
+      System.out.println("Tests suspended!!!");
+      System.out.println("Kill maven run to stop server");
+      System.out.flush();
+      Thread.sleep(24*60*60*1000);
   }
 }

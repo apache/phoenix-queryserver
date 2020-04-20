@@ -97,15 +97,14 @@ class Connection(object):
         return self._closed
 
     def commit(self):
-        """Commits pending database changes.
-
-        Currently, this does nothing, because the RPC does not support
-        transactions. Only defined for DB API 2.0 compatibility.
-        You need to use :attr:`autocommit` mode.
-        """
-        # TODO can support be added for this?
         if self._closed:
             raise ProgrammingError('the connection is already closed')
+        self._client.commit(self._id);
+
+    def rollback(self):
+        if self._closed:
+            raise ProgrammingError('the connection is already closed')
+        self._client.rollback(self._id);
 
     def cursor(self, cursor_factory=None):
         """Creates a new cursor.
