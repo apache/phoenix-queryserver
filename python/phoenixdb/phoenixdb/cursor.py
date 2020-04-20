@@ -137,11 +137,11 @@ class Cursor(object):
             return
 
         for column in signature.columns:
-            dtype = TypeHelper.from_class(column.column_class_name)
+            dtype = TypeHelper.from_column(column)
             self._column_data_types.append(dtype)
 
         for parameter in signature.parameters:
-            dtype = TypeHelper.from_class(parameter.class_name)
+            dtype = TypeHelper.from_param(parameter)
             self._parameter_data_types.append(dtype)
 
     def _set_frame(self, frame):
@@ -173,7 +173,7 @@ class Cursor(object):
     def _transform_parameters(self, parameters):
         typed_parameters = []
         for value, data_type in zip(parameters, self._parameter_data_types):
-            field_name, rep, mutate_to, cast_from = data_type
+            field_name, rep, mutate_to, cast_from, is_array = data_type
             typed_value = common_pb2.TypedValue()
 
             if value is None:
@@ -181,13 +181,27 @@ class Cursor(object):
                 typed_value.type = common_pb2.NULL
             else:
                 typed_value.null = False
-
-                # use the mutator function
-                if mutate_to is not None:
-                    value = mutate_to(value)
-
-                typed_value.type = rep
-                setattr(typed_value, field_name, value)
+                if is_array:
+                    if type(value) in [list,tuple]:
+                        for element in value:
+                            if mutate_to is not None:
+                                element = mutate_to(element)
+                            typed_element = common_pb2.TypedValue()
+                            if element is None:
+                                typed_element.null = True
+                            else:
+                                typed_element.type = rep
+                                setattr(typed_element, field_name, element)
+                            typed_value.array_value.append(typed_element)
+                        typed_value.type = common_pb2.ARRAY
+                        typed_value.component_type = rep
+                    else:
+                        raise ProgrammingError('scalar value specified for array parameter')
+                else:
+                    if mutate_to is not None:
+                        value = mutate_to(value)
+                    typed_value.type = rep
+                    setattr(typed_value, field_name, value)
 
             typed_parameters.append(typed_value)
         return typed_parameters
@@ -246,10 +260,19 @@ class Cursor(object):
         tmp_row = []
 
         for i, column in enumerate(row.value):
-            if column.has_array_value:
-                raise NotImplementedError('array types are not supported')
-            elif column.scalar_value.null:
+            if column.scalar_value.null:
                 tmp_row.append(None)
+            elif column.has_array_value:
+                field_name, rep, mutate_to, cast_from = self._column_data_types[i]
+
+                list_value = []
+                for j, typed_value in enumerate(column.array_value):
+                    value = getattr(typed_value, field_name)
+                    if cast_from is not None:
+                        value = cast_from(value)
+                    list_value.append(value)
+
+                tmp_row.append(list_value)
             else:
                 field_name, rep, mutate_to, cast_from = self._column_data_types[i]
 

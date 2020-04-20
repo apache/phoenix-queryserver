@@ -43,7 +43,8 @@ PRINC=$2
 KEYTAB_LOC=$3
 KRB5_CFG_FILE=$4
 PQS_PORT=$5
-PYTHON_SCRIPT=$6
+
+shift 5
 
 PY_ENV_PATH=$( mktemp -d )
 
@@ -59,7 +60,6 @@ popd
 
 set -u
 echo "INSTALLING COMPONENTS"
-pip install -e file:///${LOCAL_PY}/requests-kerberos
 pip install -e file:///${LOCAL_PY}/phoenixdb
 
 export KRB5_CONFIG=$KRB5_CFG_FILE
@@ -75,5 +75,22 @@ unset https_proxy
 
 echo "Working Directory is ${PWD}"
 
-echo "RUN PYTHON TEST on port $PQS_PORT"
-python $PYTHON_SCRIPT $PQS_PORT
+cat > target/krb_setup.sh << EOF
+#!/bin/sh
+export KRB5_CONFIG=$KRB5_CFG_FILE
+export KRB5_TRACE=/dev/stdout
+kinit -kt $KEYTAB_LOC $PRINC
+klist
+
+export PHOENIXDB_TEST_DB_URL="http://localhost:$PQS_PORT"
+export PHOENIXDB_TEST_DB_AUTHENTICATION="SPNEGO"
+
+EOF
+
+
+export PHOENIXDB_TEST_DB_URL="http://localhost:$PQS_PORT"
+export PHOENIXDB_TEST_DB_AUTHENTICATION="SPNEGO"
+
+echo "RUN test: $@"
+"$@" > >(tee -a target/python-stdout.log) 2> >(tee -a target/python-stderr.log >&2)
+

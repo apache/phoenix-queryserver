@@ -101,7 +101,7 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego)
     elif auth is None and authentication is not None:
         if authentication == "SPNEGO":
-            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego)
+            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego, opportunistic_auth=True)
         elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
             auth = HTTPBasicAuth(avatica_user, avatica_password)
         elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:

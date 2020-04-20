@@ -125,12 +125,7 @@ Similarly, tox can be used to run the test suite against multiple Python version
 Known issues
 ------------
 
-- You can only use the library in autocommit mode. The native Java Phoenix library also implements batched upserts, which can be committed at once, but this is not exposed over the remote server. This was previously unimplemented due to CALCITE-767, however this functionality exists in the server, but is lacking in the driver.
-  (`CALCITE-767 <https://issues.apache.org/jira/browse/CALCITE-767>`_)
 - TIME and DATE columns in Phoenix are stored as full timestamps with a millisecond accuracy,
   but the remote protocol only exposes the time (hour/minute/second) or date (year/month/day)
   parts of the columns. (`CALCITE-797 <https://issues.apache.org/jira/browse/CALCITE-797>`_, `CALCITE-798 <https://issues.apache.org/jira/browse/CALCITE-798>`_)
 - TIMESTAMP columns in Phoenix are stored with a nanosecond accuracy, but the remote protocol truncates them to milliseconds. (`CALCITE-796 <https://issues.apache.org/jira/browse/CALCITE-796>`_)
-- ARRAY columns are not supported. Again, this previously lacked server-side support which has since been built. The
-  driver needs to be updated to support this functionality.
-  (`CALCITE-1050 <https://issues.apache.org/jira/browse/CALCITE-1050>`_, `PHOENIX-2585 <https://issues.apache.org/jira/browse/PHOENIX-2585>`_)

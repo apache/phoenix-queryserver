@@ -30,7 +30,7 @@ class ProgrammingErrorTest(DatabaseTestCase):
 class IntegrityErrorTest(DatabaseTestCase):
 
     def test_null_in_pk(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key)")
         with self.conn.cursor() as cursor:
             with self.assertRaises(self.conn.IntegrityError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (NULL)")
@@ -42,7 +42,7 @@ class IntegrityErrorTest(DatabaseTestCase):
 class DataErrorTest(DatabaseTestCase):
 
     def test_number_outside_of_range(self):
-        self.createTable("phoenixdb_test_tbl1", "id tinyint primary key")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id tinyint primary key)")
         with self.conn.cursor() as cursor:
             with self.assertRaises(self.conn.DataError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (10000)")
@@ -51,7 +51,7 @@ class DataErrorTest(DatabaseTestCase):
             self.assertEqual("22005", cm.exception.sqlstate)
 
     def test_division_by_zero(self):
-        self.createTable("phoenixdb_test_tbl1", "id integer primary key")
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key)")
         with self.conn.cursor() as cursor:
             with self.assertRaises(self.conn.DataError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2/0)")

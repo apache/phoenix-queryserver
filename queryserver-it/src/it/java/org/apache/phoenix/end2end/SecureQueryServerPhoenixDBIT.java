@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.security.PrivilegedAction;
@@ -37,11 +40,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.LocalHBaseCluster;
+import org.apache.hadoop.hbase.client.TestHCM.SleepAndFailFirstTime;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.http.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
@@ -74,7 +79,6 @@ import com.google.common.collect.Maps;
  * files in phoenix-queryserver/src/it/bin.
  */
 @Category(NeedsOwnMiniClusterTest.class)
-@Ignore("Failing since QueryServer moved to its own repository")
 public class SecureQueryServerPhoenixDBIT {
     private static enum Kdc {
       MIT,
@@ -324,6 +328,30 @@ public class SecureQueryServerPhoenixDBIT {
 
     @Test
     public void testBasicReadWrite() throws Exception {
+        File file = new File(".");
+        runShellScript("python", Paths.get(file.getAbsolutePath(), "src", "it", "bin", "test_phoenixdb.py").toString());
+    }
+
+    //This takes about 300s, so we are not running this by default
+    @Ignore
+    @Test
+    public void testFullSuite() throws Exception {
+        File file = new File(".");
+        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python", "phoenixdb").toString());
+    }
+
+    @Ignore
+    @Test
+    //Quick and dirty way start up a local Phoenix+PQS instance for testing against
+    //When started, this will write a setup script into  target/krb_setup.sh
+    //If you source that file, it should log you into kerberos with the test principal,
+    //and set the environment so that the python unit tests can run against this instance.
+    //You'll need to kill the test manually
+    public void startLocalPQS() throws Exception {
+        runShellScript("sleep", "86400");
+    }
+
+    public void runShellScript(String ... testCli) throws Exception {
         final Entry<String,File> user1 = getUser(1);
         String currentDirectory;
         File file = new File(".");
@@ -400,20 +428,20 @@ public class SecureQueryServerPhoenixDBIT {
         }
 
         cmdList.add(Integer.toString(PQS_PORT));
-        cmdList.add(Paths.get(currentDirectory, "src", "it", "bin", "test_phoenixdb.py").toString());
+        cmdList.addAll(Arrays.asList(testCli));
 
+        //This will intersperse that script's output to the maven output, but that's better than
+        //getting stuck on a full buffer
         Process runPythonProcess = new ProcessBuilder(cmdList).start();
-        BufferedReader processOutput = new BufferedReader(new InputStreamReader(runPythonProcess.getInputStream()));
-        BufferedReader processError = new BufferedReader(new InputStreamReader(runPythonProcess.getErrorStream()));
-        int exitCode = runPythonProcess.waitFor();
+        BufferedReader processOutput = new BufferedReader(
+            new InputStreamReader(runPythonProcess.getInputStream()));
+        new Thread(new StreamCopy(processOutput, new PrintWriter(System.out))).start();
 
-        // dump stdout and stderr
-        while (processOutput.ready()) {
-            LOG.info(processOutput.readLine());
-        }
-        while (processError.ready()) {
-            LOG.error(processError.readLine());
-        }
+        BufferedReader processError = new BufferedReader(
+            new InputStreamReader(runPythonProcess.getErrorStream()));
+        new Thread(new StreamCopy(processError, new PrintWriter(System.err))).start();
+
+        int exitCode = runPythonProcess.waitFor();
 
         // Not managed by miniKDC so we have to clean up
         if (krb5ConfFile != null)
@@ -422,9 +450,25 @@ public class SecureQueryServerPhoenixDBIT {
         assertEquals("Subprocess exited with errors", 0, exitCode);
     }
 
-    byte[] copyBytes(byte[] src, int offset, int length) {
-        byte[] dest = new byte[length];
-        System.arraycopy(src, offset, dest, 0, length);
-        return dest;
+    private class StreamCopy implements Runnable {
+        private Reader reader;
+        private Writer writer;
+
+        public StreamCopy(Reader reader, Writer writer) {
+            this.reader = reader;
+            this.writer = writer;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while(true) {
+                    IOUtils.copy(reader, writer);
+                    Thread.sleep(10);
+                }
+            } catch (Exception e) {
+                //Just exit
+            }
+        }
     }
 }
