@@ -122,6 +122,39 @@
                     <version>${maven-eclipse-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${maven-build-helper-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-test-source</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${basedir}/src/it/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-resource</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>${basedir}/src/it/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
@@ -237,11 +270,6 @@
                     <extensions>true</extensions>
                     <inherited>true</inherited>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${maven-build-helper-plugin.version}</version>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -250,6 +278,10 @@
                 <!-- FIXME not working, leaving it here as a reminder -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -310,12 +342,6 @@
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>queryserver</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.phoenix</groupId>
-                <artifactId>queryserver</artifactId>
-                <version>${project.version}</version>
-                <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
@@ -466,6 +492,14 @@
                 <version>0.8.1</version>
             </dependency>
 
+            <!-- Phoenix test dependencies -->
+            <dependency>
+                <groupId>org.apache.phoenix</groupId>
+                <artifactId>queryserver</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+            </dependency>
+
             <!-- Hbase test dependencies -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
@@ -563,8 +597,13 @@
     <profiles>
         <profile>
             <id>package-phoenix-client</id>
+            <activation>
+              <property>
+                <name>package.phoenix.client</name>
+              </property>
+            </activation>
             <properties>
-                <!-- Used for HBase 2/Phoenix 5 only -->
+                <!-- Not necessary for Phoenix <4.16.0 -->
                 <phoenix.hbase.classifier></phoenix.hbase.classifier>
             </properties>
             <dependencyManagement>

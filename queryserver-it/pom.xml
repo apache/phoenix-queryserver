@@ -98,38 +98,6 @@
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
-      <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <executions>
-              <execution>
-                  <id>add-test-source</id>
-                  <phase>validate</phase>
-                  <goals>
-                      <goal>add-test-source</goal>
-                  </goals>
-                  <configuration>
-                      <sources>
-                          <source>${basedir}/src/it/java</source>
-                      </sources>
-                  </configuration>
-              </execution>
-              <execution>
-                  <id>add-test-resource</id>
-                  <phase>validate</phase>
-                  <goals>
-                      <goal>add-test-resource</goal>
-                  </goals>
-                  <configuration>
-                      <resources>
-                          <resource>
-                              <directory>${basedir}/src/it/resources</directory>
-                          </resource>
-                      </resources>
-                  </configuration>
-              </execution>
-          </executions>
-      </plugin>
     </plugins>
   </build>
 

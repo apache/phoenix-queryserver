@@ -35,17 +35,23 @@ are drivers in other languages which exist in varying levels of maturity includi
 This repository will build a tarball which is capable of running the Phoenix Query Server.
 
 By default, this tarball does not contain a Phoenix client jar as it is meant to be agnostic
-of Phoenix version (one PQS release can be used against any Phoenix version).
+of Phoenix version (one PQS release can be used against any Phoenix version). Today, PQS builds against
+the Phoenix 4.15.0-HBase-1.4 release.
 
 ```
 $ mvn package
 ```
 
-### Bundle a Phoenix Client
+### Bundling a Phoenix Client
 
 To build a release of PQS which packages a specific version of Phoenix, enable the `package-phoenix-client` profile
 and specify properties to indicate a specific Phoenix version.
 
+By default, PQS will package the same version of Phoenix used for build/test. This version is controlled by the system
+property `phoenix.version` system property. Depending on the version of Phoenix, you may also be required to
+use the `phoenix.hbase.classifier` system property to identify the correct version of Phoenix built against
+the version of HBase of your choosing.
+
 ```
-$ mvn package -Ppackage-phoenix-client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.hbase.classifier=hbase-2.2
+$ mvn package -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.hbase.classifier=hbase-2.2
 ```

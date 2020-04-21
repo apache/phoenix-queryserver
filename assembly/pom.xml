@@ -98,6 +98,11 @@
     <profiles>
         <profile>
             <id>package-phoenix-client</id>
+            <activation>
+              <property>
+                <name>package.phoenix.client</name>
+              </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.apache.phoenix</groupId>
