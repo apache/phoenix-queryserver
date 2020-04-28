@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import unittest
-import phoenixdb
 import phoenixdb.cursor
 from phoenixdb.errors import InternalError
 from phoenixdb.tests import TEST_DB_URL
@@ -57,18 +56,15 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             self._check_dict_cursor(cursor)
 
     def test_dict_cursor_default_attribute(self):
-        db = phoenixdb.connect(TEST_DB_URL, autocommit=True)
-        db.cursor_factory = phoenixdb.cursor.DictCursor
-        self.addCleanup(db.close)
+        self.conn.cursor_factory = phoenixdb.cursor.DictCursor
 
-        with db.cursor() as cursor:
+        with self.conn.cursor() as cursor:
             self._check_dict_cursor(cursor)
 
     def test_dict_cursor(self):
-        db = phoenixdb.connect(TEST_DB_URL, autocommit=True)
-        self.addCleanup(db.close)
+        self.reopen(autocommit=True, cursor_factory=phoenixdb.cursor.DictCursor)
 
-        with db.cursor(cursor_factory=phoenixdb.cursor.DictCursor) as cursor:
+        with self.conn.cursor(cursor_factory=phoenixdb.cursor.DictCursor) as cursor:
             self._check_dict_cursor(cursor)
 
     def test_schema(self):
@@ -87,4 +83,5 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             self.assertEqual(cursor.fetchall(), [[1, 'text 1']])
 
     def test_transaction(self):
-        db = phoenixdb.connect(TEST_DB_URL, autocommit=True)
+        #Todo write some transaction tests
+        pass

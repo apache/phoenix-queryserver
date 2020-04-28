@@ -345,7 +345,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
     assertFalse(rs.next());
   }
 
-  @Ignore
+  @Ignore("PHOENIX-4664")
   @Test
   //This is the java reproducer for PHOENIX-4664
   //This test only works as intended when the system timezone is NOT GMT
@@ -378,7 +378,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
 
   @Ignore
   @Test
-  //Quick and dirty way start up a local Phoenix+PQS instance
+  //Quick and dirty way start up a local Phoenix+PQS instance for testing against
   public void startLocalPQS() throws Exception {
       System.out.println("CONN STRING:" + CONN_STRING);
       System.out.println("Tests suspended!!!");

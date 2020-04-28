@@ -21,11 +21,11 @@
 import phoenixdb
 import phoenixdb.cursor
 import sys
+import os
 
 
 if __name__ == '__main__':
-    pqs_port = sys.argv[1]
-    database_url = 'http://localhost:' + str(pqs_port) + '/'
+    database_url = os.environ.get('PHOENIXDB_TEST_DB_URL')
 
     print("CREATING PQS CONNECTION")
     conn = phoenixdb.connect(database_url, autocommit=True, auth="SPNEGO")

@@ -40,15 +40,13 @@ class DatabaseTestCase(unittest.TestCase):
 
     def setUp(self):
         self.conn = phoenixdb.connect(TEST_DB_URL, autocommit=True, **httpArgs)
-        self.cleanup_tables = []
+        def closeDb():
+            self.conn.close()
+        self.addCleanup(closeDb)
 
     def reopen(self, **avaticaArgs):
         self.conn.close()
         self.conn = phoenixdb.connect(TEST_DB_URL, **avaticaArgs, **httpArgs)
-
-    def tearDown(self):
-        self.doCleanups()
-        self.conn.close()
 
     def addTableCleanup(self, name):
         def dropTable():
