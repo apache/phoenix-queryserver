@@ -333,14 +333,13 @@ public class SecureQueryServerPhoenixDBIT {
     }
 
     //This takes about 300s, so we are not running this by default
-    @Ignore
     @Test
     public void testFullSuite() throws Exception {
+        Assume.assumeNotNull(System.getProperty("run.full.python.testsuite"));
         File file = new File(".");
         runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python", "phoenixdb").toString());
     }
 
-    @Ignore
     @Test
     //Quick and dirty way start up a local Phoenix+PQS instance for testing against
     //When started, this will write a setup script into  target/krb_setup.sh
@@ -348,6 +347,7 @@ public class SecureQueryServerPhoenixDBIT {
     //and set the environment so that the python unit tests can run against this instance.
     //You'll need to kill the test manually
     public void startLocalPQS() throws Exception {
+        Assume.assumeNotNull(System.getProperty("start.secure.pqs"));
         runShellScript("sleep", "86400");
     }
 

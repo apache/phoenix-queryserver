@@ -13,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import sys
 import unittest
-import datetime
-import phoenixdb
 from decimal import Decimal
+
+import phoenixdb
 from phoenixdb.tests import DatabaseTestCase
 
 

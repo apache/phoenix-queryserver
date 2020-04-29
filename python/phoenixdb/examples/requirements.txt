@@ -16,6 +16,4 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-protobuf>=3.0.0
-requests
-requests-gssapi
+-e git+https://bitbucket.org/lalinsky/python-sqlline.git#egg=sqlline

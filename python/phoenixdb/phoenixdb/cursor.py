@@ -13,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import collections
-from phoenixdb.types import TypeHelper
-from phoenixdb.errors import ProgrammingError, InternalError
+import logging
+
 from phoenixdb.avatica.proto import common_pb2
+from phoenixdb.errors import InternalError, ProgrammingError
+from phoenixdb.types import TypeHelper
 
 __all__ = ['Cursor', 'ColumnDescription', 'DictCursor']
 
@@ -182,7 +183,7 @@ class Cursor(object):
             else:
                 typed_value.null = False
                 if is_array:
-                    if type(value) in [list,tuple]:
+                    if type(value) in [list, tuple]:
                         for element in value:
                             if mutate_to is not None:
                                 element = mutate_to(element)

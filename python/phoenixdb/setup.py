@@ -60,10 +60,23 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
         'requests-gssapi'
+    ],
+    tests_require=[
+        'nose',
+        'flake8'
+    ],
+    setup_requires=[
+        # Later versions don't work with python2.7
+        'Sphinx<2.0.0',
+        # These are Sphinx dependencies, included only to be version managed for python2
+        'MarkupSafe<2.0.0',
+        'Jinja2<3.0.0',
+        'pyparsing<3.0.0'
     ]
 )

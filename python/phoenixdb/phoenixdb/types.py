@@ -13,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import sys
 import time
-import datetime
 from decimal import Decimal
+
 from phoenixdb.avatica.proto import common_pb2
-from builtins import staticmethod
+
 
 __all__ = [
     'Date', 'Time', 'Timestamp', 'DateFromTicks', 'TimeFromTicks', 'TimestampFromTicks',
@@ -90,7 +91,8 @@ def datetime_to_java_sql_timestamp(d):
     td = d - datetime.datetime(1970, 1, 1)
     return td.microseconds // 1000 + (td.seconds + td.days * 24 * 3600) * 1000
 
-#FIXME This doesn't seem to be used anywhere in the code
+
+# FIXME This doesn't seem to be used anywhere in the code
 class ColumnType(object):
 
     def __init__(self, eq_types):
@@ -181,67 +183,69 @@ This mapping should be structured as:
 
 JDBC_TO_REP = dict([
     # These are the standard types that are used in Phoenix
-    (-6, common_pb2.BYTE), #TINYINT
-    (5, common_pb2.SHORT), #SMALLINT
-    (4, common_pb2.INTEGER), #INTEGER
-    (-5, common_pb2.LONG), #BIGINT
-    (6, common_pb2.DOUBLE), #FLOAT
-    (8, common_pb2.DOUBLE), #DOUBLE
-    (2, common_pb2.BIG_DECIMAL), #NUMERIC
-    (1, common_pb2.STRING), #CHAR
-    (91, common_pb2.JAVA_SQL_DATE), #DATE
-    (93, common_pb2.JAVA_SQL_TIMESTAMP), #TIME
-    (-2, common_pb2.BYTE_STRING), #BINARY
-    (-3, common_pb2.BYTE_STRING), #VARBINARY
-    (16, common_pb2.BOOLEAN), #BOOLEAN
+    (-6, common_pb2.BYTE),  # TINYINT
+    (5, common_pb2.SHORT),  # SMALLINT
+    (4, common_pb2.INTEGER),  # INTEGER
+    (-5, common_pb2.LONG),  # BIGINT
+    (6, common_pb2.DOUBLE),  # FLOAT
+    (8, common_pb2.DOUBLE),  # DOUBLE
+    (2, common_pb2.BIG_DECIMAL),  # NUMERIC
+    (1, common_pb2.STRING),  # CHAR
+    (91, common_pb2.JAVA_SQL_DATE),  # DATE
+    (93, common_pb2.JAVA_SQL_TIMESTAMP),  # TIME
+    (-2, common_pb2.BYTE_STRING),  # BINARY
+    (-3, common_pb2.BYTE_STRING),  # VARBINARY
+    (16, common_pb2.BOOLEAN),  # BOOLEAN
     # These are the Non-standard types defined by Phoenix
-    (19, common_pb2.JAVA_SQL_DATE), #UNSIGNED_DATE
-    (15, common_pb2.DOUBLE), #UNSIGNED_DOUBLE
-    (14, common_pb2.DOUBLE), #UNSIGNED_FLOAT
-    (9, common_pb2.INTEGER), #UNSIGNED_INT
-    (10, common_pb2.LONG), #UNSIGNED_LONG
-    (13, common_pb2.SHORT), #UNSIGNED_SMALLINT
-    (20, common_pb2.JAVA_SQL_TIMESTAMP), #UNSIGNED_TIMESTAMP
-    (11, common_pb2.BYTE), #UNSIGNED_TINYINT
+    (19, common_pb2.JAVA_SQL_DATE),  # UNSIGNED_DATE
+    (15, common_pb2.DOUBLE),  # UNSIGNED_DOUBLE
+    (14, common_pb2.DOUBLE),  # UNSIGNED_FLOAT
+    (9, common_pb2.INTEGER),  # UNSIGNED_INT
+    (10, common_pb2.LONG),  # UNSIGNED_LONG
+    (13, common_pb2.SHORT),  # UNSIGNED_SMALLINT
+    (20, common_pb2.JAVA_SQL_TIMESTAMP),  # UNSIGNED_TIMESTAMP
+    (11, common_pb2.BYTE),  # UNSIGNED_TINYINT
     # The following are not used by Phoenix, but some of these are used by Avaticafor
     # parameter types
-    (-7, common_pb2.BOOLEAN), #BIT
-    (7, common_pb2.DOUBLE), #REAL
-    (3, common_pb2.BIG_DECIMAL), #DECIMAL
-    (12, common_pb2.STRING), #VARCHAR
-    (-1, common_pb2.STRING), #LONGVARCHAR
-    (-4, common_pb2.BYTE_STRING), #LONGVARBINARY
-    (2004, common_pb2.BYTE_STRING), #BLOB
-    (2005, common_pb2.STRING), #CLOB
-    (-15, common_pb2.STRING), #NCHAR
-    (-9, common_pb2.STRING), #NVARCHAR
-    (-16, common_pb2.STRING), #LONGNVARCHAR
-    (2011, common_pb2.STRING), #NCLOB
-    (2009, common_pb2.STRING), #SQLXML
+    (-7, common_pb2.BOOLEAN),  # BIT
+    (7, common_pb2.DOUBLE),  # REAL
+    (3, common_pb2.BIG_DECIMAL),  # DECIMAL
+    (12, common_pb2.STRING),  # VARCHAR
+    (-1, common_pb2.STRING),  # LONGVARCHAR
+    (-4, common_pb2.BYTE_STRING),  # LONGVARBINARY
+    (2004, common_pb2.BYTE_STRING),  # BLOB
+    (2005, common_pb2.STRING),  # CLOB
+    (-15, common_pb2.STRING),  # NCHAR
+    (-9, common_pb2.STRING),  # NVARCHAR
+    (-16, common_pb2.STRING),  # LONGNVARCHAR
+    (2011, common_pb2.STRING),  # NCLOB
+    (2009, common_pb2.STRING),  # SQLXML
     # These are defined by JDBC, but cannot be mapped
-    #NULL
-    #OTHER
-    #JAVA_OBJECT
-    #DISTINCT
-    #STRUCT
-    #ARRAY 2003 - We are handling this as a special case
-    #REF
-    #DATALINK
-    #ROWID
-    #REF_CURSOR
-    #TIME WITH TIMEZONE
-    #TIMESTAMP WITH TIMEZONE
+    # NULL
+    # OTHER
+    # JAVA_OBJECT
+    # DISTINCT
+    # STRUCT
+    # ARRAY 2003 - We are handling this as a special case
+    # REF
+    # DATALINK
+    # ROWID
+    # REF_CURSOR
+    # TIME WITH TIMEZONE
+    # TIMESTAMP WITH TIMEZONE
 
     ])
 """Maps the JDBC Type IDs to Protobuf Reps """
 
 JDBC_MAP = {}
-for k,v in JDBC_TO_REP.items():
+for k, v in JDBC_TO_REP.items():
     JDBC_MAP[k & 0xffffffff] = REP_MAP[v]
 """Flips the available types to allow for faster lookup by JDBC type ID
 
 It has the same format as REP_MAP, but is keyed by JDBC type ID
 """
+
+
 class TypeHelper(object):
 
     @staticmethod
@@ -293,7 +297,7 @@ class TypeHelper(object):
     @staticmethod
     def _from_jdbc(jdbc_code):
         if jdbc_code not in JDBC_MAP:
-            #This should not happen. It's either a bug, or Avatica has added new types
+            # This should not happen. It's either a bug, or Avatica has added new types
             raise NotImplementedError('JDBC TYPE CODE {} is not supported'.format(jdbc_code))
 
         return JDBC_MAP[jdbc_code]

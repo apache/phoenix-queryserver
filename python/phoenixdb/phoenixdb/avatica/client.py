@@ -14,14 +14,14 @@
 
 """Implementation of the JSON-over-HTTP RPC protocol used by Avatica."""
 
-import re
-import socket
-import pprint
-import math
 import logging
+import math
+import pprint
+import re
 import time
+
 from phoenixdb import errors
-from phoenixdb.avatica.proto import requests_pb2, common_pb2, responses_pb2
+from phoenixdb.avatica.proto import common_pb2, requests_pb2, responses_pb2
 
 import requests
 
@@ -165,13 +165,13 @@ class AvaticaClient(object):
         while True:
             logger.debug("POST %s %r %r", self.url.geturl(), body, headers)
 
-            requestArgs = {'data':body, 'stream':True, 'headers':headers}
+            requestArgs = {'data': body, 'stream': True, 'headers': headers}
 
             if self.auth is not None:
-                requestArgs.update(auth = self.auth)
+                requestArgs.update(auth=self.auth)
 
             if self.verify is not None:
-                requestArgs.update(verify = self.verify)
+                requestArgs.update(verify=self.verify)
 
             try:
                 response = requests.request('post', self.url.geturl(), **requestArgs)

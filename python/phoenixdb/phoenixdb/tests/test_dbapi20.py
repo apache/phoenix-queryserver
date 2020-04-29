@@ -14,10 +14,11 @@
 # limitations under the License.
 
 import unittest
+
 import phoenixdb
+from phoenixdb.tests import TEST_DB_URL, httpArgs
+
 from . import dbapi20
-from phoenixdb.tests import TEST_DB_URL
-from phoenixdb.tests import httpArgs
 
 
 @unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")

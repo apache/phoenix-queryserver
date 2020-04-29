@@ -1,14 +1,6 @@
 Phoenix database adapter for Python
 ===================================
 
-.. image:: https://code.oxygene.sk/lukas/python-phoenixdb/badges/master/pipeline.svg
-    :target: https://code.oxygene.sk/lukas/python-phoenixdb/commits/master
-    :alt: Build Status
-
-.. image:: https://readthedocs.org/projects/python-phoenixdb/badge/?version=latest
-    :target: http://python-phoenixdb.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
-
 ``phoenixdb`` is a Python library for accessing the
 `Phoenix SQL database <http://phoenix.apache.org/>`_
 using the
@@ -20,14 +12,13 @@ which should be familiar to most Python programmers.
 Installation
 ------------
 
-The easiest way to install the library is using `pip <https://pip.pypa.io/en/stable/>`_::
+The source code is part of the phoenix-queryserver source distribution.
+You can download it from <https://phoenix.apache.org/>, or get the latest development version
+from <https://github.com/apache/phoenix-queryserver>
 
-    pip install phoenixdb
+Extract the archive and then install it manually::
 
-You can also download the source code from `here <https://phoenix.apache.org/download.html>`_,
-extract the archive and then install it manually::
-
-    cd /path/to/apache-phoenix-x.y.z/phoenix
+    cd /path/to/phoenix-queryserver-x.y.z/python/phoenixdb
     python setup.py install
 
 Usage
@@ -65,17 +56,11 @@ necessary requirements::
     pip install -r requirements.txt
     python setup.py develop
 
-To create or update the Avatica protobuf classes, change the tag in ``gen-protobuf.sh``
-and run the script.
+You can start a Phoenix QueryServer test instance on http://localhost:8765 for testing by running
+the following command in the phoenix-queryserver directory:
 
-If you need a Phoenix query server for experimenting, you can get one running
-quickly using `Docker <https://www.docker.com/>`_::
-
-    docker-compose up
-
-Or if you need an older version of Phoenix::
-
-    PHOENIX_VERSION=4.9 docker-compose up
+    mvn clean verify -am -pl queryserver-it -Dtest=foo -Dit.test=QueryServerBasicsIT#startLocalPQS \
+    -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 If you want to use the library without installing the phoenixdb library, you can use
 the `PYTHONPATH` environment variable to point to the library directly::
@@ -85,12 +70,15 @@ the `PYTHONPATH` environment variable to point to the library directly::
     cd ~/my_project
     PYTHONPATH=$PHOENIX_HOME/build/lib python my_app.py
 
+Don't forget to run flake8 on your changes.
+
 Interactive SQL shell
 ---------------------
 
 There is a Python-based interactive shell include in the examples folder, which can be
 used to connect to Phoenix and execute queries::
 
+    pip install -r ./examples/requirements.txt
     ./examples/shell.py http://localhost:8765/
     db=> CREATE TABLE test (id INTEGER PRIMARY KEY, name VARCHAR);
     no rows affected (1.363 seconds)
@@ -114,6 +102,14 @@ working Phoenix database and set the ``PHOENIXDB_TEST_DB_URL`` environment varia
     export PHOENIXDB_TEST_DB_URL='http://localhost:8765/'
     nosetests
 
+If you use a secure PQS server, you can set the connection parameters via the following environment
+variables:
+
+- PHOENIXDB_TEST_DB_TRUSTSTORE
+- PHOENIXDB_TEST_DB_AUTHENTICATION
+- PHOENIXDB_TEST_DB_AVATICA_USER
+- PHOENIXDB_TEST_DB_AVATICA_PASSWORD
+
 Similarly, tox can be used to run the test suite against multiple Python versions::
 
     pyenv install 3.5.5
@@ -121,6 +117,19 @@ Similarly, tox can be used to run the test suite against multiple Python version
     pyenv install 2.7.14
     pyenv global 2.7.14 3.5.5 3.6.4
     PHOENIXDB_TEST_DB_URL='http://localhost:8765' tox
+
+You can use tox and docker to run the tests on all supported python versions without installing the
+environments locally::
+
+    docker build -t toxtest .
+    docker run --rm  -v `pwd`:/src toxtest
+
+You can also run the test suite from maven as part of the Java build by setting the 
+run.full.python.testsuite property. You DO NOT need to set the PHOENIXDB_* enviroment variables,
+maven will set them up for you. The output of the test run will be saved in
+phoenix-queryserver/queryserver-it/target/python-stdout.log and python-stderr.log::
+
+    mvn clean verify -Drun.full.python.testsuite=true
 
 Known issues
 ------------

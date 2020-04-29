@@ -16,6 +16,7 @@
 import logging
 import uuid
 import weakref
+
 from phoenixdb import errors
 from phoenixdb.avatica.client import OPEN_CONNECTION_PROPERTIES
 from phoenixdb.cursor import Cursor
@@ -99,12 +100,12 @@ class Connection(object):
     def commit(self):
         if self._closed:
             raise ProgrammingError('the connection is already closed')
-        self._client.commit(self._id);
+        self._client.commit(self._id)
 
     def rollback(self):
         if self._closed:
             raise ProgrammingError('the connection is already closed')
-        self._client.rollback(self._id);
+        self._client.rollback(self._id)
 
     def cursor(self, cursor_factory=None):
         """Creates a new cursor.

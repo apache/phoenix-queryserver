@@ -14,10 +14,10 @@
 # limitations under the License.
 
 import unittest
+
 import phoenixdb.cursor
 from phoenixdb.errors import InternalError
-from phoenixdb.tests import TEST_DB_URL
-from phoenixdb.tests import DatabaseTestCase
+from phoenixdb.tests import DatabaseTestCase, TEST_DB_URL
 
 
 @unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")
@@ -83,5 +83,5 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             self.assertEqual(cursor.fetchall(), [[1, 'text 1']])
 
     def test_transaction(self):
-        #Todo write some transaction tests
+        # Todo write some transaction tests
         pass
