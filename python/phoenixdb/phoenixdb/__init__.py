@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from gssapi import mechs
 
 from phoenixdb import errors, types
 from phoenixdb.avatica import AvaticaClient
@@ -19,9 +20,10 @@ from phoenixdb.connection import Connection
 from phoenixdb.errors import *  # noqa: F401,F403
 from phoenixdb.types import *  # noqa: F401,F403
 
-from requests_gssapi import HTTPSPNEGOAuth, OPTIONAL
-from gssapi import mechs;
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+
+from requests_gssapi import HTTPSPNEGOAuth, OPTIONAL
+
 
 __all__ = ['connect', 'apilevel', 'threadsafety', 'paramstyle'] + types.__all__ + errors.__all__
 
@@ -97,11 +99,11 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
     spnego = mechs.Mechanism.from_sasl_name("SPNEGO")
 
     if auth == "SPNEGO":
-        #Special case for backwards compatibility
-        auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego)
+        # Special case for backwards compatibility
+        auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech=spnego)
     elif auth is None and authentication is not None:
         if authentication == "SPNEGO":
-            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech = spnego, opportunistic_auth=True)
+            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech=spnego, opportunistic_auth=True)
         elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
             auth = HTTPBasicAuth(avatica_user, avatica_password)
         elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:

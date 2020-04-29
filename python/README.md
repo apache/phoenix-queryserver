@@ -23,7 +23,7 @@ This driver implements the Python DB 2.0 API for database drivers as described b
 This driver is implemented using the Phoenix Query Server (PQS) and the [Apache Calcite
 Avatica](https://calcite.apache.org/avatica) project.
 
-This driver should be compatible with Python 2.7 and Python 3.3+ and support both unauthenticated access and
+This driver should be compatible with Python 2.7 and Python 3.4+ and support both unauthenticated access and
 authenticated access via SPNEGO to PQS.
 
 ## Usage

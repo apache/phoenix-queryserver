@@ -43,6 +43,7 @@ import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.util.ThinClientUtil;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -68,7 +69,9 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   @BeforeClass
   public static synchronized void beforeClass() throws Exception {
     CONF = getTestClusterConfig();
-    CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+    if(System.getProperty("do.not.randomize.pqs.port") == null) {
+        CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+    }
     String url = getUrl();
     AVATICA_SERVER = new QueryServerThread(new String[] { url }, CONF,
             QueryServerBasicsIT.class.getName());
@@ -376,10 +379,10 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
     }
   }
 
-  @Ignore
   @Test
   //Quick and dirty way start up a local Phoenix+PQS instance for testing against
   public void startLocalPQS() throws Exception {
+      Assume.assumeNotNull(System.getProperty("start.unsecure.pqs"));
       System.out.println("CONN STRING:" + CONN_STRING);
       System.out.println("Tests suspended!!!");
       System.out.println("Kill maven run to stop server");

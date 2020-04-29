@@ -32,16 +32,16 @@ def readme():
         return f.read()
 
 
-version = "0.7"
+version = "1.0.0.dev"
 
 setup(
     name="phoenixdb",
     version=version,
     description="Phoenix database adapter for Python",
     long_description=readme(),
-    author="Lukas Lalinsky",
-    author_email="lukas@oxygene.sk",
-    url="https://bitbucket.org/lalinsky/python-phoenixdb",
+    author="Apache Software Foundation",
+    author_email="dev@phoenix.apache.org",
+    url="http://phoenix.apache.org/python.html",
     license="Apache 2",
     packages=find_packages(),
     include_package_data=True,
@@ -60,10 +60,24 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
         'requests-gssapi'
+    ],
+    tests_require=[
+        'nose',
+        'flake8'
+    ],
+    setup_requires=[
+        # Later versions don't work with python2.7
+        'Sphinx<2.0.0',
+        # These are Sphinx dependencies, included only to be version managed for python2
+        'MarkupSafe<2.0.0',
+        'Jinja2<3.0.0',
+        'pyparsing<3.0.0'
     ]
 )

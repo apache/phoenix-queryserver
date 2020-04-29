@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import unittest
+
 from phoenixdb.avatica.client import parse_url, urlparse
 
 
