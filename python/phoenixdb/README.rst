@@ -56,10 +56,11 @@ necessary requirements::
     pip install -r requirements.txt
     python setup.py develop
 
-You can start a Phoenix QueryServer test instance on http://localhost:8765 for testing by running
+You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
 the following command in the phoenix-queryserver directory:
 
-    mvn clean verify -am -pl queryserver-it -Dtest=foo -Dit.test=QueryServerBasicsIT#startLocalPQS \
+    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    -Dit.test=QueryServerBasicsIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 If you want to use the library without installing the phoenixdb library, you can use
@@ -71,26 +72,6 @@ the `PYTHONPATH` environment variable to point to the library directly::
     PYTHONPATH=$PHOENIX_HOME/build/lib python my_app.py
 
 Don't forget to run flake8 on your changes.
-
-Interactive SQL shell
----------------------
-
-There is a Python-based interactive shell include in the examples folder, which can be
-used to connect to Phoenix and execute queries::
-
-    pip install -r ./examples/requirements.txt
-    ./examples/shell.py http://localhost:8765/
-    db=> CREATE TABLE test (id INTEGER PRIMARY KEY, name VARCHAR);
-    no rows affected (1.363 seconds)
-    db=> UPSERT INTO test (id, name) VALUES (1, 'Lukas');
-    1 row affected (0.004 seconds)
-    db=> SELECT * FROM test;
-    +------+-------+
-    |   ID | NAME  |
-    +======+=======+
-    |    1 | Lukas |
-    +------+-------+
-    1 row selected (0.019 seconds)
 
 Running the test suite
 ----------------------

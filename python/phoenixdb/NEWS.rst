@@ -4,14 +4,16 @@ Changelog
 Unreleased
 ----------
 - Replaced bundled requests_kerberos with request_gssapi library
-- Refactor authentication code
-- Support for specifying server certificate
-- Support for BASIC and DIGEST authentication
-- Fix HTTP error parsing
-- Add transaction support
-- Add list support
-- Rewrite type handling
-- Refactor test suite
+- Refactored authentication code
+- Added support for specifying server certificate
+- Added support for BASIC and DIGEST authentication
+- Fixed HTTP error parsing
+- Added transaction support
+- Added list support
+- Rewritten type handling
+- Refactored test suite
+- Removed shell example, as it was python2 only
+- Updated documentation
 
 Version 0.7
 -----------
