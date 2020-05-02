@@ -17,6 +17,8 @@
 # under the License.
 #
 from setuptools import setup, find_packages
+import setuptools
+import sys
 
 cmdclass = {}
 
@@ -31,6 +33,31 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+
+if setuptools.__version__ < '20.8.1':
+    # Workaround for source install on old setuptools
+    # This won't be able to create a proper multi-version pacakage
+    install_requires=[
+        'protobuf>=3.0.0',
+        'requests',
+        'requests-gssapi',
+        'SQLAlchemy'
+    ]
+    if sys.version_info < (3,6):
+        install_requires.append('gssapi<1.6.0')
+    #Don't build the docs on an old stack
+    setup_requires=[]
+else:
+    install_requires=[
+        'protobuf>=3.0.0',
+        'requests',
+        'requests-gssapi',
+        'gssapi<1.6.0;python_version<"3.6"',
+        'SQLAlchemy'
+    ]
+    setup_requires=[
+        'Sphinx;python_version>="3.6"',
+    ],
 
 version = "1.0.0.dev"
 
@@ -63,21 +90,19 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    install_requires=[
-        'protobuf>=3.0.0',
-        'requests',
-        'requests-gssapi'
-    ],
+    install_requires=install_requires,
+    extras_require={
+        'SQLAlchemy': ['SQLAlchemy'],
+    },
     tests_require=[
+        'SQLAlchemy',
         'nose',
         'flake8'
     ],
-    setup_requires=[
-        # Later versions don't work with python2.7
-        'Sphinx<2.0.0',
-        # These are Sphinx dependencies, included only to be version managed for python2
-        'MarkupSafe<2.0.0',
-        'Jinja2<3.0.0',
-        'pyparsing<3.0.0'
-    ]
+    setup_requires=setup_requires,
+    entry_points={
+        "sqlalchemy.dialects": [
+            "phoenix = phoenixdb.sqlalchemy_phoenix:PhoenixDialect"
+        ]
+    },
 )

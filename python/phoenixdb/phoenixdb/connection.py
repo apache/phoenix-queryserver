@@ -130,9 +130,7 @@ class Connection(object):
         """Sets one or more parameters in the current connection.
 
         :param autocommit:
-            Switch the connection to autocommit mode. With the current
-            version, you need to always enable this, because
-            :meth:`commit` is not implemented.
+            Switch the connection to autocommit mode.
 
         :param readonly:
             Switch the connection to read-only mode.

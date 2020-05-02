@@ -57,11 +57,21 @@ necessary requirements::
     python setup.py develop
 
 You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
-the following command in the phoenix-queryserver directory:
+the following command in the phoenix-queryserver directory::
 
     mvn clean verify -am -pl queryserver-it -Dtest=foo \
     -Dit.test=QueryServerBasicsIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
+
+You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
+for testing by running the following command in the phoenix-queryserver directory::
+
+    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    -Dit.test=SecureQueryServerPhoenixDBIT\#startLocalPQS \
+    -Ddo.not.randomize.pqs.port=true -Dstart.secure.pqs=true
+
+this will also create a shell script in queryserver-it/target/krb_setup.sh, that you can use to set
+up the environment for the tests.
 
 If you want to use the library without installing the phoenixdb library, you can use
 the `PYTHONPATH` environment variable to point to the library directly::

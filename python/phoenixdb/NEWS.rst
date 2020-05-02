@@ -4,6 +4,7 @@ Changelog
 Unreleased
 ----------
 - Replaced bundled requests_kerberos with request_gssapi library
+- Use default SPNEGO Auth settings from request_gssapi
 - Refactored authentication code
 - Added support for specifying server certificate
 - Added support for BASIC and DIGEST authentication
@@ -14,6 +15,7 @@ Unreleased
 - Refactored test suite
 - Removed shell example, as it was python2 only
 - Updated documentation
+- Added SQLAlchemy dialect
 
 Version 0.7
 -----------

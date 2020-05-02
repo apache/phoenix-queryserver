@@ -83,5 +83,27 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             self.assertEqual(cursor.fetchall(), [[1, 'text 1']])
 
     def test_transaction(self):
-        # Todo write some transaction tests
-        pass
+        self.reopen(autocommit=False)
+        with self.conn.cursor() as cursor:
+            self.createTable("test", "CREATE TABLE {table} (id INTEGER PRIMARY KEY, text VARCHAR)")
+
+            cursor.execute("UPSERT INTO test VALUES (?, ?)", [1, 'one'])
+            cursor.execute("SELECT * FROM test ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [])
+
+            self.conn.commit()
+            cursor.execute("SELECT * FROM test ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [[1, 'one']])
+            self.assertEqual(self.conn.autocommit, False)
+
+            cursor.execute("UPSERT INTO test VALUES (?, ?)", [2, 'two'])
+            self.conn.rollback()
+            cursor.execute("SELECT * FROM test ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [[1, 'one']])
+            self.assertEqual(self.conn.autocommit, False)
+
+            cursor.execute("UPSERT INTO test VALUES (?, ?)", [2, 'two'])
+            # Since we expose the JDBC semantics, this is an implicit commit
+            self.conn.autocommit = True
+            cursor.execute("SELECT * FROM test ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [[1, 'one'], [2, 'two']])
