@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from gssapi import mechs
+import sys
 
 from phoenixdb import errors, types
 from phoenixdb.avatica import AvaticaClient
@@ -22,8 +22,13 @@ from phoenixdb.types import *  # noqa: F401,F403
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
-from requests_gssapi import HTTPSPNEGOAuth, OPTIONAL
+from requests_gssapi import HTTPSPNEGOAuth
 
+if sys.version_info.major == 3:
+    from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
+else:
+    from urllib import urlencode
+    from urlparse import urlparse, urlunparse, parse_qs
 
 __all__ = ['connect', 'apilevel', 'threadsafety', 'paramstyle'] + types.__all__ + errors.__all__
 
@@ -96,14 +101,41 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         :class:`~phoenixdb.connection.Connection` object.
     """
 
-    spnego = mechs.Mechanism.from_sasl_name("SPNEGO")
+    url_parsed = urlparse(url)
+    url_params = parse_qs(url_parsed.query, keep_blank_values=True)
+
+    # Parse supported JDBC compatible options from URL. args have precendece
+    rebuild = False
+    if auth is None and authentication is None and 'authentication' in url_params:
+        authentication = url_params['authentication'][0]
+        del url_params['authentication']
+        rebuild = True
+
+    if avatica_user is None and 'avatica_user' in url_params:
+        avatica_user = url_params['avatica_user'][0]
+        del url_params['avatica_user']
+        rebuild = True
+
+    if avatica_password is None and 'avatica_password' in url_params:
+        avatica_password = url_params['avatica_password'][0]
+        del url_params['avatica_password']
+        rebuild = True
+
+    if verify is None and truststore is None and 'truststore' in url_params:
+        truststore = url_params['truststore'][0]
+        del url_params['truststore']
+        rebuild = True
+
+    if rebuild:
+        url_parsed._replace(query=urlencode(url_params, True))
+        url = urlunparse(url_parsed)
 
     if auth == "SPNEGO":
         # Special case for backwards compatibility
-        auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech=spnego)
+        auth = HTTPSPNEGOAuth(opportunistic_auth=True)
     elif auth is None and authentication is not None:
         if authentication == "SPNEGO":
-            auth = HTTPSPNEGOAuth(mutual_authentication=OPTIONAL, mech=spnego, opportunistic_auth=True)
+            auth = HTTPSPNEGOAuth(opportunistic_auth=True)
         elif authentication == "BASIC" and avatica_user is not None and avatica_password is not None:
             auth = HTTPBasicAuth(avatica_user, avatica_password)
         elif authentication == "DIGEST" and avatica_user is not None and avatica_password is not None:

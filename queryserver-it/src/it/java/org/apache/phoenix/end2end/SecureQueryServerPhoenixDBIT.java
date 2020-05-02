@@ -245,7 +245,9 @@ public class SecureQueryServerPhoenixDBIT {
         conf.set(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
             KEYTAB.getAbsolutePath());
         conf.setBoolean(QueryServerProperties.QUERY_SERVER_DISABLE_KERBEROS_LOGIN, true);
-        conf.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+        if(System.getProperty("do.not.randomize.pqs.port") == null) {
+            conf.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+        }
         // Required so that PQS can impersonate the end-users to HBase
         conf.set("hadoop.proxyuser.phoenixqs.groups", "*");
         conf.set("hadoop.proxyuser.phoenixqs.hosts", "*");
