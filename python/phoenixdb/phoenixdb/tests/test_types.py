@@ -227,6 +227,16 @@ class TypesTest(DatabaseTestCase):
                 [5, None],
             ])
 
+    # Minimal date/time/timestamp type test that doesn't trigger PHOENIX-4664
+    def test_time_minimal(self):
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val1 date, val2 time, val3 timestamp)")
+        with self.conn.cursor() as cursor:
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, '2015-07-12', '2015-07-12 13:01:02', '2015-07-12 13:01:02.123')")
+            cursor.execute("SELECT * FROM phoenixdb_test_tbl1 ORDER BY id")
+            self.assertEqual(cursor.fetchall(), [
+                [1, datetime.date(2015, 7, 12), datetime.time(13, 1, 2), datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)]
+            ])
+
     @unittest.skip("https://issues.apache.org/jira/browse/CALCITE-796")
     def test_timestamp_full(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val timestamp)")
@@ -248,6 +258,25 @@ class TypesTest(DatabaseTestCase):
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (6, ?)", [''])
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
             self.assertEqual(cursor.fetchall(), [[1, 'abc'], [2, None], [3, 'abc'], [4, None], [5, None], [6, None]])
+
+    @unittest.skipIf(sys.version_info[0] < 3, "phoenixdb doesn't support unicode strings in Python2")
+    def test_unicode(self):
+        self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val varchar)")
+        with self.conn.cursor() as cursor:
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (1, \
+            '\u00E1rv\u00EDzt\u0171r\u0151 t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p')")
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, '\u265E')")
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, '\U0001F600')")
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (4, ?)",
+                           ['\u00E1rv\u00EDzt\u0171r\u0151 t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p'])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (5, ?)", ['\u265E'])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (6, ?)", ['\U0001F600'])
+            cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
+            self.assertEqual(cursor.fetchall(),
+                             [[1, '\u00E1rv\u00EDzt\u0171r\u0151 t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p'],
+                              [2, '\u265E'], [3, '\U0001F600'],
+                              [4, '\u00E1rv\u00EDzt\u0171r\u0151 t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p'],
+                              [5, '\u265E'], [6, '\U0001F600']])
 
     def test_varchar_very_long(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val varchar)")

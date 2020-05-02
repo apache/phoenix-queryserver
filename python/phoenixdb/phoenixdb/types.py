@@ -192,7 +192,8 @@ JDBC_TO_REP = dict([
     (2, common_pb2.BIG_DECIMAL),  # NUMERIC
     (1, common_pb2.STRING),  # CHAR
     (91, common_pb2.JAVA_SQL_DATE),  # DATE
-    (93, common_pb2.JAVA_SQL_TIMESTAMP),  # TIME
+    (92, common_pb2.JAVA_SQL_TIME),  # TIME
+    (93, common_pb2.JAVA_SQL_TIMESTAMP),  # TIMESTAMP
     (-2, common_pb2.BYTE_STRING),  # BINARY
     (-3, common_pb2.BYTE_STRING),  # VARBINARY
     (16, common_pb2.BOOLEAN),  # BOOLEAN
