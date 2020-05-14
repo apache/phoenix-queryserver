@@ -18,8 +18,7 @@ import unittest
 
 import phoenixdb
 
-# TEST_DB_URL = "http://localhost:8765"
-TEST_DB_URL = os.environ.get('PHOENIXDB_TEST_DB_URL')
+TEST_DB_URL = os.environ.get('PHOENIXDB_TEST_DB_URL', "http://localhost:8765")
 TEST_DB_TRUSTSTORE = os.environ.get('PHOENIXDB_TEST_DB_TRUSTSTORE')
 TEST_DB_AUTHENTICATION = os.environ.get('PHOENIXDB_TEST_DB_AUTHENTICATION')
 TEST_DB_AVATICA_USER = os.environ.get('PHOENIXDB_TEST_DB_AVATICA_USER')

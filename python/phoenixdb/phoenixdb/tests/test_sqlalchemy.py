@@ -17,6 +17,7 @@ import unittest
 import sys
 
 import sqlalchemy as db
+from sqlalchemy import text
 
 from . import TEST_DB_URL, TEST_DB_AUTHENTICATION, TEST_DB_AVATICA_USER, TEST_DB_AVATICA_PASSWORD,\
         TEST_DB_TRUSTSTORE
@@ -27,6 +28,7 @@ else:
     from urlparse import urlparse, urlunparse
 
 
+@unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")
 class SQLAlchemyTest(unittest.TestCase):
 
     def test_connection(self):
@@ -35,6 +37,24 @@ class SQLAlchemyTest(unittest.TestCase):
         metadata = db.MetaData()
         catalog = db.Table('CATALOG', metadata, autoload=True, autoload_with=engine)
         self.assertIn('TABLE_NAME', catalog.columns.keys())
+
+    def test_textual(self):
+        engine = self._create_engine()
+        with engine.connect() as connection:
+            try:
+                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute(text('create table ALCHEMY_TEST (id integer primary key)'))
+                connection.execute(text('upsert into ALCHEMY_TEST values (42)'))
+                # SQLAlchemy autocommit should kick in
+                result = connection.execute(text('select * from ALCHEMY_TEST'))
+                row = result.fetchone()
+                self.assertEqual(row[0], 42)
+            finally:
+                connection.execute('drop table if exists ALCHEMY_TEST')
+
+    @unittest.skip("ORM feature not implemented")
+    def test_orm(self):
+        pass
 
     def _create_engine(self):
         ''''Massage the properties that we use for the DBAPI tests so that they apply to

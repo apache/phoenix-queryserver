@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from sqlalchemy import types
-from sqlalchemy.engine.default import DefaultDialect
+from sqlalchemy.engine.default import DefaultDialect, DefaultExecutionContext
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.compiler import DDLCompiler
 from sqlalchemy.types import BIGINT, BOOLEAN, CHAR, DATE, DECIMAL, FLOAT, INTEGER, NUMERIC,\
@@ -41,6 +41,12 @@ class PhoenixDDLCompiler(DDLCompiler):
 AUTOCOMMIT_REGEXP = re.compile(
     r"\s*(?:UPDATE|UPSERT|CREATE|DELETE|DROP|ALTER)", re.I | re.UNICODE
 )
+
+
+class PhoenixExecutionContext(DefaultExecutionContext):
+
+    def should_autocommit_text(self, statement):
+        return AUTOCOMMIT_REGEXP.match(statement)
 
 
 class PhoenixDialect(DefaultDialect):
@@ -85,21 +91,13 @@ class PhoenixDialect(DefaultDialect):
 
     ddl_compiler = PhoenixDDLCompiler
 
+    execution_ctx_cls = PhoenixExecutionContext
+
     def __init__(self, tls=False, path='/', **opts):
         # There is no way to pass these via the SqlAlchemy url object
         self.tls = tls
         self.path = path
         super(PhoenixDialect, self).__init__(self, **opts)
-
-    def should_autocommit_text(self, statement):
-        return AUTOCOMMIT_REGEXP.match(statement)
-
-    def should_autocommit(self):
-        if self._dbapi_connection.autocommit:
-            # Do not bother
-            return False
-        else:
-            return super(PhoenixDialect, self).should_autocommit()
 
     @classmethod
     def dbapi(cls):
