@@ -126,7 +126,7 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         del url_params['truststore']
         rebuild = True
 
-    if rebuild is not None:
+    if rebuild:
         url_parsed._replace(query=urlencode(url_params, True))
         url = urlunparse(url_parsed)
 
