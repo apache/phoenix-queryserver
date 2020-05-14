@@ -18,7 +18,6 @@
  */
 package org.apache.phoenix.queryserver.orchestrator;
 
-import com.google.common.base.Joiner;
 import org.apache.phoenix.tool.PhoenixCanaryTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public class ToolWrapper {
             LOGGER.error("Bad argument list passed to executeMain. Skipping QueryServerCanaryTool.");
             return;
         }
-        LOGGER.info("Passing args to QueryServerCanaryTool: " + Joiner.on(",").join(args));
+        LOGGER.info("Passing args to QueryServerCanaryTool: " + String.join(",",args));
         PhoenixCanaryTool.main(args);
     }
 }

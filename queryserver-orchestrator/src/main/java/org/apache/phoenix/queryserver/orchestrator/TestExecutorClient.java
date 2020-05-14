@@ -18,7 +18,6 @@
  */
 package org.apache.phoenix.queryserver.orchestrator;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.CancelLeadershipException;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
@@ -110,7 +109,7 @@ public class TestExecutorClient extends LeaderSelectorListenerAdapter implements
         }
     }
 
-    @VisibleForTesting
+    //@VisibleForTesting
     public void executeQueryServerCanaryTool() {
         List<String> cmd = new ArrayList<>();
         for (Map.Entry<String, String> entry : params.entrySet()) {

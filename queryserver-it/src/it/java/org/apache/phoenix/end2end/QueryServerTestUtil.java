@@ -37,8 +37,6 @@ import org.apache.phoenix.util.ThinClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 public class QueryServerTestUtil {
     private static final Logger LOG = LoggerFactory.getLogger(QueryServerTestUtil.class);
 
@@ -101,7 +99,7 @@ public class QueryServerTestUtil {
     public void startQueryServer() throws Exception {
         setupQueryServerConfiguration(conf);
         executor = Executors.newSingleThreadExecutor();
-        if (!Strings.isNullOrEmpty(principal) && null != keytab) {
+        if (principal != null && !principal.isEmpty() && null != keytab) {
             // Get the PQS ident for PQS to use
             final UserGroupInformation ugi = UserGroupInformation
                     .loginUserFromKeytabAndReturnUGI(principal, keytab.getAbsolutePath());

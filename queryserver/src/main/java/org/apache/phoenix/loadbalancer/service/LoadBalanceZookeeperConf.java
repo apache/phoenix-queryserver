@@ -18,7 +18,7 @@
  */
 package org.apache.phoenix.loadbalancer.service;
 
-import com.google.common.net.HostAndPort;
+import org.apache.phoenix.util.HostAndPort;
 import org.apache.zookeeper.data.ACL;
 
 import java.util.List;

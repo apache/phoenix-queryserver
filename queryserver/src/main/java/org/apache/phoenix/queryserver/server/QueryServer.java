@@ -17,12 +17,6 @@
  */
 package org.apache.phoenix.queryserver.server;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import org.apache.calcite.avatica.Meta;
 import org.apache.calcite.avatica.remote.Driver;
 import org.apache.calcite.avatica.remote.LocalService;
@@ -53,6 +47,7 @@ import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.util.InstanceResolver;
+import org.apache.phoenix.util.SimpleLRUCache;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +151,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   /**
    * @return the port number this instance is bound to, or {@code -1} if the server is not running.
    */
-  @VisibleForTesting
+  //@VisibleForTesting
   public int getPort() {
     if (server == null) return -1;
     return server.getPort();
@@ -165,7 +160,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   /**
    * @return the return code from running as a {@link Tool}.
    */
-  @VisibleForTesting
+  //@VisibleForTesting
   public int getRetCode() {
     return retCode;
   }
@@ -173,7 +168,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   /**
    * @return the throwable from an unsuccessful run, or null otherwise.
    */
-  @VisibleForTesting
+  //@VisibleForTesting
   public Throwable getThrowable() {
     return t;
   }
@@ -295,7 +290,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     }
 }
 
-@VisibleForTesting
+  //@VisibleForTesting
   void configureClientAuthentication(final HttpServer.Builder builder, boolean disableSpnego, UserGroupInformation ugi) throws IOException {
 
     // Enable SPNEGO for client authentication unless it's explicitly disabled
@@ -305,7 +300,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     configureCallBack(builder, ugi);
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   void configureSpnegoAuthentication(HttpServer.Builder builder, UserGroupInformation ugi) throws IOException {
     String keytabPath = getConf().get(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB);
     File keytab = new File(keytabPath);
@@ -350,7 +345,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     return SecurityUtil.getServerPrincipal(httpPrincipal, hostname);
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   UserGroupInformation getUserGroupInformation() throws IOException {
     UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
     LOG.debug("Current user is " + ugi);
@@ -361,7 +356,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     return ugi;
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   void configureCallBack(HttpServer.Builder<Server> builder, UserGroupInformation ugi) {
     builder.withImpersonation(new PhoenixDoAsCallback(ugi, getConf()));
   }
@@ -386,9 +381,14 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     boolean success = true ;
     try {
       LoadBalanceZookeeperConf loadBalanceConfiguration = getLoadBalanceConfiguration();
-      Preconditions.checkNotNull(loadBalanceConfiguration);
+      if (loadBalanceConfiguration == null) {
+        throw new NullPointerException();
+      }
       this.registry = getRegistry();
-      Preconditions.checkNotNull(registry);
+
+      if (registry == null) {
+        throw new NullPointerException();
+      }
       String zkConnectString = loadBalanceConfiguration.getZkConnectString();
       this.registry.registerServer(loadBalanceConfiguration, getPort(), zkConnectString, hostName);
     } catch(Throwable ex){
@@ -464,7 +464,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   }
 
   // add remoteUserExtractor to builder if enabled
-  @VisibleForTesting
+  //@VisibleForTesting
   public void setRemoteUserExtractorIfNecessary(HttpServer.Builder builder, Configuration conf) {
     if (conf.getBoolean(QueryServerProperties.QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR_ATTRIB,
             QueryServerOptions.DEFAULT_QUERY_SERVER_WITH_REMOTEUSEREXTRACTOR)) {
@@ -472,7 +472,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     }
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   public void enableServerCustomizersIfNecessary(HttpServer.Builder<Server> builder,
                                                  Configuration conf, AvaticaServerConfiguration avaticaServerConfiguration) {
     // Always try to enable the "provided" ServerCustomizers. The expectation is that the Factory implementation
@@ -483,7 +483,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     }
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   public AvaticaServerConfiguration enableCustomAuth(HttpServer.Builder<Server> builder,
                                                      Configuration conf, UserGroupInformation ugi) {
     AvaticaServerConfiguration avaticaServerConfiguration = createAvaticaServerConfig(conf, ugi);
@@ -500,21 +500,21 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   private static final AvaticaServerConfigurationFactory DEFAULT_SERVER_CONFIG =
     new AvaticaServerConfigurationFactory.AvaticaServerConfigurationFactoryImpl();
 
-  @VisibleForTesting
+  //@VisibleForTesting
   RemoteUserExtractor createRemoteUserExtractor(Configuration conf) {
     RemoteUserExtractorFactory factory =
         InstanceResolver.getSingleton(RemoteUserExtractorFactory.class, DEFAULT_USER_EXTRACTOR);
     return factory.createRemoteUserExtractor(conf);
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   List<ServerCustomizer<Server>> createServerCustomizers(Configuration conf, AvaticaServerConfiguration avaticaServerConfiguration) {
     ServerCustomizersFactory factory =
       InstanceResolver.getSingleton(ServerCustomizersFactory.class, DEFAULT_SERVER_CUSTOMIZERS);
     return factory.createServerCustomizers(conf, avaticaServerConfiguration);
   }
 
-  @VisibleForTesting
+  //@VisibleForTesting
   AvaticaServerConfiguration createAvaticaServerConfig(Configuration conf, UserGroupInformation ugi) {
     AvaticaServerConfigurationFactory factory =
             InstanceResolver.getSingleton(AvaticaServerConfigurationFactory.class, DEFAULT_SERVER_CONFIG);
@@ -566,18 +566,15 @@ public final class QueryServer extends Configured implements Tool, Runnable {
    */
   public static class PhoenixDoAsCallback implements DoAsRemoteUserCallback {
     private final UserGroupInformation serverUgi;
-    private final LoadingCache<String,UserGroupInformation> ugiCache;
+    private final SimpleLRUCache<String,UserGroupInformation> ugiCache;
 
     public PhoenixDoAsCallback(UserGroupInformation serverUgi, Configuration conf) {
       this.serverUgi = Objects.requireNonNull(serverUgi);
-      this.ugiCache = CacheBuilder.newBuilder()
-          .initialCapacity(conf.getInt(QueryServerProperties.QUERY_SERVER_UGI_CACHE_INITIAL_SIZE,
-                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_INITIAL_SIZE))
-          .concurrencyLevel(conf.getInt(QueryServerProperties.QUERY_SERVER_UGI_CACHE_CONCURRENCY,
-                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_CONCURRENCY))
-          .maximumSize(conf.getLong(QueryServerProperties.QUERY_SERVER_UGI_CACHE_MAX_SIZE,
-                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_MAX_SIZE))
-          .build(new UgiCacheLoader(this.serverUgi));
+      this.ugiCache = new SimpleLRUCache<String,UserGroupInformation>(
+              conf.getLong(QueryServerProperties.QUERY_SERVER_UGI_CACHE_MAX_SIZE,
+                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_MAX_SIZE),
+              conf.getInt(QueryServerProperties.QUERY_SERVER_UGI_CACHE_CONCURRENCY,
+                  QueryServerOptions.DEFAULT_QUERY_SERVER_UGI_CACHE_CONCURRENCY));
     }
 
     @Override
@@ -600,34 +597,18 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       });
     }
 
-      @VisibleForTesting
+      //@VisibleForTesting
       UserGroupInformation createProxyUser(String remoteUserName) throws ExecutionException {
           // PHOENIX-3164 UGI's hashCode and equals methods rely on reference checks, not
           // value-based checks. We need to make sure we return the same UGI instance for a remote
           // user, otherwise downstream code in Phoenix and HBase may not treat two of the same
           // calls from one user as equivalent.
-          return ugiCache.get(remoteUserName);
+          return ugiCache.computeIfAbsent(remoteUserName, f -> UserGroupInformation.createProxyUser(f, serverUgi));
       }
 
-      @VisibleForTesting
-      LoadingCache<String,UserGroupInformation> getCache() {
+      //@VisibleForTesting
+      SimpleLRUCache<String,UserGroupInformation> getCache() {
           return ugiCache;
-      }
-  }
-
-  /**
-   * CacheLoader implementation which creates a "proxy" UGI instance for the given user name.
-   */
-  static class UgiCacheLoader extends CacheLoader<String,UserGroupInformation> {
-      private final UserGroupInformation serverUgi;
-
-      public UgiCacheLoader(UserGroupInformation serverUgi) {
-          this.serverUgi = Objects.requireNonNull(serverUgi);
-      }
-
-      @Override
-      public UserGroupInformation load(String remoteUserName) throws Exception {
-          return UserGroupInformation.createProxyUser(remoteUserName, serverUgi);
       }
   }
 

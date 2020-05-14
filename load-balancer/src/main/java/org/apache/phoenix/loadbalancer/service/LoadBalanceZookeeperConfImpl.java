@@ -19,13 +19,12 @@
 
 package org.apache.phoenix.loadbalancer.service;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.net.HostAndPort;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.zookeeper.ZKConfig;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
+import org.apache.phoenix.util.HostAndPort;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -47,7 +46,7 @@ public class LoadBalanceZookeeperConfImpl implements LoadBalanceZookeeperConf {
             this.configuration = configuration;
         }
 
-        @VisibleForTesting
+        //@VisibleForTesting
         public void setConfiguration(Configuration configuration) {
             this.configuration = configuration;
         }

@@ -19,12 +19,12 @@
 package org.apache.phoenix.queryserver.register;
 
 
-import com.google.common.net.HostAndPort;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.phoenix.loadbalancer.service.LoadBalanceZookeeperConf;
+import org.apache.phoenix.util.HostAndPort;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
