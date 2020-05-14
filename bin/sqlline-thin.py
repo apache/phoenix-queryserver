@@ -19,12 +19,19 @@
 #
 ############################################################################
 
+from __future__ import print_function
+from phoenix_utils import tryDecode
 import os
 import subprocess
 import sys
 import phoenix_utils
 import atexit
-import urlparse
+try:
+    import urlparse
+    parse_url = urlparse.urlparse
+except ImportError:
+    import urllib.parse
+    parse_url = urllib.parse.urlparse
 
 # import argparse
 try:
@@ -69,8 +76,8 @@ args=parser.parse_args()
 
 phoenix_utils.setPath()
 
-url = args.url
-sqlfile = args.sqlfile
+url = tryDecode(args.url)
+sqlfile = tryDecode(args.sqlfile)
 
 serialization_key = 'phoenix.queryserver.serialization'
 default_serialization='PROTOBUF'
@@ -80,10 +87,10 @@ spnego_auth_disabled_key = 'phoenix.queryserver.spnego.auth.disabled'
 default_spnego_auth_disabled = 'false'
 
 def cleanup_url(url):
-    parsed = urlparse.urlparse(url)
+    parsed = parse_url(url)
     if parsed.scheme == "":
         url = "http://" + url
-        parsed = urlparse.urlparse(url)
+        parsed = parse_url(url)
     if ":" not in parsed.netloc:
         url = url + ":8765"
     return url
@@ -95,12 +102,12 @@ def get_hbase_param(key, default):
     elif os.name == 'nt':
       hbase_exec_name = 'hbase.cmd'
     else:
-      print 'Unknown platform "%s", defaulting to HBase executable of "hbase"' % os.name
+      print('Unknown platform "%s", defaulting to HBase executable of "hbase"' % os.name)
       hbase_exec_name = 'hbase'
 
     hbase_cmd = phoenix_utils.which(hbase_exec_name)
     if hbase_cmd is None:
-        print 'Failed to find hbase executable on PATH, defaulting %s to %s.' % (key, default)
+        print('Failed to find hbase executable on PATH, defaulting %s to %s.' % (key, default))
         return default
 
     env['HBASE_CONF_DIR'] = phoenix_utils.hbase_conf_dir
@@ -108,13 +115,13 @@ def get_hbase_param(key, default):
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdout, stderr) = proc.communicate()
     if proc.returncode != 0:
-        print 'Failed to extract %s from hbase-site.xml, defaulting to %s.' % (key, default)
+        print('Failed to extract %s from hbase-site.xml, defaulting to %s.' % (key, default))
         return default
     # Don't expect this to happen, but give a default value just in case
     if stdout is None:
         return default
 
-    stdout = stdout.strip()
+    stdout = tryDecode(stdout.strip())
     if stdout == 'null':
         return default
     return stdout
@@ -133,7 +140,7 @@ url = cleanup_url(url)
 if sqlfile != "":
     sqlfile = "--run=" + sqlfile
 
-colorSetting = args.color
+colorSetting = tryDecode(args.color)
 # disable color setting for windows OS
 if os.name == 'nt':
     colorSetting = "false"
@@ -142,7 +149,7 @@ if os.name == 'nt':
 # HBase/Phoenix client side property override
 hbase_config_path = os.getenv('HBASE_CONF_DIR', phoenix_utils.current_dir)
 
-serialization = args.serialization if args.serialization else get_serialization()
+serialization = tryDecode(args.serialization) if args.serialization else get_serialization()
 
 java_home = os.getenv('JAVA_HOME')
 
@@ -156,17 +163,17 @@ elif os.name == 'nt':
     hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.cmd')
     hbase_env_cmd = ['cmd.exe', '/c', 'call %s & set' % hbase_env_path]
 if not hbase_env_path or not hbase_env_cmd:
-    print >> sys.stderr, "hbase-env file unknown on platform %s" % os.name
+    sys.stderr.write("hbase-env file unknown on platform {}{}".format(os.name, os.linesep))
     sys.exit(-1)
 
 hbase_env = {}
 if os.path.isfile(hbase_env_path):
     p = subprocess.Popen(hbase_env_cmd, stdout = subprocess.PIPE)
     for x in p.stdout:
-        (k, _, v) = x.partition('=')
+        (k, _, v) = tryDecode(x).partition('=')
         hbase_env[k.strip()] = v.strip()
 
-if hbase_env.has_key('JAVA_HOME'):
+if 'JAVA_HOME' in hbase_env:
     java_home = hbase_env['JAVA_HOME']
 
 if java_home:
@@ -176,19 +183,19 @@ else:
 
 jdbc_url = 'jdbc:phoenix:thin:url=' + url + ';serialization=' + serialization
 if args.authentication:
-    jdbc_url += ';authentication=' + args.authentication
+    jdbc_url += ';authentication=' + tryDecode(args.authentication)
 if args.auth_user:
-    jdbc_url += ';avatica_user=' + args.auth_user
+    jdbc_url += ';avatica_user=' + tryDecode(args.auth_user)
 if args.auth_password:
-    jdbc_url += ';avatica_password=' + args.auth_password
+    jdbc_url += ';avatica_password=' + tryDecode(args.auth_password)
 if args.principal:
-    jdbc_url += ';principal=' + args.principal
+    jdbc_url += ';principal=' + tryDecode(args.principal)
 if args.keytab:
-    jdbc_url += ';keytab=' + args.keytab
+    jdbc_url += ';keytab=' + tryDecode(args.keytab)
 if args.truststore:
-    jdbc_url += ';truststore=' + args.truststore
+    jdbc_url += ';truststore=' + tryDecode(args.truststore)
 if args.truststore_password:
-    jdbc_url += ';truststore_password=' + args.truststore_password
+    jdbc_url += ';truststore_password=' + tryDecode(args.truststore_password)
 
 
 # Add SPENGO auth if this cluster uses it, and there are no conflicting HBase parameters
@@ -204,7 +211,7 @@ java_cmd = java + ' $PHOENIX_OPTS ' + \
     ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
     ' -u "' + jdbc_url + '"' + " -n none -p none " + \
-    " --color=" + colorSetting + " --fastConnect=" + args.fastconnect + " --verbose=" + args.verbose + \
+    " --color=" + colorSetting + " --fastConnect=" + tryDecode(args.fastconnect) + " --verbose=" + tryDecode(args.verbose) + \
     " --incremental=false --isolation=TRANSACTION_READ_COMMITTED " + sqlfile
 
 os.execl("/bin/sh", "/bin/sh", "-c", java_cmd)

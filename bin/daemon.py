@@ -259,8 +259,6 @@ class DaemonContext:
 
         """
 
-    __metaclass__ = type
-
     def __init__(
             self,
             chroot_directory=None,
@@ -534,7 +532,7 @@ class DaemonContext:
             """
         signal_handler_map = dict(
                 (signal_number, self._make_signal_handler(target))
-                for (signal_number, target) in self.signal_map.items())
+                for (signal_number, target) in list(self.signal_map.items()))
         return signal_handler_map
 
 
@@ -849,7 +847,7 @@ def close_all_open_files(exclude=set()):
 
         """
     maxfd = get_maximum_file_descriptors()
-    for fd in reversed(range(maxfd)):
+    for fd in reversed(list(range(maxfd))):
         if fd not in exclude:
             close_file_descriptor_if_open(fd)
 
@@ -895,7 +893,7 @@ def make_default_signal_map():
             }
     signal_map = dict(
             (getattr(signal, name), target)
-            for (name, target) in name_map.items()
+            for (name, target) in list(name_map.items())
             if hasattr(signal, name))
 
     return signal_map
@@ -912,7 +910,7 @@ def set_signal_handlers(signal_handler_map):
         handlers.
 
         """
-    for (signal_number, handler) in signal_handler_map.items():
+    for (signal_number, handler) in list(signal_handler_map.items()):
         signal.signal(signal_number, handler)
 
 

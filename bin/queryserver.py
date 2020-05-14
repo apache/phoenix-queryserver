@@ -25,6 +25,8 @@
 # usage: queryserver.py [start|stop|makeWinServiceDesc] [-Dhadoop=configs]
 #
 
+from __future__ import print_function
+from phoenix_utils import tryDecode
 import datetime
 import getpass
 import os
@@ -67,7 +69,7 @@ if os.name == 'nt':
     args = subprocess.list2cmdline(args)
 else:
     import pipes    # pipes module isn't available on Windows
-    args = " ".join([pipes.quote(v) for v in args])
+    args = " ".join([pipes.quote(tryDecode(v)) for v in args])
 
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
@@ -91,14 +93,14 @@ elif os.name == 'nt':
     hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.cmd')
     hbase_env_cmd = ['cmd.exe', '/c', 'call %s & set' % hbase_env_path]
 if not hbase_env_path or not hbase_env_cmd:
-    print >> sys.stderr, "hbase-env file unknown on platform %s" % os.name
+    sys.stderr.write("hbase-env file unknown on platform {}{}".format(os.name, os.linesep))
     sys.exit(-1)
 
 hbase_env = {}
 if os.path.isfile(hbase_env_path):
     p = subprocess.Popen(hbase_env_cmd, stdout = subprocess.PIPE)
     for x in p.stdout:
-        (k, _, v) = x.partition('=')
+        (k, _, v) = tryDecode(x).partition('=')
         hbase_env[k.strip()] = v.strip()
 
 java_home = hbase_env.get('JAVA_HOME') or os.getenv('JAVA_HOME')
@@ -137,18 +139,18 @@ if command == 'makeWinServiceDesc':
     cmd = java_cmd % {'java': java, 'root_logger': 'INFO,DRFA,console', 'log_dir': log_dir, 'log_file': phoenix_log_file}
     slices = cmd.split(' ')
 
-    print "<service>"
-    print "  <id>queryserver</id>"
-    print "  <name>Phoenix Query Server</name>"
-    print "  <description>This service runs the Phoenix Query Server.</description>"
-    print "  <executable>%s</executable>" % slices[0]
-    print "  <arguments>%s</arguments>" % ' '.join(slices[1:])
-    print "</service>"
+    print("<service>")
+    print("  <id>queryserver</id>")
+    print("  <name>Phoenix Query Server</name>")
+    print("  <description>This service runs the Phoenix Query Server.</description>")
+    print("  <executable>%s</executable>" % slices[0])
+    print("  <arguments>%s</arguments>" % ' '.join(slices[1:]))
+    print("</service>")
     sys.exit()
 
 if command == 'start':
     if not daemon_supported:
-        print >> sys.stderr, "daemon mode not supported on this platform"
+        sys.stderr.write("daemon mode not supported on this platform{}".format(os.linesep))
         sys.exit(-1)
 
     # run in the background
@@ -161,7 +163,7 @@ if command == 'start':
             stdout = out,
             stderr = out,
         )
-        print 'starting Query Server, logging to %s' % log_file_path
+        print('starting Query Server, logging to %s' % log_file_path)
         with context:
             # this block is the main() for the forked daemon process
             child = None
@@ -174,21 +176,23 @@ if command == 'start':
                 sys.exit(0)
             signal.signal(signal.SIGTERM, handler)
 
-            print '%s launching %s' % (datetime.datetime.now(), cmd)
+            print('%s launching %s' % (datetime.datetime.now(), cmd))
             child = subprocess.Popen(cmd.split())
             sys.exit(child.wait())
 
 elif command == 'stop':
     if not daemon_supported:
-        print >> sys.stderr, "daemon mode not supported on this platform"
+        sys.stderr.write("daemon mode not supported on this platform{}".format(os.linesep))
         sys.exit(-1)
 
     if not os.path.exists(pid_file_path):
-        print >> sys.stderr, "no Query Server to stop because PID file not found, %s" % pid_file_path
+        sys.stderr.write("no Query Server to stop because PID file not found, {}{}"
+                         .format(pid_file_path, os.linesep))
         sys.exit(0)
 
     if not os.path.isfile(pid_file_path):
-        print >> sys.stderr, "PID path exists but is not a file! %s" % pid_file_path
+        sys.stderr.write("PID path exists but is not a file! {}{}".format(pid_file_path,
+                                                                          os.linesep))
         sys.exit(1)
 
     pid = None
@@ -197,9 +201,9 @@ elif command == 'stop':
     if not pid:
         sys.exit("cannot read PID file, %s" % pid_file_path)
 
-    print "stopping Query Server pid %s" % pid
+    print("stopping Query Server pid %s" % pid)
     with open(out_file_path, 'a+') as out:
-        print >> out, "%s terminating Query Server" % datetime.datetime.now()
+        sys.stderr.write("daemon mode not supported on this platform{}".format(os.linesep))
     os.kill(pid, signal.SIGTERM)
 
 else:
