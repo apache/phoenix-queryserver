@@ -17,15 +17,13 @@
  */
 package org.apache.phoenix.tool;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.RetryCounter;
@@ -35,7 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -48,7 +49,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A Canary Tool to perform synthetic tests for Phoenix
@@ -99,7 +104,7 @@ public class PhoenixCanaryTool extends Configured implements Tool {
                 result.setMessage("Test " + result.getTestName() + " successful");
             } catch (Exception e) {
                 result.setSuccessful(false);
-                result.setMessage(Throwables.getStackTraceAsString(e));
+                result.setMessage(getStackTrace(e));
             } finally {
                 onExit();
             }
@@ -226,7 +231,9 @@ public class PhoenixCanaryTool extends Configured implements Tool {
             String fileName = logfileName + "-" + new SimpleDateFormat("yyyy.MM.dd.HH" + ".mm" +
                     ".ss").format(new Date()) + ".log";
             File file = new File(dir, fileName);
-            Files.write(Bytes.toBytes(resultJson), file);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(Bytes.toBytes(resultJson));
+            }
         }
 
         @Override
@@ -330,9 +337,8 @@ public class PhoenixCanaryTool extends Configured implements Tool {
                 LOGGER.error("Failed to get connection after multiple retries; the connection is null");
             }
 
-            SimpleTimeLimiter limiter = new SimpleTimeLimiter();
-
-            limiter.callWithTimeout(new Callable<Void>() {
+            ExecutorService executor = Executors.newFixedThreadPool(1);
+            Future<Void> future = executor.submit(new Callable<Void>() {
 
                 public Void call() {
 
@@ -347,16 +353,22 @@ public class PhoenixCanaryTool extends Configured implements Tool {
                     return null;
 
                 }
-            }, timeoutVal, TimeUnit.SECONDS, true);
+            });
 
+            try {
+                future.get(timeoutVal, TimeUnit.SECONDS);
+            } catch (InterruptedException|TimeoutException e) {
+                future.cancel(true);
+                throw e;
+            }
             long estimatedTime = System.currentTimeMillis() - startTime;
 
             appInfo.setExecutionTime(estimatedTime);
             appInfo.setSuccessful(true);
 
         } catch (Exception e) {
-            LOGGER.error(Throwables.getStackTraceAsString(e));
-            appInfo.setMessage(Throwables.getStackTraceAsString(e));
+            LOGGER.error("error running tests", e);
+            appInfo.setMessage(getStackTrace(e));
             appInfo.setSuccessful(false);
 
         } finally {
@@ -366,6 +378,13 @@ public class PhoenixCanaryTool extends Configured implements Tool {
         }
 
         return 0;
+    }
+
+    private static String getStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        return sw.toString();
     }
 
     private Connection getConnectionWithRetry(String connectionURL) {

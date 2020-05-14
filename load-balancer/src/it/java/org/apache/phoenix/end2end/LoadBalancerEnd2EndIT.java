@@ -18,7 +18,6 @@
  */
 package org.apache.phoenix.end2end;
 
-import com.google.common.net.HostAndPort;
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -30,6 +29,7 @@ import org.apache.phoenix.loadbalancer.service.LoadBalanceZookeeperConf;
 import org.apache.phoenix.loadbalancer.service.LoadBalanceZookeeperConfImpl;
 import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.queryserver.register.ZookeeperRegistry;
+import org.apache.phoenix.util.HostAndPort;
 import org.apache.zookeeper.KeeperException;
 import org.junit.*;
 import org.slf4j.Logger;

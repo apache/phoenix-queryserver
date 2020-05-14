@@ -31,8 +31,6 @@ import org.apache.hadoop.hbase.HConstants;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Bridge between Phoenix and Avatica.
  */
@@ -51,7 +49,10 @@ public class PhoenixMetaFactoryImpl extends Configured implements PhoenixMetaFac
 
   @Override
   public Meta create(List<String> args) {
-    Configuration conf = Preconditions.checkNotNull(getConf(), "Configuration must not be null.");
+    Configuration conf = getConf();
+    if (conf == null) {
+      throw new NullPointerException(String.valueOf("Configuration must not be null."));
+    }
     Properties info = new Properties();
     info.putAll(conf.getValByRegex("avatica.*"));
     try {
@@ -110,7 +111,9 @@ public class PhoenixMetaFactoryImpl extends Configured implements PhoenixMetaFac
 
   private int getInt(String key, int defaultValue, Properties props, Configuration conf) {
     if (conf == null) {
-      Preconditions.checkNotNull(props);
+      if (props == null) {
+        throw new NullPointerException();
+      }
       return Integer.parseInt(props.getProperty(key, String.valueOf(defaultValue)));
     }
     return conf.getInt(key, defaultValue);
@@ -118,8 +121,10 @@ public class PhoenixMetaFactoryImpl extends Configured implements PhoenixMetaFac
 
   private String getString(String key, String defaultValue, Properties props, Configuration conf) {
       if (conf == null) {
-          Preconditions.checkNotNull(props);
-          return props.getProperty(key, defaultValue);
+        if (props == null) {
+          throw new NullPointerException();
+        }
+        return props.getProperty(key, defaultValue);
       }
       return conf.get(key, defaultValue);
   }

@@ -18,9 +18,6 @@
  */
 package org.apache.phoenix.loadbalancer.service;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.net.HostAndPort;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.UnhandledErrorListener;
@@ -30,6 +27,7 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.phoenix.util.HostAndPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +52,7 @@ public class LoadBalancer {
     private static final LoadBalancer loadBalancer = new LoadBalancer();
     private ConnectionStateListener connectionStateListener = null;
     private UnhandledErrorListener unhandledErrorListener = null;
-    private List<Closeable> closeAbles = Lists.newArrayList();
+    private List<Closeable> closeAbles = new ArrayList<>();
 
     private LoadBalancer()  {
         try  {
@@ -87,11 +85,11 @@ public class LoadBalancer {
 
     /**
      * It returns the location of Phoenix Query Server
-     * in form of Guava <a href="https://google.github.io/guava/releases/19.0/api/docs/com/google/common/net/HostAndPort.html">HostAndPort</a>
+     * in form of a HostAndPort (copied from Guava)
      * from the cache. The client should catch Exception incase
      * the method is unable to fetch PQS location due to network failure or
      * in-correct configuration issues.
-     * @return - return Guava HostAndPort. See <a href="http://google.com">http://google.com</a>
+     * @return - return HostAndPort
      * @throws Exception
      */
     public HostAndPort getSingleServiceLocation()  throws Exception{
@@ -103,7 +101,7 @@ public class LoadBalancer {
 
     /**
      * return locations of all Phoenix Query Servers
-     * in the form of a List of PQS servers  <a href="https://google.github.io/guava/releases/19.0/api/docs/com/google/common/net/HostAndPort.html">HostAndPort</a>
+     * in the form of a List of PQS servers
      * @return - HostAndPort
      * @throws Exception
      */
@@ -112,9 +110,12 @@ public class LoadBalancer {
     }
 
     private List<HostAndPort> conductSanityCheckAndReturn() throws Exception{
-        Preconditions.checkNotNull(curaFramework
-                ," curator framework in not initialized ");
-        Preconditions.checkNotNull(cache," cache value is not initialized");
+        if (curaFramework == null) {
+            throw new NullPointerException(String.valueOf(" curator framework in not initialized "));
+        }
+        if (cache == null) {
+            throw new NullPointerException(String.valueOf(" cache value is not initialized"));
+        }
         boolean connected = curaFramework.getZookeeperClient().isConnected();
         if (!connected) {
             String message = " Zookeeper seems to be down. The data is stale ";

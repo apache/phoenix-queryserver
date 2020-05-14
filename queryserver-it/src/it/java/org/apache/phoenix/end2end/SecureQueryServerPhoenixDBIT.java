@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.security.PrivilegedAction;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,9 +71,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 
 /**
  * This integration test stands up a secured PQS and runs Python code against it. See supporting
@@ -134,8 +132,10 @@ public class SecureQueryServerPhoenixDBIT {
     }
 
     private static Entry<String,File> getUser(int offset) {
-        Preconditions.checkArgument(offset > 0 && offset <= NUM_CREATED_USERS);
-        return Maps.immutableEntry("user" + offset, USER_KEYTAB_FILES.get(offset - 1));
+        if (!(offset > 0 && offset <= NUM_CREATED_USERS)) {
+          throw new IllegalArgumentException();
+        }
+        return new AbstractMap.SimpleImmutableEntry<String,File>("user" + offset, USER_KEYTAB_FILES.get(offset - 1));
     }
 
     /**

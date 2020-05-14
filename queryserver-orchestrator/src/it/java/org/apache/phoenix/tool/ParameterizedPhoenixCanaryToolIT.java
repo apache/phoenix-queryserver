@@ -17,7 +17,6 @@
 */
 package org.apache.phoenix.tool;
 
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
@@ -65,8 +64,8 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 	private static final String fileOutSink
 			= "org.apache.phoenix.tool.PhoenixCanaryTool$FileOutSink";
 
-	private static Map<String, String> serverProps = Maps.newHashMapWithExpectedSize(2);
-	private static Map<String, String> clientProps = Maps.newHashMapWithExpectedSize(2);
+	private static Map<String, String> serverProps = new HashMap<>(2);
+	private static Map<String, String> clientProps = new HashMap<>(2);
 	private static String connString = "";
 	private static Properties canaryProp = new Properties();
 	private static Connection connection = null;

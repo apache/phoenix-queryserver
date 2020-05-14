@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.security.PrivilegedAction;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,6 @@ import org.apache.phoenix.util.InstanceResolver;
 import org.apache.phoenix.util.ThinClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 
 /**
  * Due to this bug https://bugzilla.redhat.com/show_bug.cgi?id=668830 We need to use
@@ -151,8 +149,10 @@ public class QueryServerEnvironment {
     }
 
     public Map.Entry<String, File> getUser(int offset) {
-        Preconditions.checkArgument(offset > 0 && offset <= NUM_CREATED_USERS);
-        return Maps.immutableEntry("user" + offset, USER_KEYTAB_FILES.get(offset - 1));
+        if (!(offset > 0 && offset <= NUM_CREATED_USERS)) {
+          throw new IllegalArgumentException();
+        }
+        return new AbstractMap.SimpleImmutableEntry<String, File>("user" + offset, USER_KEYTAB_FILES.get(offset - 1));
     }
 
     /**
