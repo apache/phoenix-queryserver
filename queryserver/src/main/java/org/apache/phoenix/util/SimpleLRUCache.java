@@ -35,14 +35,14 @@ import org.slf4j.LoggerFactory;
  * The maxSize logic will only work if all access is via the the computeIfAbsent() method.
  *
  */
-public class SimpleLRUCache <K,V> extends ConcurrentHashMap<K,V> {
+public class SimpleLRUCache <K extends Comparable, V> extends ConcurrentHashMap<K,V> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(SimpleLRUCache.class);
 
     int maxSize;
     int triggerSize;
 
-    private ConcurrentHashMap<Object, AtomicLong> accessed =
+    private ConcurrentHashMap<K, AtomicLong> accessed =
             new ConcurrentHashMap<>();
 
     public SimpleLRUCache (long maxSize, int concurrencyLevel) {
@@ -70,19 +70,16 @@ public class SimpleLRUCache <K,V> extends ConcurrentHashMap<K,V> {
                 return;
             }
             LOG.warn("UGI Cache capacity exceeded, you may want to increase its size");
-            TreeSet<Entry<Object, AtomicLong>> sortedByLRU = new TreeSet<>(
-                    new Comparator<Entry<Object, AtomicLong>>() {
+            TreeSet<Entry<K, AtomicLong>> sortedByLRU = new TreeSet<>(
+                    new Comparator<Entry<K, AtomicLong>>() {
                         @Override
-                        public int compare(Entry<Object, AtomicLong> o1, 
-                                Entry<Object, AtomicLong> o2) {
-                            int compareResult =
+                        public int compare(Entry<K, AtomicLong> o1, Entry<K, AtomicLong> o2) {
+                            int keyResult =
                                     Long.compare(o2.getValue().get(), o1.getValue().get());
-                            if( compareResult == 0) {
-                                //The ordering of objects of identical timestamps is arbitrary,
-                                //but we have to make sure not to return 0.
-                                return 1;
+                            if(keyResult == 0) {
+                                return o2.getKey().compareTo(o1.getKey());
                             } else {
-                                return compareResult;
+                                return keyResult;
                             }
                         }
                     });
