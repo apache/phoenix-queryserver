@@ -210,10 +210,15 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         }
         SecurityUtil.login(getConf(), QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
             QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
-        LOG.info("Login successful.");
+        if (!UserGroupInformation.getCurrentUser().hasKerberosCredentials()) {
+          LOG.error("Kerberos login failed, current user does not have Kerberos credentials");
+          return -1;
+        } else {
+          LOG.info("Kerberos login successful.");
+        }
       } else {
         hostname = InetAddress.getLocalHost().getHostName();
-        LOG.info(" Kerberos is off and hostname is : "+hostname);
+        LOG.info("Kerberos is off and hostname is : " + hostname);
       }
 
       int port = getConf().getInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB,
