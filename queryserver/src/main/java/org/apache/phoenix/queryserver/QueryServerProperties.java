@@ -38,6 +38,8 @@ public class QueryServerProperties {
             "phoenix.queryserver.dns.interface";
     public static final String QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB =
             "hbase.security.authentication";
+    public static final String QUERY_SERVER_HADOOP_SECURITY_CONF_ATTRIB =
+            "hadoop.security.authentication";
     public static final String QUERY_SERVER_UGI_CACHE_MAX_SIZE =
             "phoenix.queryserver.ugi.cache.max.size";
     public static final String QUERY_SERVER_UGI_CACHE_INITIAL_SIZE =

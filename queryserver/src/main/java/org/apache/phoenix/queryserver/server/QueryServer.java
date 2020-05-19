@@ -191,6 +191,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     try {
       final boolean isKerberos = "kerberos".equalsIgnoreCase(getConf().get(
           QueryServerProperties.QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB));
+      final boolean isHadoopKerberos = "kerberos".equalsIgnoreCase(getConf().get(
+          QueryServerProperties.QUERY_SERVER_HADOOP_SECURITY_CONF_ATTRIB));
       final boolean disableSpnego = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_SPNEGO_AUTH_DISABLED_ATTRIB,
               QueryServerOptions.DEFAULT_QUERY_SERVER_SPNEGO_AUTH_DISABLED);
       String hostname;
@@ -199,6 +201,13 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
       // handle secure cluster credentials
       if (isKerberos && !disableLogin) {
+        if(!isHadoopKerberos) {
+          LOG.error("HBase and Hadoop security config inconsistent, "
+                  + QueryServerProperties.QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB
+                  + " was configured as kerberos, but "
+                  + QueryServerProperties.QUERY_SERVER_HADOOP_SECURITY_CONF_ATTRIB + " not!");
+          return -1;
+        }
         hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
             getConf().get(QueryServerProperties.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
             getConf().get(QueryServerProperties.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
@@ -210,10 +219,10 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         }
         SecurityUtil.login(getConf(), QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
             QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
-        LOG.info("Login successful.");
+        LOG.info("Kerberos login successful.");
       } else {
         hostname = InetAddress.getLocalHost().getHostName();
-        LOG.info(" Kerberos is off and hostname is : "+hostname);
+        LOG.info("Kerberos is off and hostname is : " + hostname);
       }
 
       int port = getConf().getInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB,
