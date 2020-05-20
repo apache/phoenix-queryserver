@@ -73,9 +73,8 @@ else:
 
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
-hbase_config_path = phoenix_utils.hbase_conf_dir
-hadoop_config_path = phoenix_utils.hadoop_conf
-hadoop_classpath = phoenix_utils.hadoop_classpath
+hbase_conf_dir = phoenix_utils.hbase_conf_dir
+hadoop_conf_dir = phoenix_utils.hadoop_conf_dir
 
 # TODO: add windows support
 phoenix_file_basename = 'phoenix-%s-queryserver' % getpass.getuser()
@@ -87,10 +86,10 @@ phoenix_pid_file = '%s.pid' % phoenix_file_basename
 hbase_env_path = None
 hbase_env_cmd  = None
 if os.name == 'posix':
-    hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.sh')
+    hbase_env_path = os.path.join(hbase_conf_dir, 'hbase-env.sh')
     hbase_env_cmd = ['bash', '-c', 'source %s && env' % hbase_env_path]
 elif os.name == 'nt':
-    hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.cmd')
+    hbase_env_path = os.path.join(hbase_conf_dir, 'hbase-env.cmd')
     hbase_env_cmd = ['cmd.exe', '/c', 'call %s & set' % hbase_env_path]
 if not hbase_env_path or not hbase_env_cmd:
     sys.stderr.write("hbase-env file unknown on platform {}{}".format(os.name, os.linesep))
@@ -121,12 +120,11 @@ out_file_path = os.path.join(log_dir, phoenix_out_file)
 #    " -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true" + \
 
 # The command is run through subprocess so environment variables are automatically inherited
-java_cmd = '%(java)s -cp ' + hbase_config_path + os.pathsep + hadoop_config_path + os.pathsep + \
+java_cmd = '%(java)s -cp ' + hbase_conf_dir + os.pathsep + hadoop_conf_dir + os.pathsep + \
     phoenix_utils.phoenix_client_jar + os.pathsep + \
     phoenix_utils.phoenix_loadbalancer_jar + os.pathsep + \
     phoenix_utils.phoenix_queryserver_jar + os.pathsep + \
-    phoenix_utils.phoenix_queryserver_classpath + os.pathsep + \
-    hadoop_classpath + \
+    phoenix_utils.phoenix_queryserver_classpath + \
     " -Dproc_phoenixserver" + \
     " -Dlog4j.configuration=file:" + os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
     " -Dpsql.root.logger=%(root_logger)s" + \

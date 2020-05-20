@@ -80,9 +80,6 @@ def setPath():
     PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-*-thin-client.jar"
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-*-queryserver.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
-    PHOENIX_TRACESERVER_JAR_PATTERN = "phoenix-tracing-webapp-*-runnable.jar"
-    PHOENIX_TESTS_JAR_PATTERN = "phoenix-core-*-tests*.jar"
-    PHOENIX_PHERF_JAR_PATTERN = "phoenix-pherf-*-minimal*.jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
 
     # Backward support old env variable PHOENIX_LIB_DIR replaced by PHOENIX_CLASS_PATH
@@ -107,66 +104,27 @@ def setPath():
     global hbase_conf_path # keep conf_path around for backward compatibility
     hbase_conf_path = hbase_conf_dir
 
+    global hadoop_conf_dir
+    hadoop_conf_dir = os.getenv('HADOOP_CONF_DIR', None)
+    if not hadoop_conf_dir:
+        if os.name == 'posix':
+            # Try to provide a sane configuration directory for Hadoop if not otherwise provided.
+            # If there's no jaas file specified by the caller, this is necessary when Kerberos is enabled.
+            hadoop_conf_dir = '/etc/hadoop/conf'
+        else:
+            # Try to provide something valid..
+            hadoop_conf_dir = '.'
+
     global current_dir
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     global phoenix_queryserver_classpath
     phoenix_queryserver_classpath = os.path.join(current_dir, "../lib/*")
 
-    global pherf_conf_path
-    pherf_conf_path = os.path.join(current_dir, "config")
-    pherf_properties_file = find("pherf.properties", pherf_conf_path)
-    if pherf_properties_file == "":
-        pherf_conf_path = os.path.join(current_dir, "..", "phoenix-pherf", "config")
-
-    global phoenix_jar_path
-    phoenix_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*")
-
     global phoenix_client_jar
-    phoenix_client_jar = find("phoenix-*[!n]-client.jar", phoenix_jar_path)
+    phoenix_client_jar = find(PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
     if phoenix_client_jar == "":
         phoenix_client_jar = findFileInPathWithoutRecursion(PHOENIX_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
-    if phoenix_client_jar == "":
-        phoenix_client_jar = find(PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
-
-    global phoenix_test_jar_path
-    phoenix_test_jar_path = os.path.join(current_dir, "..", "phoenix-core", "target","*")
-
-    global hadoop_conf
-    hadoop_conf = os.getenv('HADOOP_CONF_DIR', None)
-    if not hadoop_conf:
-        if os.name == 'posix':
-            # Try to provide a sane configuration directory for Hadoop if not otherwise provided.
-            # If there's no jaas file specified by the caller, this is necessary when Kerberos is enabled.
-            hadoop_conf = '/etc/hadoop/conf'
-        else:
-            # Try to provide something valid..
-            hadoop_conf = '.'
-
-    global hadoop_classpath
-    if (os.name != 'nt'):
-        hadoop_classpath = findClasspath('hadoop').rstrip()
-    else:
-        hadoop_classpath = os.getenv('HADOOP_CLASSPATH', '').rstrip()
-
-    global hadoop_common_jar_path
-    hadoop_common_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
-
-    global hadoop_common_jar
-    hadoop_common_jar = find("hadoop-common*.jar", hadoop_common_jar_path)
-
-    global hadoop_hdfs_jar_path
-    hadoop_hdfs_jar_path = os.path.join(current_dir, "..", "phoenix-client", "target","*").rstrip()
-
-    global hadoop_hdfs_jar
-    hadoop_hdfs_jar = find("hadoop-hdfs*.jar", hadoop_hdfs_jar_path)
-
-    global testjar
-    testjar = find(PHOENIX_TESTS_JAR_PATTERN, phoenix_test_jar_path)
-    if testjar == "":
-        testjar = findFileInPathWithoutRecursion(PHOENIX_TESTS_JAR_PATTERN, os.path.join(current_dir, "..", 'lib'))
-    if testjar == "":
-        testjar = find(PHOENIX_TESTS_JAR_PATTERN, phoenix_class_path)
 
     global phoenix_queryserver_jar
     phoenix_queryserver_jar = find(PHOENIX_QUERYSERVER_JAR_PATTERN, os.path.join(current_dir, "..", "queryserver", "target", "*"))
@@ -181,20 +139,6 @@ def setPath():
         phoenix_loadbalancer_jar = findFileInPathWithoutRecursion(PHOENIX_LOADBALANCER_JAR_PATTERN, os.path.join(current_dir, "..", "lib"))
     if phoenix_loadbalancer_jar == "":
         phoenix_loadbalancer_jar = findFileInPathWithoutRecursion(PHOENIX_LOADBALANCER_JAR_PATTERN, os.path.join(current_dir, ".."))
-
-    global phoenix_traceserver_jar
-    phoenix_traceserver_jar = find(PHOENIX_TRACESERVER_JAR_PATTERN, os.path.join(current_dir, "..", "phoenix-tracing-webapp", "target", "*"))
-    if phoenix_traceserver_jar == "":
-        phoenix_traceserver_jar = findFileInPathWithoutRecursion(PHOENIX_TRACESERVER_JAR_PATTERN, os.path.join(current_dir, "..", "lib"))
-    if phoenix_traceserver_jar == "":
-        phoenix_traceserver_jar = findFileInPathWithoutRecursion(PHOENIX_TRACESERVER_JAR_PATTERN, os.path.join(current_dir, ".."))
-
-    global phoenix_pherf_jar
-    phoenix_pherf_jar = find(PHOENIX_PHERF_JAR_PATTERN, os.path.join(current_dir, "..", "phoenix-pherf", "target", "*"))
-    if phoenix_pherf_jar == "":
-        phoenix_pherf_jar = findFileInPathWithoutRecursion(PHOENIX_PHERF_JAR_PATTERN, os.path.join(current_dir, "..", "lib"))
-    if phoenix_pherf_jar == "":
-        phoenix_pherf_jar = findFileInPathWithoutRecursion(PHOENIX_PHERF_JAR_PATTERN, os.path.join(current_dir, ".."))
 
     global phoenix_thin_client_jar
     phoenix_thin_client_jar = find(PHOENIX_THIN_CLIENT_JAR_PATTERN, os.path.join(current_dir, "..", "queryserver-client", "target", "*"))
@@ -228,21 +172,14 @@ def common_sqlline_args(parser):
 
 if __name__ == "__main__":
     setPath()
-    print("phoenix_class_path:", phoenix_class_path)
-    print("hbase_conf_dir:", hbase_conf_dir)
-    print("hbase_conf_path:", hbase_conf_path)
-    print("current_dir:", current_dir)
-    print("phoenix_jar_path:", phoenix_jar_path)
-    print("phoenix_client_jar:", phoenix_client_jar)
-    print("phoenix_test_jar_path:", phoenix_test_jar_path)
-    print("hadoop_common_jar_path:", hadoop_common_jar_path)
-    print("hadoop_common_jar:", hadoop_common_jar)
-    print("hadoop_hdfs_jar_path:", hadoop_hdfs_jar_path)
-    print("hadoop_hdfs_jar:", hadoop_hdfs_jar)
-    print("testjar:", testjar)
-    print("phoenix_queryserver_jar:", phoenix_queryserver_jar)
-    print("phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar)
-    print("phoenix_queryserver_classpath", phoenix_queryserver_classpath)
-    print("phoenix_thin_client_jar:", phoenix_thin_client_jar)
-    print("hadoop_classpath:", hadoop_classpath)
-    print("sqlline_with_deps_jar", sqlline_with_deps_jar)
+    print "phoenix_class_path:", phoenix_class_path
+    print "hbase_conf_dir:", hbase_conf_dir
+    print "hbase_conf_path:", hbase_conf_path
+    print "hadoop_conf_dir:", hadoop_conf_dir
+    print "current_dir:", current_dir
+    print "phoenix_client_jar:", phoenix_client_jar
+    print "phoenix_queryserver_jar:", phoenix_queryserver_jar
+    print "phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar
+    print "phoenix_queryserver_classpath", phoenix_queryserver_classpath
+    print "phoenix_thin_client_jar:", phoenix_thin_client_jar
+    print "sqlline_with_deps_jar", sqlline_with_deps_jar
