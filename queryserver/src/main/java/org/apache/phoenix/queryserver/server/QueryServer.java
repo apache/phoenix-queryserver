@@ -199,22 +199,26 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
       // handle secure cluster credentials
       if (isKerberos && !disableLogin) {
-        hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
-            getConf().get(QueryServerProperties.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
-            getConf().get(QueryServerProperties.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Login to " + hostname + " using " + getConf().get(
-              QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB)
-              + " and principal " + getConf().get(
-                  QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB) + ".");
-        }
-        SecurityUtil.login(getConf(), QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
-            QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
-        if (!UserGroupInformation.getCurrentUser().hasKerberosCredentials()) {
-          LOG.error("Kerberos login failed, current user does not have Kerberos credentials");
-          return -1;
-        } else {
+        if ("kerberos".equalsIgnoreCase(getConf().get(
+                QueryServerProperties.QUERY_SERVER_HADOOP_SECURITY_CONF_ATTRIB))) {
+          hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
+                  getConf().get(QueryServerProperties.QUERY_SERVER_DNS_INTERFACE_ATTRIB, "default"),
+                  getConf().get(QueryServerProperties.QUERY_SERVER_DNS_NAMESERVER_ATTRIB, "default")));
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Login to " + hostname + " using " + getConf().get(
+                    QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB)
+                    + " and principal " + getConf().get(
+                    QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB) + ".");
+          }
+          SecurityUtil.login(getConf(), QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB,
+                  QueryServerProperties.QUERY_SERVER_KERBEROS_PRINCIPAL_ATTRIB, hostname);
           LOG.info("Kerberos login successful.");
+        } else {
+          LOG.error("HBase and Hadoop security config inconsistent, "
+                  + QueryServerProperties.QUERY_SERVER_HBASE_SECURITY_CONF_ATTRIB
+                  + " was configured as kerberos, but "
+                  + QueryServerProperties.QUERY_SERVER_HADOOP_SECURITY_CONF_ATTRIB + " not!");
+          return -1;
         }
       } else {
         hostname = InetAddress.getLocalHost().getHostName();
