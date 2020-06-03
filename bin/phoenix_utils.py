@@ -104,6 +104,17 @@ def setPath():
     global hbase_conf_path # keep conf_path around for backward compatibility
     hbase_conf_path = hbase_conf_dir
 
+    global hadoop_conf_dir
+    hadoop_conf_dir = os.getenv('HADOOP_CONF_DIR', None)
+    if not hadoop_conf_dir:
+        if os.name == 'posix':
+            # Try to provide a sane configuration directory for Hadoop if not otherwise provided.
+            # If there's no jaas file specified by the caller, this is necessary when Kerberos is enabled.
+            hadoop_conf_dir = '/etc/hadoop/conf'
+        else:
+            # Try to provide something valid..
+            hadoop_conf_dir = '.'
+
     global current_dir
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -164,6 +175,7 @@ if __name__ == "__main__":
     print "phoenix_class_path:", phoenix_class_path
     print "hbase_conf_dir:", hbase_conf_dir
     print "hbase_conf_path:", hbase_conf_path
+    print "hadoop_conf_dir:", hadoop_conf_dir
     print "current_dir:", current_dir
     print "phoenix_client_jar:", phoenix_client_jar
     print "phoenix_queryserver_jar:", phoenix_queryserver_jar
