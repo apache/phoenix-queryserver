@@ -129,7 +129,7 @@ def _process_args(
 
     # Parse supported JDBC compatible parameters from URL. args have precendece
     # Unlike the JDBC driver, we are expecting these as query params, as the avatica java client
-    # has a differnt idea of what is an URL param than urlparse does. (urlparse seems just broken
+    # has a different idea of what an URL param is than urlparse. (urlparse seems just broken
     # in this regard)
     params_changed = False
     if auth is None and authentication is None and 'authentication' in url_params:

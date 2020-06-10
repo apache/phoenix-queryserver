@@ -95,6 +95,13 @@ class PhoenixDialect(DefaultDialect):
     execution_ctx_cls = PhoenixExecutionContext
 
     def __init__(self, tls=False, path='/', **opts):
+        '''
+        :param tls:
+            If True, then use https for connecting, otherwise use http
+
+        :param path:
+            The path component of the connection URL
+        '''
         # There is no way to pass these via the SqlAlchemy url object
         self.tls = tls
         self.path = path
