@@ -6,3 +6,8 @@
 *.egg-info/
 .vagrant/
 .tox
+dev-support/artifacts
+dev-support/work
+phoenixdb/.eggs
+phoenixdb/build
+phoenixdb/e
