@@ -39,6 +39,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -339,7 +340,7 @@ public class SecureQueryServerPhoenixDBIT {
     public void testFullSuite() throws Exception {
         Assume.assumeNotNull(System.getProperty("run.full.python.testsuite"));
         File file = new File(".");
-        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python", "phoenixdb").toString());
+        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python-phoenixdb").toString());
     }
 
     @Test
@@ -364,7 +365,7 @@ public class SecureQueryServerPhoenixDBIT {
         ArrayList<String> cmdList = new ArrayList<>();
         // This assumes the test is being run from phoenix/phoenix-queryserver
         cmdList.add(Paths.get(currentDirectory, "src", "it", "bin", "test_phoenixdb.sh").toString());
-        cmdList.add(Paths.get(currentDirectory, "..", "python").toString());
+        cmdList.add(Paths.get(currentDirectory, "..", "python-phoenixdb").toString());
         cmdList.add(user1.getKey() + "@" + KDC.getRealm());
         cmdList.add(user1.getValue().getAbsolutePath());
         final String osName = System.getProperty("os.name").toLowerCase();
@@ -432,24 +433,42 @@ public class SecureQueryServerPhoenixDBIT {
         cmdList.add(Integer.toString(PQS_PORT));
         cmdList.addAll(Arrays.asList(testCli));
 
-        //This will intersperse that script's output to the maven output, but that's better than
-        //getting stuck on a full buffer
-        Process runPythonProcess = new ProcessBuilder(cmdList).start();
-        BufferedReader processOutput = new BufferedReader(
-            new InputStreamReader(runPythonProcess.getInputStream()));
-        new Thread(new StreamCopy(processOutput, new PrintWriter(System.out))).start();
+        LOG.info("Running command {}", cmdList.stream().collect(Collectors.joining(" ")));
 
-        BufferedReader processError = new BufferedReader(
-            new InputStreamReader(runPythonProcess.getErrorStream()));
-        new Thread(new StreamCopy(processError, new PrintWriter(System.err))).start();
+        Thread outWriter = null;
+        Thread errWriter = null;
+        try {
+          //This will intersperse that script's output to the maven output, but that's better than
+          //getting stuck on a full buffer
+          Process runPythonProcess = new ProcessBuilder(cmdList).start();
+          BufferedReader processOutput = new BufferedReader(
+              new InputStreamReader(runPythonProcess.getInputStream()));
+          outWriter = new Thread(new StreamCopy(processOutput, new PrintWriter(System.out)));
+          outWriter.start();
 
-        int exitCode = runPythonProcess.waitFor();
+          BufferedReader processError = new BufferedReader(
+              new InputStreamReader(runPythonProcess.getErrorStream()));
+          errWriter = new Thread(new StreamCopy(processError, new PrintWriter(System.err)));
+          errWriter.start();
 
-        // Not managed by miniKDC so we have to clean up
-        if (krb5ConfFile != null)
-            krb5ConfFile.delete();
+          int exitCode = runPythonProcess.waitFor();
 
-        assertEquals("Subprocess exited with errors", 0, exitCode);
+          // Not managed by miniKDC so we have to clean up
+          if (krb5ConfFile != null)
+              krb5ConfFile.delete();
+
+          assertEquals("Subprocess exited with errors", 0, exitCode);
+        } finally {
+          LOG.info("Test exiting");
+          if (outWriter != null) {
+            outWriter.stop();
+            System.out.flush();
+          }
+          if (errWriter != null) {
+            errWriter.stop();
+            System.err.flush();
+          }
+        }
     }
 
     private class StreamCopy implements Runnable {

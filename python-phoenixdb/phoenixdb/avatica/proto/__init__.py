@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -15,25 +13,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -x
-AVATICA_VER=rel/avatica-1.10.0
-
-set -e
-
-rm -rf avatica-tmp
-
-mkdir avatica-tmp
-cd avatica-tmp
-wget -O avatica.tar.gz https://github.com/apache/calcite-avatica/archive/$AVATICA_VER.tar.gz
-tar -x --strip-components=1 -f avatica.tar.gz
-
-cd ..
-rm -f phoenixdb/avatica/proto/*_pb2.py
-protoc --proto_path=avatica-tmp/core/src/main/protobuf/ --python_out=phoenixdb/avatica/proto avatica-tmp/core/src/main/protobuf/*.proto
-if [[ "$(uname)" == "Darwin" ]]; then
-  sed -i '' 's/import common_pb2/from . import common_pb2/' phoenixdb/avatica/proto/*_pb2.py
-else
-  sed -i 's/import common_pb2/from . import common_pb2/' phoenixdb/avatica/proto/*_pb2.py
-fi
-
-rm -rf avatica-tmp
