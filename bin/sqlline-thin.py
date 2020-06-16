@@ -20,11 +20,11 @@
 ############################################################################
 
 from __future__ import print_function
-from phoenix_utils import tryDecode
+from phoenix_queryserver_utils import tryDecode
 import os
 import subprocess
 import sys
-import phoenix_utils
+import phoenix_queryserver_utils
 import atexit
 try:
     import urlparse
@@ -70,11 +70,11 @@ parser.add_argument('-kt', '--keytab', help='Kerberos keytab file for SPNEGO aut
 parser.add_argument('-t', '--truststore', help='Truststore file that contains the TLS certificate of the server.')
 parser.add_argument('-tp', '--truststore-password', help='Password for the server TLS certificate truststore')
 # Common arguments across sqlline.py and sqlline-thin.py
-phoenix_utils.common_sqlline_args(parser)
+phoenix_queryserver_utils.common_sqlline_args(parser)
 # Parse the args
 args=parser.parse_args()
 
-phoenix_utils.setPath()
+phoenix_queryserver_utils.setPath()
 
 url = tryDecode(args.url)
 sqlfile = tryDecode(args.sqlfile)
@@ -105,12 +105,12 @@ def get_hbase_param(key, default):
       print('Unknown platform "%s", defaulting to HBase executable of "hbase"' % os.name)
       hbase_exec_name = 'hbase'
 
-    hbase_cmd = phoenix_utils.which(hbase_exec_name)
+    hbase_cmd = phoenix_queryserver_utils.which(hbase_exec_name)
     if hbase_cmd is None:
         print('Failed to find hbase executable on PATH, defaulting %s to %s.' % (key, default))
         return default
 
-    env['HBASE_CONF_DIR'] = phoenix_utils.hbase_conf_dir
+    env['HBASE_CONF_DIR'] = phoenix_queryserver_utils.hbase_conf_dir
     proc = subprocess.Popen([hbase_cmd, 'org.apache.hadoop.hbase.util.HBaseConfTool', key],
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdout, stderr) = proc.communicate()
@@ -147,7 +147,7 @@ if os.name == 'nt':
 
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
-hbase_config_path = os.getenv('HBASE_CONF_DIR', phoenix_utils.current_dir)
+hbase_config_path = os.getenv('HBASE_CONF_DIR', phoenix_queryserver_utils.current_dir)
 
 serialization = tryDecode(args.serialization) if args.serialization else get_serialization()
 
@@ -204,10 +204,10 @@ if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == '
     jdbc_url += ';authentication=SPNEGO'
 
 java_cmd = java + ' $PHOENIX_OPTS ' + \
-    ' -cp "' + phoenix_utils.sqlline_with_deps_jar \
-    + os.pathsep + phoenix_utils.phoenix_thin_client_jar + \
+    ' -cp "' + phoenix_queryserver_utils.sqlline_with_deps_jar \
+    + os.pathsep + phoenix_queryserver_utils.phoenix_thin_client_jar + \
     '" -Dlog4j.configuration=file:' + \
-    os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
+    os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
     ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
     ' -u "' + jdbc_url + '"' + " -n none -p none " + \

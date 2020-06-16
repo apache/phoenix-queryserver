@@ -26,7 +26,7 @@
 #
 
 from __future__ import print_function
-from phoenix_utils import tryDecode
+from phoenix_queryserver_utils import tryDecode
 import datetime
 import getpass
 import os
@@ -43,9 +43,9 @@ except ImportError:
     # daemon script not supported on some platforms (windows?)
     daemon_supported = False
 
-import phoenix_utils
+import phoenix_queryserver_utils
 
-phoenix_utils.setPath()
+phoenix_queryserver_utils.setPath()
 
 command = None
 args = sys.argv
@@ -73,8 +73,8 @@ else:
 
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
-hbase_conf_dir = phoenix_utils.hbase_conf_dir
-hadoop_conf_dir = phoenix_utils.hadoop_conf_dir
+hbase_conf_dir = phoenix_queryserver_utils.hbase_conf_dir
+hadoop_conf_dir = phoenix_queryserver_utils.hadoop_conf_dir
 
 # TODO: add windows support
 phoenix_file_basename = 'phoenix-%s-queryserver' % getpass.getuser()
@@ -121,12 +121,10 @@ out_file_path = os.path.join(log_dir, phoenix_out_file)
 
 # The command is run through subprocess so environment variables are automatically inherited
 java_cmd = '%(java)s -cp ' + hbase_conf_dir + os.pathsep + hadoop_conf_dir + os.pathsep + \
-    phoenix_utils.phoenix_client_jar + os.pathsep + \
-    phoenix_utils.phoenix_loadbalancer_jar + os.pathsep + \
-    phoenix_utils.phoenix_queryserver_jar + os.pathsep + \
-    phoenix_utils.phoenix_queryserver_classpath + \
+    phoenix_queryserver_utils.phoenix_client_jar + os.pathsep + \
+    phoenix_queryserver_utils.phoenix_queryserver_jar + os.pathsep + \
     " -Dproc_phoenixserver" + \
-    " -Dlog4j.configuration=file:" + os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
+    " -Dlog4j.configuration=file:" + os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
     " -Dpsql.root.logger=%(root_logger)s" + \
     " -Dpsql.log.dir=%(log_dir)s" + \
     " -Dpsql.log.file=%(log_file)s" + \

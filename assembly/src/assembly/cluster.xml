@@ -28,33 +28,29 @@
         <fileSet>
             <directory>${project.basedir}/../bin</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/bin</outputDirectory>
+            <excludes>
+              <exclude>__pycache__</exclude>
+              <exclude>__pycache__/*</exclude>
+              <exclude>*.pyc</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../queryserver/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
-                <include>phoenix*.jar</include>
-                <include>queryserver*.jar</include>
+                <include>queryserver-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../queryserver-client/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver-client/target</outputDirectory>
+            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
-                <include>phoenix*.jar</include>
-                <include>queryserver*.jar</include>
+                <include>queryserver-client-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
           <directory>${project.build.directory}/maven-repo</directory>
           <outputDirectory>${project.parent.artifactId}-${project.parent.version}/maven</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/../load-balancer/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/load-balancer/target</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
         </fileSet>
     </fileSets>
     <dependencySets>
@@ -63,34 +59,14 @@
         <outputDirectory>${project.parent.artifactId}-${project.parent.version}/lib</outputDirectory>
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
-          <include>com.google.guava:guava</include>
         </includes>
       </dependencySet>
       <dependencySet>
         <unpack>false</unpack>
         <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
         <includes>
-          <include>org.apache.phoenix:phoenix-client</include>
+          <include>org.apache.phoenix:phoenix-client:jar:${phoenix.hbase.classifier}</include>
         </includes>
-        <!-- Unwind the name from phoenix-client-$version to phonix-$version-client -->
-        <outputFileNameMapping>phoenix-${artifact.version}${dashClassifier}-client.${artifact.extension}</outputFileNameMapping>
-      </dependencySet>
-      <dependencySet>
-        <unpack>false</unpack>
-        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver/target</outputDirectory>
-        <includes>
-          <include>org.apache.phoenix:queryserver</include>
-        </includes>
-        <outputFileNameMapping>phoenix-${project.parent.version}-queryserver.${artifact.extension}</outputFileNameMapping>
-      </dependencySet>
-      <!-- Unwind the name from queryserver-client-$version to phoenix-$version-thin-client -->
-      <dependencySet>
-        <unpack>false</unpack>
-        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/queryserver-client/target</outputDirectory>
-        <includes>
-          <include>org.apache.phoenix:queryserver-client</include>
-        </includes>
-        <outputFileNameMapping>phoenix-${project.parent.version}-thin-client.${artifact.extension}</outputFileNameMapping>
       </dependencySet>
     </dependencySets>
 </assembly>

@@ -28,21 +28,17 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.phoenix</groupId>
     <artifactId>assembly</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.phoenix</groupId>
             <artifactId>queryserver</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.phoenix</groupId>
             <artifactId>queryserver-client</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>sqlline</groupId>
