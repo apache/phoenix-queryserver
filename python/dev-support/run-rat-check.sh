@@ -32,4 +32,4 @@ fi
 echo "RAT binary installation localized, running RAT check"
 
 # Run the RAT check, excluding pyc files
-java -jar "$ARTIFACTS_DIR/$RAT_BINARY_DIR/$RAT_JAR" -d "$DEV_SUPPORT/../phoenixdb" -e '.*\.pyc'
+java -jar "$ARTIFACTS_DIR/$RAT_BINARY_DIR/$RAT_JAR" -d "$DEV_SUPPORT/../phoenixdb" -E "$DEV_SUPPORT/rat-excludes.txt"
