@@ -30,10 +30,10 @@
     </parent>
 
     <groupId>org.apache.phoenix</groupId>
-    <artifactId>phoenix-queryserver</artifactId>
+    <artifactId>phoenix-queryserver-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Phoenix Query Server</name>
+    <name>Phoenix Query Server Maven Parent Project</name>
 
     <licenses>
         <license>
@@ -50,12 +50,12 @@
     </organization>
 
     <modules>
-        <module>queryserver</module>
-        <module>queryserver-it</module>
-        <module>queryserver-client</module>
-        <module>load-balancer</module>
-        <module>assembly</module>
-        <module>queryserver-orchestrator</module>
+        <module>phoenix-queryserver</module>
+        <module>phoenix-queryserver-it</module>
+        <module>phoenix-queryserver-client</module>
+        <module>phoenix-queryserver-load-balancer</module>
+        <module>phoenix-queryserver-assembly</module>
+        <module>phoenix-queryserver-orchestrator</module>
     </modules>
 
     <scm>
@@ -340,12 +340,12 @@
             <!-- Intra-project dependencies -->
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
-                <artifactId>queryserver</artifactId>
+                <artifactId>phoenix-queryserver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
-                <artifactId>queryserver-client</artifactId>
+                <artifactId>phoenix-queryserver-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -26,11 +26,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.phoenix</groupId>
-    <artifactId>phoenix-queryserver</artifactId>
+    <artifactId>phoenix-queryserver-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>load-balancer</artifactId>
-  <name>Phoenix Load Balancer</name>
+  <artifactId>phoenix-queryserver-load-balancer</artifactId>
+  <name>Phoenix Query Server Load Balancer</name>
   <description>A Load balancer which routes calls to Phoenix Query Server</description>
 
   <build>
@@ -90,7 +90,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.phoenix</groupId>
-      <artifactId>queryserver</artifactId>
+      <artifactId>phoenix-queryserver</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
