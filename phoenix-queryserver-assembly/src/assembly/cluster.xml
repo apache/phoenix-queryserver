@@ -35,14 +35,14 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../queryserver/target</directory>
+            <directory>${project.basedir}/../phoenix-queryserver/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
                 <include>queryserver-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../queryserver-client/target</directory>
+            <directory>${project.basedir}/../phoenix-queryserver-client/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
                 <include>queryserver-client-${project.parent.version}.jar</include>

@@ -27,12 +27,12 @@
 
   <parent>
     <groupId>org.apache.phoenix</groupId>
-    <artifactId>phoenix-queryserver</artifactId>
+    <artifactId>phoenix-queryserver-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>queryserver</artifactId>
-  <name>Query Server</name>
+  <artifactId>phoenix-queryserver</artifactId>
+  <name>Phoenix Query Server</name>
   <description>A query server for exposing Phoenix to thin clients</description>
 
   <properties>
@@ -222,7 +222,7 @@
     <!-- for tests -->
     <dependency>
       <groupId>org.apache.phoenix</groupId>
-      <artifactId>queryserver-client</artifactId>
+      <artifactId>phoenix-queryserver-client</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
