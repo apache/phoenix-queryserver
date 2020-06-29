@@ -339,7 +339,7 @@ public class SecureQueryServerPhoenixDBIT {
     public void testFullSuite() throws Exception {
         Assume.assumeNotNull(System.getProperty("run.full.python.testsuite"));
         File file = new File(".");
-        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python", "phoenixdb").toString());
+        runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python-phoenixdb").toString());
     }
 
     @Test
@@ -364,7 +364,7 @@ public class SecureQueryServerPhoenixDBIT {
         ArrayList<String> cmdList = new ArrayList<>();
         // This assumes the test is being run from phoenix/phoenix-queryserver
         cmdList.add(Paths.get(currentDirectory, "src", "it", "bin", "test_phoenixdb.sh").toString());
-        cmdList.add(Paths.get(currentDirectory, "..", "python").toString());
+        cmdList.add(Paths.get(currentDirectory, "..", "python-phoenixdb").toString());
         cmdList.add(user1.getKey() + "@" + KDC.getRealm());
         cmdList.add(user1.getValue().getAbsolutePath());
         final String osName = System.getProperty("os.name").toLowerCase();

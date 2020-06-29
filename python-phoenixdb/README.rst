@@ -1,13 +1,14 @@
 Phoenix database adapter for Python
 ===================================
 
-``phoenixdb`` is a Python library for accessing the
-`Phoenix SQL database <http://phoenix.apache.org/>`_
+``phoenixdb`` is a Python library for accessing 
+`Apache Phoenix <http://phoenix.apache.org/>`_
 using the
 `remote query server <http://phoenix.apache.org/server.html>`_.
-The library implements the
-standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface,
-which should be familiar to most Python programmers.
+This library implements the
+standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface and
+`SQLAlchemy <https://www.sqlalchemy.org/>`_, either of which should be familiar
+to most Python programmers.
 
 Installation
 ------------
