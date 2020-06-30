@@ -60,7 +60,7 @@ popd
 
 set -u
 echo "INSTALLING COMPONENTS"
-pip install -e file:///${LOCAL_PY}/phoenixdb
+pip install -e file:///${LOCAL_PY}/
 
 export KRB5_CONFIG=$KRB5_CFG_FILE
 cat $KRB5_CONFIG
