@@ -6,8 +6,8 @@ Phoenix database adapter for Python
 using the
 `remote query server <http://phoenix.apache.org/server.html>`_.
 This library implements the
-standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface and
-`SQLAlchemy <https://www.sqlalchemy.org/>`_, either of which should be familiar
+standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface and a
+subset of `SQLAlchemy <https://www.sqlalchemy.org/>`_, either of which should be familiar
 to most Python programmers.
 
 Installation
@@ -130,3 +130,15 @@ Known issues
   but the remote protocol only exposes the time (hour/minute/second) or date (year/month/day)
   parts of the columns. (`CALCITE-797 <https://issues.apache.org/jira/browse/CALCITE-797>`_, `CALCITE-798 <https://issues.apache.org/jira/browse/CALCITE-798>`_)
 - TIMESTAMP columns in Phoenix are stored with a nanosecond accuracy, but the remote protocol truncates them to milliseconds. (`CALCITE-796 <https://issues.apache.org/jira/browse/CALCITE-796>`_)
+
+
+SQLAlchemy feature support
+--------------------------
+
+SQLAlchemy has a wide breadth of API, ranging from basic SQL commands to object-relational mapping support.
+
+Today, python-phoenixdb only supports the following subset of the complete SQLAlchemy API:
+
+- `Textual SQL <https://docs.sqlalchemy.org/en/13/core/tutorial.html#using-textual-sql>`_
+
+All other API should be considered not implemented.
