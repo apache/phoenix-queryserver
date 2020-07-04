@@ -592,6 +592,12 @@
                 <version>${hadoop-two.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>bouncycastle</groupId>
+                <artifactId>bcprov-jdk15</artifactId>
+                <version>140</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>

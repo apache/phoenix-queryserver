@@ -207,6 +207,11 @@
       <artifactId>hadoop-common</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
-     </dependency>
+    </dependency>
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk15</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
