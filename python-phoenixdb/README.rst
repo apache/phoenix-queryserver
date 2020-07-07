@@ -60,18 +60,18 @@ necessary requirements::
 You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
 the following command in the phoenix-queryserver directory::
 
-    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=QueryServerBasicsIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
 for testing by running the following command in the phoenix-queryserver directory::
 
-    mvn clean verify -am -pl queryserver-it -Dtest=foo \
+    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=SecureQueryServerPhoenixDBIT\#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.secure.pqs=true
 
-this will also create a shell script in queryserver-it/target/krb_setup.sh, that you can use to set
+this will also create a shell script in phoenix-queryserver-it/target/krb_setup.sh, that you can use to set
 up the environment for the tests.
 
 If you want to use the library without installing the phoenixdb library, you can use
@@ -119,7 +119,7 @@ environments locally::
 You can also run the test suite from maven as part of the Java build by setting the 
 run.full.python.testsuite property. You DO NOT need to set the PHOENIXDB_* enviroment variables,
 maven will set them up for you. The output of the test run will be saved in
-phoenix-queryserver/queryserver-it/target/python-stdout.log and python-stderr.log::
+phoenix-queryserver/phoenix-queryserver-it/target/python-stdout.log and python-stderr.log::
 
     mvn clean verify -Drun.full.python.testsuite=true
 
