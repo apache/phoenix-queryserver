@@ -128,7 +128,8 @@ class PhoenixDialect(DefaultDialect):
 
     def has_table(self, connection, table_name, schema=None):
         if schema is None:
-            query = "SELECT 1 FROM system.catalog WHERE table_name = ? LIMIT 1"
+            query = """SELECT 1 FROM system.catalog WHERE table_name = ? AND TABLE_SCHEM IS NULL
+            LIMIT 1"""
             params = [table_name.upper()]
         else:
             query = "SELECT 1 FROM system.catalog WHERE table_name = ? AND TABLE_SCHEM = ? LIMIT 1"
@@ -141,18 +142,19 @@ class PhoenixDialect(DefaultDialect):
 
     def get_table_names(self, connection, schema=None, **kw):
         if schema is None:
-            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG"
+            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG WHERE TABLE_SCHEM IS NULL"
             params = []
         else:
-            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG WHERE TABLE_SCHEM = ? "
+            query = "SELECT DISTINCT table_name FROM SYSTEM.CATALOG WHERE TABLE_SCHEM = ?"
             params = [schema.upper()]
         return [row[0] for row in connection.execute(query, params)]
 
     def get_columns(self, connection, table_name, schema=None, **kw):
         if schema is None:
-            query = """SELECT COLUMN_NAME,  DATA_TYPE, NULLABLE
+            query = """SELECT COLUMN_NAME, DATA_TYPE, NULLABLE
                     FROM system.catalog
-                    WHERE table_name = ?
+                    WHERE TABLE_SCHEM IS NULL
+                    AND table_name = ?
                     AND ORDINAL_POSITION is not null
                     ORDER BY ORDINAL_POSITION"""
             params = [table_name.upper()]

@@ -35,7 +35,7 @@ class SQLAlchemyTest(unittest.TestCase):
         engine = self._create_engine()
         # connection = engine.connect()
         metadata = db.MetaData()
-        catalog = db.Table('CATALOG', metadata, autoload=True, autoload_with=engine)
+        catalog = db.Table('CATALOG', metadata, schema='SYSTEM', autoload=True, autoload_with=engine)
         self.assertIn('TABLE_NAME', catalog.columns.keys())
 
     def test_textual(self):
@@ -51,6 +51,39 @@ class SQLAlchemyTest(unittest.TestCase):
                 self.assertEqual(row[0], 42)
             finally:
                 connection.execute('drop table if exists ALCHEMY_TEST')
+
+    def test_schema_filtering(self):
+        engine = self._create_engine()
+        with engine.connect() as connection:
+            try:
+                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
+                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
+
+                connection.execute(text('create table ALCHEMY_TEST (ID integer primary key)'))
+                connection.execute(text('create table A.ALCHEMY_TEST_A (ID_A integer primary key)'))
+                connection.execute(text('create table B.ALCHEMY_TEST_B (ID_B integer primary key)'))
+
+                inspector = db.inspect(engine)
+
+                self.assertEqual(inspector.get_schema_names(), [None, 'A', 'B', 'SYSTEM'])
+
+                self.assertEqual(inspector.get_table_names(), ['ALCHEMY_TEST'])
+                self.assertEqual(inspector.get_table_names(schema='A'), ['ALCHEMY_TEST_A'])
+                self.assertEqual(inspector.get_table_names(schema='B'), ['ALCHEMY_TEST_B'])
+
+                self.assertEqual(inspector.get_columns('ALCHEMY_TEST').pop()['name'], 'ID')
+                self.assertEqual(inspector.get_columns('ALCHEMY_TEST_A', schema='A').pop()['name'],
+                                 'ID_A')
+
+                self.assertTrue(engine.has_table('ALCHEMY_TEST'))
+                self.assertFalse(engine.has_table('ALCHEMY_TEST', schema='A'))
+                self.assertTrue(engine.has_table('ALCHEMY_TEST_A', schema='A'))
+                self.assertFalse(engine.has_table('ALCHEMY_TEST', schema='A'))
+            finally:
+                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
+                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
 
     def test_reflection(self):
         engine = self._create_engine()
