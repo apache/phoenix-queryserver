@@ -65,16 +65,20 @@ class SQLAlchemyTest(unittest.TestCase):
                 connection.execute(text('create table B.ALCHEMY_TEST_B (ID_B integer primary key)'))
 
                 inspector = db.inspect(engine)
+                print(inspector.default_schema_name)
 
                 self.assertEqual(inspector.get_schema_names(), [None, 'A', 'B', 'SYSTEM'])
 
                 self.assertEqual(inspector.get_table_names(), ['ALCHEMY_TEST'])
+                self.assertEqual(inspector.get_table_names(schema=''), ['ALCHEMY_TEST'])
                 self.assertEqual(inspector.get_table_names(schema='A'), ['ALCHEMY_TEST_A'])
                 self.assertEqual(inspector.get_table_names(schema='B'), ['ALCHEMY_TEST_B'])
 
                 self.assertEqual(inspector.get_columns('ALCHEMY_TEST').pop()['name'], 'ID')
-                self.assertEqual(inspector.get_columns('ALCHEMY_TEST_A', schema='A').pop()['name'],
-                                 'ID_A')
+                self.assertEqual(
+                    inspector.get_columns('ALCHEMY_TEST', schema='').pop()['name'], 'ID')
+                self.assertEqual(
+                    inspector.get_columns('ALCHEMY_TEST_A', schema='A').pop()['name'], 'ID_A')
 
                 self.assertTrue(engine.has_table('ALCHEMY_TEST'))
                 self.assertFalse(engine.has_table('ALCHEMY_TEST', schema='A'))
