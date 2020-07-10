@@ -240,11 +240,9 @@ class Cursor(object):
             self._connection._id, operation, max_rows_total=0)
         self._set_id(statement.id)
         self._set_signature(statement.signature)
-        for parameters in seq_of_parameters:
-            self._connection._client.execute(
-                self._connection._id, self._id,
-                statement.signature, self._transform_parameters(parameters),
-                first_frame_max_size=0)
+        return self._connection._client.execute_batch(
+            self._connection._id, self._id,
+            [self._transform_parameters(p) for p in seq_of_parameters])
 
     def _transform_row(self, row):
         """Transforms a Row into Python values.
