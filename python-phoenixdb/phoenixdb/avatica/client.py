@@ -313,26 +313,28 @@ class AvaticaClient(object):
         :returns:
             A ``common_pb2.ConnectionProperties`` object.
         """
-        if not connProps:
-            connProps = {}
+        if connProps:
+            props = connProps.copy()
+        else:
+            props = {}
 
         request = requests_pb2.ConnectionSyncRequest()
         request.connection_id = connection_id
         request.conn_props.has_auto_commit = True
         request.conn_props.has_read_only = True
-        if 'autoCommit' in connProps:
-            request.conn_props.auto_commit = connProps.pop('autoCommit')
-        if 'readOnly' in connProps:
-            request.conn_props.read_only = connProps.pop('readOnly')
-        if 'transactionIsolation' in connProps:
-            request.conn_props.transaction_isolation = connProps.pop('transactionIsolation', None)
-        if 'catalog' in connProps:
-            request.conn_props.catalog = connProps.pop('catalog', None)
-        if 'schema' in connProps:
-            request.conn_props.schema = connProps.pop('schema', None)
+        if 'autoCommit' in props:
+            request.conn_props.auto_commit = props.pop('autoCommit')
+        if 'readOnly' in props:
+            request.conn_props.read_only = props.pop('readOnly')
+        if 'transactionIsolation' in props:
+            request.conn_props.transaction_isolation = props.pop('transactionIsolation', None)
+        if 'catalog' in props:
+            request.conn_props.catalog = props.pop('catalog', None)
+        if 'schema' in props:
+            request.conn_props.schema = props.pop('schema', None)
 
-        if connProps:
-            logger.warning("Unhandled connection property:" + connProps)
+        if props:
+            logger.warning("Unhandled connection property:" + props)
 
         response_data = self._apply(request)
         response = responses_pb2.ConnectionSyncResponse()

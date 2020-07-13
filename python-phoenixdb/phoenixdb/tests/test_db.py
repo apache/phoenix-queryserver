@@ -177,7 +177,7 @@ class PhoenixDatabaseTest(DatabaseTestCase):
                 cursor.execute('drop table if exists A_SCHEMA.A_TABLE')
                 cursor.execute('drop table if exists B_SCHEMA.B_TABLE')
 
-    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-6003")
+    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-6004")
     def test_case_sensitivity(self):
         with self.conn.cursor() as cursor:
             try:

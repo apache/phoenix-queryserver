@@ -34,7 +34,7 @@ class Meta(object):
 
     def get_catalogs(self):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_catalogs(self._connection._id)
         with DictCursor(self._connection) as cursor:
             cursor._process_result(result)
@@ -42,7 +42,7 @@ class Meta(object):
 
     def get_schemas(self, catalog=None, schemaPattern=None):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_schemas(self._connection._id, catalog, schemaPattern)
         with DictCursor(self._connection) as cursor:
             cursor._process_result(result)
@@ -50,7 +50,7 @@ class Meta(object):
 
     def get_tables(self, catalog=None, schemaPattern=None, tableNamePattern=None, typeList=None):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_tables(
             self._connection._id, catalog, schemaPattern, tableNamePattern, typeList=typeList)
         with DictCursor(self._connection) as cursor:
@@ -60,7 +60,7 @@ class Meta(object):
     def get_columns(self, catalog=None, schemaPattern=None, tableNamePattern=None,
                     columnNamePattern=None):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_columns(
             self._connection._id, catalog, schemaPattern, tableNamePattern, columnNamePattern)
         with DictCursor(self._connection) as cursor:
@@ -69,7 +69,7 @@ class Meta(object):
 
     def get_table_types(self):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_table_types(self._connection._id)
         with DictCursor(self._connection) as cursor:
             cursor._process_result(result)
@@ -77,7 +77,7 @@ class Meta(object):
 
     def get_type_info(self):
         if self._connection._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         result = self._connection._client.get_type_info(self._connection._id)
         with DictCursor(self._connection) as cursor:
             cursor._process_result(result)

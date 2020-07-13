@@ -173,7 +173,8 @@ class PhoenixDialect(DefaultDialect):
         return []
 
     def get_foreign_keys(self, conn, table_name, schema=None, **kw):
-        '''Foreign keys are a foreign concept to Phoenix'''
+        '''Foreign keys are a foreign concept to Phoenix,
+        but SqlAlchemy cannot parse the DB schema if it's not implemented '''
         return []
 
     def _map_column(self, raw):

@@ -106,7 +106,7 @@ class Connection(object):
         be automatically called at the end of the ``with`` block.
         """
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         for cursor_ref in self._cursors:
             cursor = cursor_ref()
             if cursor is not None and not cursor._closed:
@@ -122,12 +122,12 @@ class Connection(object):
 
     def commit(self):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._client.commit(self._id)
 
     def rollback(self):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._client.rollback(self._id)
 
     def cursor(self, cursor_factory=None):
@@ -144,7 +144,7 @@ class Connection(object):
             A :class:`~phoenixdb.cursor.Cursor` object.
         """
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         cursor = (cursor_factory or self.cursor_factory)(self)
         self._cursors.append(weakref.ref(cursor, self._cursors.remove))
         return cursor
@@ -169,7 +169,7 @@ class Connection(object):
     @autocommit.setter
     def autocommit(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._avatica_props = self._client.connection_sync_dict(self._id, {'autoCommit': bool(value)})
 
     @property
@@ -180,7 +180,7 @@ class Connection(object):
     @readonly.setter
     def readonly(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._avatica_props = self._client.connection_sync_dict(self._id, {'readOnly': bool(value)})
 
     @property
@@ -190,7 +190,7 @@ class Connection(object):
     @transactionisolation.setter
     def transactionisolation(self, value):
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         self._avatica_props = self._client.connection_sync_dict(self._id, {'transactionIsolation': bool(value)})
 
     def meta(self):
@@ -200,7 +200,7 @@ class Connection(object):
             A :class:`~phoenixdb.meta` object.
         """
         if self._closed:
-            raise ProgrammingError('the connection is already closed')
+            raise ProgrammingError('The connection is already closed.')
         meta = Meta(self)
         return meta
 
