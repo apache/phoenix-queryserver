@@ -93,6 +93,7 @@ def raise_sql_error(code, sqlstate, message):
     for prefix, error_class in SQLSTATE_ERROR_CLASSES:
         if sqlstate.startswith(prefix):
             raise error_class(message, code, sqlstate)
+    raise errors.InternalError(message, code, sqlstate)
 
 
 def parse_and_raise_sql_error(message):
@@ -112,15 +113,20 @@ def parse_error_page(html):
 
 
 def parse_error_protobuf(text):
-    message = common_pb2.WireMessage()
-    message.ParseFromString(text)
+    try:
+        message = common_pb2.WireMessage()
+        message.ParseFromString(text)
 
-    err = responses_pb2.ErrorResponse()
-    err.ParseFromString(message.wrapped_message)
+        err = responses_pb2.ErrorResponse()
+        if not err.ParseFromString(message.wrapped_message):
+            raise Exception('No error message found')
+    except Exception:
+        # Not a protobuf error, fall through
+        return
 
     parse_and_raise_sql_error(err.error_message)
     raise_sql_error(err.error_code, err.sql_state, err.error_message)
-    raise errors.InternalError(err.error_message)
+    # Not a protobuf error, fall through
 
 
 class AvaticaClient(object):
