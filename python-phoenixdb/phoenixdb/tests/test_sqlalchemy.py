@@ -56,16 +56,17 @@ class SQLAlchemyTest(unittest.TestCase):
         engine = self._create_engine()
         with engine.connect() as connection:
             try:
+                inspector = db.inspect(engine)
+
                 connection.execute('drop table if exists ALCHEMY_TEST')
                 connection.execute('drop table if exists A.ALCHEMY_TEST_A')
                 connection.execute('drop table if exists B.ALCHEMY_TEST_B')
 
+                self.assertEqual(inspector.get_schema_names(), ['', 'SYSTEM'])
+
                 connection.execute(text('create table ALCHEMY_TEST (ID integer primary key)'))
                 connection.execute(text('create table A.ALCHEMY_TEST_A (ID_A integer primary key)'))
                 connection.execute(text('create table B.ALCHEMY_TEST_B (ID_B integer primary key)'))
-
-                inspector = db.inspect(engine)
-                print(inspector.default_schema_name)
 
                 self.assertEqual(inspector.get_schema_names(), ['', 'A', 'B', 'SYSTEM'])
 

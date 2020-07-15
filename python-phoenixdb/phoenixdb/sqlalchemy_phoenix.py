@@ -136,14 +136,18 @@ class PhoenixDialect(DefaultDialect):
 
     def get_schema_names(self, connection, **kw):
         schemas = connection.connect().connection.meta().get_schemas()
-        return [schema['TABLE_SCHEM'] for schema in schemas]
+        schema_names = [schema['TABLE_SCHEM'] for schema in schemas]
+        # Phoenix won't return the default schema if there aren't any tables in it
+        if '' not in schema_names:
+            schema_names.insert(0, '')
+        return schema_names
 
     def get_table_names(self, connection, schema=None, order_by=None, **kw):
         '''order_by is ignored'''
         if schema is None:
             schema = ''
         tables = connection.connect().connection.meta().get_tables(
-            schemaPattern=schema, typeList=('TABLE', 'SYSTEM_TABLE'))
+            schemaPattern=schema, typeList=('TABLE', 'SYSTEM TABLE'))
         return [table['TABLE_NAME'] for table in tables]
 
     def get_view_names(self, connection, schema=None, **kw):
