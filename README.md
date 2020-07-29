@@ -44,14 +44,12 @@ $ mvn package
 
 ### Bundling a Phoenix Client
 
-To build a release of PQS which packages a specific version of Phoenix, enable the `package-phoenix-client` profile
-and specify properties to indicate a specific Phoenix version.
+To build a release of PQS which packages a specific version of Phoenix, specify the `package-phoenix-client` system property
+and specify the `phoenix.version` system property to indicate a specific Phoenix version.
 
-By default, PQS will package the same version of Phoenix used for build/test. This version is controlled by the system
-property `phoenix.version` system property. Depending on the version of Phoenix, you may also be required to
-use the `phoenix.hbase.classifier` system property to identify the correct version of Phoenix built against
-the version of HBase of your choosing.
+PQS will package the same version of Phoenix used for build/test. This version is controlled by the
+ `phoenix.version` system property.
 
 ```
-$ mvn package -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.hbase.classifier=hbase-2.2
+$ mvn package -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT
 ```
