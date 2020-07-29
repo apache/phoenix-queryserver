@@ -38,14 +38,14 @@
             <directory>${project.basedir}/../phoenix-queryserver/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
-                <include>queryserver-${project.parent.version}.jar</include>
+                <include>phoenix-queryserver-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../phoenix-queryserver-client/target</directory>
             <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
             <includes>
-                <include>queryserver-client-${project.parent.version}.jar</include>
+                <include>phoenix-queryserver-client-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -65,7 +65,7 @@
         <unpack>false</unpack>
         <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
         <includes>
-          <include>org.apache.phoenix:phoenix-client:jar:${phoenix.hbase.classifier}</include>
+          <include>org.apache.phoenix:phoenix-client:jar</include>
         </includes>
       </dependencySet>
     </dependencySets>

@@ -222,12 +222,12 @@
     <!-- for tests -->
     <dependency>
       <groupId>org.apache.phoenix</groupId>
-      <artifactId>phoenix-queryserver-client</artifactId>
+      <artifactId>phoenix-client</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.phoenix</groupId>
-      <artifactId>phoenix-core</artifactId>
+      <artifactId>phoenix-queryserver-client</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -78,8 +78,8 @@ def findClasspath(command_name):
 def setPath():
     PHOENIX_CLIENT_JAR_PATTERN = "phoenix-client-*.jar"
     OLD_PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*[!n]-client.jar"
-    PHOENIX_THIN_CLIENT_JAR_PATTERN = "queryserver-client-*.jar"
-    PHOENIX_QUERYSERVER_JAR_PATTERN = "queryserver-[!c]*.jar"
+    PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-queryserver-client-*.jar"
+    PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-queryserver-[!c]*.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
 
