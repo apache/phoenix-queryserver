@@ -183,15 +183,8 @@
   </dependencies>
 
   <profiles>
-    <!-- Phoenix 4.16.0-SNAPSHOT doesn't need special handling -->
     <profile>
-      <id>phoenix-5.1.0-SNAPSHOT</id>
-      <activation>
-        <property>
-          <name>phoenix.version</name>
-          <value>5.1.0-SNAPSHOT</value>
-        </property>
-      </activation>
+      <id>hbase-2.x</id>
       <properties>
         <hbase.version>2.1.9</hbase.version>
         <hadoop.version>3.0.3</hadoop.version>
