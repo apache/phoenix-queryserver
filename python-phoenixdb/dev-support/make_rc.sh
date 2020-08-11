@@ -23,23 +23,28 @@ set -e
 echo "Script that assembles all you need to make an RC."
 echo "It generates source tar in release directory"
 echo "Presumes that you can sign a release as described at https://www.apache.org/dev/release-signing.html"
+echo ""
+echo "Continuing will overwrite all uncommitted changes under the phoenix-queryerver repository."
+
+read -p "Y to continue or any other key to quit" prompt
+if [[ ! $prompt =~ [yY](es)* ]]
+then
+  echo "Aborting."
+  exit
+ fi
+
 echo "Starting...";sleep 2s
 
 # Set directory variables
 DIR_ROOT="$(cd $(dirname $0);pwd)/.."
-echo $DIR_ROOT
 cd $DIR_ROOT
-VERSION=$(cat setup.py | grep '^version = ".*"$' | grep -o '".*"' |sed 's/"//g')
 
-echo $VERSION
+VERSION=$(grep '^version = ".*"$' setup.py | grep -o '".*"' | sed 's/"//g')
+
 DIR_REL_BASE=$DIR_ROOT/release
-echo $DIR_REL_BASE
 DIR_REL_ROOT=$DIR_REL_BASE/python-phoenixdb-$VERSION
-echo $DIR_REL_ROOT
 REL_SRC=python-phoenixdb-$VERSION-src
-echo $REL_SRC
 DIR_REL_SRC_TAR_PATH=$DIR_REL_ROOT/src
-echo $DIR_REL_SRC_TAR_PATH
 
 git clean -fx .
 
