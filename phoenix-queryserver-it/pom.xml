@@ -105,12 +105,12 @@
       <artifactId>phoenix-client</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.phoenix</groupId>
-      <artifactId>phoenix-core</artifactId>
-      <scope>test</scope>
-      <classifier>tests</classifier>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.phoenix</groupId>-->
+<!--      <artifactId>phoenix-core</artifactId>-->
+<!--      <scope>test</scope>-->
+<!--      <classifier>tests</classifier>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.apache.phoenix</groupId>
       <artifactId>phoenix-queryserver-orchestrator</artifactId>

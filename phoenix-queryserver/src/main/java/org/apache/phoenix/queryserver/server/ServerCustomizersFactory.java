@@ -27,6 +27,7 @@ import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
+import org.apache.phoenix.queryserver.server.customizers.AdminServerCustomizer;
 import org.apache.phoenix.queryserver.server.customizers.HostedClientJarsServerCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
@@ -71,6 +72,13 @@ public interface ServerCustomizersFactory {
                     LOG.warn("Empty value provided for {}, ignoring", QueryServerProperties.CLIENT_JARS_REPO_ATTRIB);
                 }
             }
+//            if (conf.getBoolean(QueryServerProperties.ADMIN_REST_ENABLED, QueryServerOptions.DEFAULT_ADMIN_REST_ENABLED)) {
+                String contextPath = conf.get(QueryServerProperties.ADMIN_REST_CONTEXT_ATTRIB,
+                                        QueryServerOptions.DEFAULT_ADMIN_REST_CONTEXT);
+                LOG.info("Creating admin HTTP endpoint {}", contextPath);
+                AdminServerCustomizer customizer = new AdminServerCustomizer(contextPath);
+                customizers.add(customizer);
+//            }
             return Collections.unmodifiableList(customizers);
         }
     }

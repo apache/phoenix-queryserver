@@ -65,6 +65,10 @@ public class QueryServerOptions {
     public static final String DEFAULT_CLIENT_JARS_REPO = "";
     public static final String DEFAULT_CLIENT_JARS_CONTEXT = "/maven";
 
+    // Admin rest defaults
+    public static final boolean DEFAULT_ADMIN_REST_ENABLED = false;
+    public static final String DEFAULT_ADMIN_REST_CONTEXT = "/admin";
+
     // Common defaults
     public static final String DEFAULT_EXTRA_JDBC_ARGUMENTS = "";
 
