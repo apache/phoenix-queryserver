@@ -27,7 +27,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/../bin</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/bin</outputDirectory>
+            <outputDirectory>phoenix-queryserver-${project.parent.version}/bin</outputDirectory>
             <excludes>
               <exclude>__pycache__</exclude>
               <exclude>__pycache__/*</exclude>
@@ -36,34 +36,34 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../phoenix-queryserver/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
+            <outputDirectory>phoenix-queryserver-${project.parent.version}/</outputDirectory>
             <includes>
                 <include>phoenix-queryserver-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../phoenix-queryserver-client/target</directory>
-            <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
+            <outputDirectory>phoenix-queryserver-${project.parent.version}/</outputDirectory>
             <includes>
                 <include>phoenix-queryserver-client-${project.parent.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
           <directory>${project.build.directory}/maven-repo</directory>
-          <outputDirectory>${project.parent.artifactId}-${project.parent.version}/maven</outputDirectory>
+          <outputDirectory>phoenix-queryserver-${project.parent.version}/maven</outputDirectory>
         </fileSet>
     </fileSets>
     <dependencySets>
       <dependencySet>
         <unpack>false</unpack>
-        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/lib</outputDirectory>
+        <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
         </includes>
       </dependencySet>
       <dependencySet>
         <unpack>false</unpack>
-        <outputDirectory>${project.parent.artifactId}-${project.parent.version}/</outputDirectory>
+        <outputDirectory>phoenix-queryserver-${project.parent.version}/</outputDirectory>
         <includes>
           <include>org.apache.phoenix:phoenix-client:jar</include>
         </includes>
