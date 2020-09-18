@@ -1,8 +1,9 @@
 Changelog
 =========
 
-Unreleased
-----------
+Version 1.0.0
+-------------
+
 - Replaced bundled requests_kerberos with request_gssapi library
 - Use default SPNEGO Auth settings from request_gssapi
 - Refactored authentication code
