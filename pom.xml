@@ -26,7 +26,7 @@
     <parent>
       <groupId>org.apache</groupId>
       <artifactId>apache</artifactId>
-      <version>21</version>
+      <version>23</version>
     </parent>
 
     <groupId>org.apache.phoenix</groupId>
@@ -75,11 +75,11 @@
         <hadoop.version>2.7.5</hadoop.version>
 
         <!-- Dependency versions -->
-        <zookeeper.version>3.4.10</zookeeper.version>
+        <zookeeper.version>3.5.8</zookeeper.version>
         <curator.version>2.12.0</curator.version>
 
         <gson.version>2.2.4</gson.version>
-        <jetty.version>9.4.27.v20200227</jetty.version>
+        <jetty.version>9.4.31.v20200723</jetty.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <sqlline.version>1.9.0</sqlline.version>
@@ -95,14 +95,25 @@
         <!-- Plugin versions -->
         <maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
         <maven-build-helper-plugin.version>1.9.1</maven-build-helper-plugin.version>
+        <spotbugs-maven-plugin.version>4.0.4</spotbugs-maven-plugin.version>
+        <spotbugs.version>4.1.2</spotbugs.version>
+        <maven-owasp-plugin.version>5.3.2</maven-owasp-plugin.version>
+        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 
         <!-- Plugin options -->
         <it.failIfNoSpecifiedTests>false</it.failIfNoSpecifiedTests>
         <surefire.failIfNoSpecifiedTests>false</surefire.failIfNoSpecifiedTests>
+        <!-- Empty argument when code coverage is deactivated -->
+        <jacocoArgLine></jacocoArgLine>
 
         <!-- Set default encoding so multi-byte tests work correctly on the Mac -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- JaCoCo thresholds which we can override in each sub-module if required -->
+        <!-- The current setting does not mandate any coverage -->
+        <jacoco.instruction.coverage.percentage>0.0</jacoco.instruction.coverage.percentage>
+        <jacoco.branch.coverage.percentage>0.0</jacoco.branch.coverage.percentage>
     </properties>
 
     <build>
@@ -186,7 +197,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <reuseForks>true</reuseForks>
-                        <argLine>-enableassertions -Xmx2250m -XX:MaxPermSize=128m
+                        <argLine>@{jacocoArgLine} -enableassertions -Xmx2250m -XX:MaxPermSize=128m
                             -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <shutdown>kill</shutdown>
@@ -204,7 +215,7 @@
                                 <runOrder>alphabetical</runOrder>
                                 <reuseForks>false</reuseForks>
                                 <runOrder>alphabetical</runOrder>
-                                <argLine>-Xmx2000m -XX:MaxPermSize=256m -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
+                                <argLine>@{jacocoArgLine} -Xmx2000m -XX:MaxPermSize=256m -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                 <shutdown>kill</shutdown>
                                 <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
@@ -237,6 +248,32 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${maven-owasp-plugin.version}</version>
+                    <configuration>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipRuntimeScope>true</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-maven-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>${spotbugs.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <effort>Max</effort>
+                        <maxHeap>2048</maxHeap>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <!-- FIXME not working, leaving it here as a reminder -->
@@ -315,14 +352,6 @@
                     <excludes>
                         <!-- precommit? -->
                         <exclude>**/patchprocess/**</exclude>
-                        <!-- Not our code -->
-                        <exclude>python/requests-kerberos/**</exclude>
-                        <exclude>python/phoenixdb/phoenixdb/avatica/proto/*</exclude>
-                        <exclude>python/phoenixdb/*.rst</exclude>
-                        <exclude>python/phoenixdb/ci/**</exclude>
-                        <exclude>python/phoenixdb/doc/*.rst</exclude>
-                        <exclude>python/phoenixdb/doc/conf.py</exclude>
-                        <exclude>python/phoenixdb/doc/Makefile</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -436,6 +465,17 @@
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+                <exclusions>
+                  <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                  </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
                 <version>${zookeeper.version}</version>
                 <exclusions>
                   <exclusion>
@@ -612,4 +652,121 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+  <profiles>
+      <profile>
+      <id>codecoverage</id>
+      <activation>
+        <property>
+            <name>!skip.code-coverage</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <configuration>
+                  <propertyName>jacocoArgLine</propertyName>
+                </configuration>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>check</id>
+                <phase>verify</phase>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <rule>
+                      <element>BUNDLE</element>
+                      <limits>
+                        <limit>
+                          <counter>INSTRUCTION</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${jacoco.instruction.coverage.percentage}</minimum>
+                        </limit>
+                        <limit>
+                          <counter>BRANCH</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${jacoco.branch.coverage.percentage}</minimum>
+                        </limit>
+                      </limits>
+                    </rule>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>spotbugs-site</id>
+      <activation>
+        <property>
+            <name>!spotbugs.site</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <configuration>
+              <spotbugsXmlOutput>true</spotbugsXmlOutput>
+              <xmlOutput>true</xmlOutput>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <reportSets>
+          <reportSet>
+              <reports>
+                  <report>aggregate</report>
+              </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
