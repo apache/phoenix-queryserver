@@ -30,46 +30,5 @@ all done via the Apache Avatica project (sub-project of Apache Calcite).
 The reference client implementation for PQS is a "thin" JDBC driver which can communicate with PQS. There
 are drivers in other languages which exist in varying levels of maturity including Python, Golang, and .NET.
 
-## Building
-
-This repository will build a tarball which is capable of running the Phoenix Query Server.
-
-By default, this tarball does not contain a Phoenix client jar as it is meant to be agnostic
-of Phoenix version (one PQS release can be used against any Phoenix version). Today, PQS builds against
-the Phoenix 4.15.0-HBase-1.4 release.
-
-```
-$ mvn package
-```
-
-### Bundling a Phoenix Client
-
-To build a release of PQS which packages a specific version of Phoenix, specify the `package-phoenix-client` system property
-and specify the `phoenix.version` system property to indicate a specific Phoenix version.
-
-PQS will package the same version of Phoenix used for build/test. This version is controlled by the
- `phoenix.version` system property.
-
-```
-$ mvn package -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT
-```
-
-### Running integration tests
-
-`mvn package` will run the unit tests while building, but it will not run the integration test suite.
-
-The IT suite is run when executing `mvn install` or `mvn verify`. The Phoenix version specified
-with `phoenix.version` is used for running the integration tests.
-
-When specifying `phoenix.version`, also specify the HBase version to be used
-for integration testing by activating the corresponding `hbase<minor.major>` profile.
-
-When using a Phoenix 5.x version, activate the `hbase-2.x` profile in addition to the
-profile for the minor 2.x version.
-
-```
-$ mvn verify -Dpackage.phoenix.client -Dphoenix.version=4.16.0-SNAPSHOT -Phbase-1.3
-```
-```
-$ mvn install -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT -Phbase-2.1 -Phbase-2.x
-```
+The Python driver is maintained by the Phoenix project, and is available in the python-phoenixdb
+directory of the phoenix-queryserver repository.
