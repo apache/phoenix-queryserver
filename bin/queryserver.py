@@ -181,7 +181,7 @@ if command == 'start':
                 os.umask(current_umask)
 
             print('%s launching %s' % (datetime.datetime.now(), cmd))
-            child = subprocess.Popen(cmd.split())
+            child = subprocess.Popen(cmd.split(), preexec_fn=initsubproc)
             sys.exit(child.wait())
 
 elif command == 'stop':
