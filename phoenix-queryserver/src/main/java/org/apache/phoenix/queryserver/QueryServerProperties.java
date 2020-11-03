@@ -89,4 +89,7 @@ public class QueryServerProperties {
     public static final String CLIENT_JARS_ENABLED_ATTRIB = "phoenix.queryserver.client.jars.enabled";
     public static final String CLIENT_JARS_REPO_ATTRIB = "phoenix.queryserver.client.jars.repo";
     public static final String CLIENT_JARS_CONTEXT_ATTRIB = "phoenix.queryserver.client.jars.context";
+
+    public static final String ADMIN_REST_ENABLED = "phoenix.queryserver.admin.rest.enabled";
+    public static final String ADMIN_REST_CONTEXT_ATTRIB = "phoenix.queryserver.admin.rest.context";
 }

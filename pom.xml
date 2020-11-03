@@ -607,18 +607,18 @@
             </dependency>
 
             <!-- Other test dependencies -->
+<!--            <dependency>-->
+<!--                <groupId>org.apache.phoenix</groupId>-->
+<!--                <artifactId>phoenix-core</artifactId>-->
+<!--                <version>${phoenix.version}</version>-->
+<!--                <classifier>tests</classifier>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
                 <artifactId>phoenix-core</artifactId>
                 <version>${phoenix.version}</version>
-                <classifier>tests</classifier>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.phoenix</groupId>
-                <artifactId>phoenix-core</artifactId>
-                <version>${phoenix.version}</version>
-                <scope>test</scope>
+<!--                <scope>test</scope>-->
             </dependency>
             <dependency>
                <groupId>commons-io</groupId>
