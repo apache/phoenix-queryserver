@@ -226,7 +226,7 @@
     <!-- for tests -->
     <dependency>
       <groupId>org.apache.phoenix</groupId>
-      <artifactId>phoenix-client</artifactId>
+      <artifactId>${phoenix.client.artifactid}</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

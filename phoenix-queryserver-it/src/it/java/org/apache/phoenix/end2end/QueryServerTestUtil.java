@@ -16,6 +16,8 @@
  */
 package org.apache.phoenix.end2end;
 
+import static org.apache.hadoop.hbase.HConstants.HBASE_DIR;
+
 import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.Map;
@@ -28,7 +30,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.LocalHBaseCluster;
-import org.apache.hadoop.hbase.util.FSUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.query.ConfigurationFactory;
 import org.apache.phoenix.queryserver.server.QueryServer;
@@ -79,7 +80,8 @@ public class QueryServerTestUtil {
         util.startMiniDFSCluster(1);
         // Start HBase
         Path rootdir = util.getDataTestDirOnTestFS(uniqueName);
-        FSUtils.setRootDir(conf, rootdir);
+        // There is no setRootdir method that is available in all supported HBase versions.
+        conf.set(HBASE_DIR, rootdir.toString());
         hbase = new LocalHBaseCluster(conf, 1);
         hbase.startup();
     }
