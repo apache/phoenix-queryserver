@@ -82,7 +82,7 @@
                     <goal>copy-dependencies</goal>
                   </goals>
                   <configuration>
-                    <includeArtifactIds>phoenix-client,phoenix-queryserver-client</includeArtifactIds>
+                    <includeArtifactIds>${phoenix.client.artifactid},phoenix-queryserver-client</includeArtifactIds>
                     <outputDirectory>${project.build.directory}/maven-repo</outputDirectory>
                     <overWriteIfNewer>true</overWriteIfNewer>
                     <useRepositoryLayout>true</useRepositoryLayout>
@@ -120,7 +120,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.apache.phoenix</groupId>
-                    <artifactId>phoenix-client</artifactId>
+                    <artifactId>${phoenix.client.artifactid}</artifactId>
                 </dependency>
             </dependencies>
         </profile>

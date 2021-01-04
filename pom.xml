@@ -73,6 +73,7 @@
         <!-- Hadoop/Hbase Versions -->
         <hbase.version>1.4.10</hbase.version>
         <hadoop.version>2.7.5</hadoop.version>
+        <phoenix.client.artifactid>phoenix-client</phoenix.client.artifactid>
 
         <!-- Dependency versions -->
         <zookeeper.version>3.5.8</zookeeper.version>
@@ -373,7 +374,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
-                <artifactId>phoenix-client</artifactId>
+                <artifactId>${phoenix.client.artifactid}</artifactId>
                 <version>${phoenix.version}</version>
             </dependency>
 

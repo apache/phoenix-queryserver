@@ -16,6 +16,7 @@
  */
 package org.apache.phoenix.end2end;
 
+import static org.apache.hadoop.hbase.HConstants.HBASE_DIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -51,7 +52,6 @@ import org.apache.hadoop.hbase.LocalHBaseCluster;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.security.HBaseKerberosUtils;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
-import org.apache.hadoop.hbase.util.FSUtils;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.minikdc.MiniKdc;
@@ -274,7 +274,8 @@ public class SecureQueryServerPhoenixDBIT {
         // NB. I'm not actually sure what HTU does incorrect, but this was pulled from some test
         //     classes in HBase itself. I couldn't get HTU to work myself (2017/07/06)
         Path rootdir = UTIL.getDataTestDirOnTestFS(SecureQueryServerPhoenixDBIT.class.getSimpleName());
-        FSUtils.setRootDir(conf, rootdir);
+        // There is no setRootdir method that is available in all supported HBase versions.
+        conf.set(HBASE_DIR, rootdir.toString());
         HBASE_CLUSTER = new LocalHBaseCluster(conf, 1);
         HBASE_CLUSTER.startup();
 
