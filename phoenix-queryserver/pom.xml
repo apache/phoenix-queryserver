@@ -133,6 +133,10 @@
                   <pattern>org.eclipse.jetty</pattern>
                   <shadedPattern>${shaded.package}.org.eclipse.jetty</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>javax.servlet</pattern>
+                  <shadedPattern>${shaded.package}.javax.servlet</shadedPattern>
+                </relocation>
                 <!-- Calcite/Avatica is not relocated because the wire API (as of <=1.8.0) expects
                      consistent class names on client and server. Relocating these would break
                      backwards compatibility. -->
