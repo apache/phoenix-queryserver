@@ -17,6 +17,11 @@
  */
 package org.apache.phoenix.end2end;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HConstants;
+
+import org.apache.phoenix.query.BaseTest;
+
 import static java.lang.String.format;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CAT;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CATALOG;
@@ -49,13 +54,17 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.phoenix.util.ReadOnlyProps;
 
 /**
  * Smoke test for query server.
  */
-public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
+
+@Category(NeedsOwnMiniClusterTest.class)
+public class QueryServerBasicsIT extends BaseTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryServerBasicsIT.class);
 
@@ -63,11 +72,17 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   private static Configuration CONF;
   private static String CONN_STRING;
 
+  protected static Configuration getTestClusterConfig() {
+    // don't want callers to modify config.
+    return new Configuration(config);
+  }
+
   @Rule
   public TestName name = new TestName();
 
   @BeforeClass
   public static synchronized void beforeClass() throws Exception {
+    setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
     CONF = getTestClusterConfig();
     if(System.getProperty("do.not.randomize.pqs.port") == null) {
         CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
@@ -94,6 +109,7 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
       assertEquals("query server didn't exit cleanly", 0, AVATICA_SERVER.getQueryServer()
         .getRetCode());
     }
+    dropNonSystemTables();
   }
 
   @Test
