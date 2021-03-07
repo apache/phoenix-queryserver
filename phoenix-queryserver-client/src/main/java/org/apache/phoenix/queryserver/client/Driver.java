@@ -38,7 +38,7 @@ public class Driver extends org.apache.calcite.avatica.remote.Driver {
         "org-apache-phoenix-remote-jdbc.properties",
         "Phoenix Remote JDBC Driver",
         "unknown version",
-        "Apache Phoenix",
+        "Phoenix",
         "unknown version");
   }
 
