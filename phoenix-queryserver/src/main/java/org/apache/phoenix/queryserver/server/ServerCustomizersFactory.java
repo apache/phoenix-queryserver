@@ -17,20 +17,21 @@
  */
 package org.apache.phoenix.queryserver.server;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.customizers.HostedClientJarsServerCustomizer;
+import org.apache.phoenix.queryserver.server.customizers.JMXJsonEndpointServerCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Creates customizers for the underlying Avatica HTTP server.
@@ -71,6 +72,7 @@ public interface ServerCustomizersFactory {
                     LOG.warn("Empty value provided for {}, ignoring", QueryServerProperties.CLIENT_JARS_REPO_ATTRIB);
                 }
             }
+            customizers.add(new JMXJsonEndpointServerCustomizer());
             return Collections.unmodifiableList(customizers);
         }
     }
