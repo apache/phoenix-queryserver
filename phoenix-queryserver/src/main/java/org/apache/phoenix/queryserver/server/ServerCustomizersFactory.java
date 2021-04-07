@@ -28,6 +28,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.customizers.HostedClientJarsServerCustomizer;
+import org.apache.phoenix.queryserver.server.customizers.JMXJsonEndpointServerCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,10 @@ public interface ServerCustomizersFactory {
                 } else {
                     LOG.warn("Empty value provided for {}, ignoring", QueryServerProperties.CLIENT_JARS_REPO_ATTRIB);
                 }
+            }
+            if (!conf.getBoolean(QueryServerProperties.QUERY_SERVER_JMX_JSON_ENDPOINT_DISABLED,
+                QueryServerOptions.DEFAULT_QUERY_SERVER_JMXJSONENDPOINT_DISABLED)) {
+                customizers.add(new JMXJsonEndpointServerCustomizer());
             }
             return Collections.unmodifiableList(customizers);
         }

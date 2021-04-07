@@ -130,10 +130,6 @@
               </filters>
               <relocations>
                 <relocation>
-                  <pattern>org.eclipse.jetty</pattern>
-                  <shadedPattern>${shaded.package}.org.eclipse.jetty</shadedPattern>
-                </relocation>
-                <relocation>
                   <pattern>javax.servlet</pattern>
                   <shadedPattern>${shaded.package}.javax.servlet</shadedPattern>
                 </relocation>
@@ -209,6 +205,10 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
