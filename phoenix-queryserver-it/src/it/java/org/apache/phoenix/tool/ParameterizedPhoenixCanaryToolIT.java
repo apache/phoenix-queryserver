@@ -106,6 +106,7 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 			setClientSideNamespaceProperties();
 			setServerSideNamespaceProperties();
 			tearDownMiniClusterAsync(1);
+//			tearDownMiniCluster(1);
 			setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()),
 					new ReadOnlyProps(clientProps.entrySet().iterator()));
 			LOGGER.info("New cluster is spinned up with test parameters " +

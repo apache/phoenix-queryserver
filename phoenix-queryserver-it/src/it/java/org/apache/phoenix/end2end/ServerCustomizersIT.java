@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.phoenix.query.BaseTest;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.queryserver.QueryServerProperties;
@@ -34,20 +35,29 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.phoenix.util.ReadOnlyProps;
 
-public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
+@Category(NeedsOwnMiniClusterTest.class)
+public class ServerCustomizersIT extends BaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(ServerCustomizersIT.class);
     private static final String USER_NOT_AUTHORIZED = "user1";
 
     private static QueryServerTestUtil PQS_UTIL;
+
+    protected static Configuration getTestClusterConfig() {
+        // don't want callers to modify config.
+        return new Configuration(config);
+    }
 
     @Rule
     public ExpectedException expected = ExpectedException.none();
 
     @BeforeClass
     public static synchronized void setup() throws Exception {
+        setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
         Configuration conf = getTestClusterConfig();
         PQS_UTIL = new QueryServerTestUtil(conf);
         PQS_UTIL.startLocalHBaseCluster(ServerCustomizersIT.class);
@@ -65,6 +75,7 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
             PQS_UTIL.stopQueryServer();
             PQS_UTIL.stopLocalHBaseCluster();
         }
+        dropNonSystemTables();
     }
 
     @Test
