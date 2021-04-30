@@ -149,6 +149,7 @@ class AvaticaClient(object):
         self.auth = auth
         self.verify = verify
         self.connection = None
+        self.session = requests.Session()
 
     def connect(self):
         """This method used to open a persistent TCP connection
@@ -173,7 +174,7 @@ class AvaticaClient(object):
                 requestArgs.update(verify=self.verify)
 
             try:
-                response = requests.request('post', self.url.geturl(), **requestArgs)
+                response = self.session.post(self.url.geturl(), **requestArgs)
 
             except requests.HTTPError as e:
                 if retry_count > 0:
