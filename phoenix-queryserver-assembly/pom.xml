@@ -86,6 +86,7 @@
                     <outputDirectory>${project.build.directory}/maven-repo</outputDirectory>
                     <overWriteIfNewer>true</overWriteIfNewer>
                     <useRepositoryLayout>true</useRepositoryLayout>
+                    <copyPom>true</copyPom>
                   </configuration>
                  </execution>
               </executions>
