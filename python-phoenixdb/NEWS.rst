@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.0.1
+-------------
+
+- Use HTTP sessions to enable sticky load balancers (PHOENIX-6459)
+- Revert default GSSAPI OID to "1.3.6.1.5.5.2" to improve compatibility (PHOENIX-6414)
+
 Version 1.0.0
 -------------
 
