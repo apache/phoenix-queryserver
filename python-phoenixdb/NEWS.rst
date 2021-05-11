@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.0.1
+-------------
+
+- Use HTTP sessions to enable sticky load balancers (PHOENIX-6459)
+- Revert default GSSAPI OID to SPNEGO to improve compatibility (PHOENIX-6414)
+
 Version 1.0.0
 -------------
 
