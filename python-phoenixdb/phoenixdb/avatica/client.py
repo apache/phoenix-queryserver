@@ -148,17 +148,20 @@ class AvaticaClient(object):
         self.max_retries = max_retries if max_retries is not None else 3
         self.auth = auth
         self.verify = verify
-        self.connection = None
         self.session = None
 
+    def __del__(self):
+        """Finalizer. Calls close() to close any open sessions"""
+        self.close()
+
     def connect(self):
-        """This method used to open a persistent TCP connection
-        requests does not require this"""
+        """Open the session on the the first request instead"""
         pass
 
     def close(self):
-        """Also does nothing per requests"""
-        pass
+        if self.session:
+            self.session.close()
+            self.session = None
 
     def _post_request(self, body, headers):
         # Create the session if we haven't before
