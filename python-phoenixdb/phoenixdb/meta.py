@@ -16,6 +16,7 @@
 import sys
 import logging
 
+from phoenixdb.avatica.proto import common_pb2
 from phoenixdb.errors import ProgrammingError
 from phoenixdb.cursor import DictCursor
 
@@ -82,6 +83,119 @@ class Meta(object):
         with DictCursor(self._connection) as cursor:
             cursor._process_result(result)
             return cursor.fetchall()
+
+    def get_primary_keys(self, catalog=None, schema=None, table=None):
+        if self._connection._closed:
+            raise ProgrammingError('The cursor is already closed.')
+
+        state = common_pb2.QueryState()
+        state.type = common_pb2.StateType.METADATA
+        state.op = common_pb2.MetaDataOperation.GET_PRIMARY_KEYS
+        state.has_args = True
+        state.has_op = True
+
+        catalog_arg = self._moa_string_arg_factory(catalog)
+        schema_arg = self._moa_string_arg_factory(schema)
+        table_arg = self._moa_string_arg_factory(table)
+        state.args.extend([catalog_arg, schema_arg, table_arg])
+
+        with DictCursor(self._connection) as cursor:
+            syncResultResponse = cursor.get_sync_results(state)
+            if not syncResultResponse.more_results:
+                return []
+
+            signature = common_pb2.Signature()
+            signature.columns.append(self._column_meta_data_factory(1, 'TABLE_CAT', 12))
+            signature.columns.append(self._column_meta_data_factory(2, 'TABLE_SCHEM', 12))
+            signature.columns.append(self._column_meta_data_factory(3, 'TABLE_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(4, 'COLUMN_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(5, 'KEY_SEQ', 5))
+            signature.columns.append(self._column_meta_data_factory(6, 'PK_NAME', 12))
+            # The following are non-standard Phoenix extensions
+            # This returns '\x00\x00\x00A' or '\x00\x00\x00D' , but that's consistent with Java
+            signature.columns.append(self._column_meta_data_factory(7, 'ASC_OR_DESC', 12))
+            signature.columns.append(self._column_meta_data_factory(8, 'DATA_TYPE', 5))
+            signature.columns.append(self._column_meta_data_factory(9, 'TYPE_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(10, 'COLUMN_SIZE', 5))
+            signature.columns.append(self._column_meta_data_factory(11, 'TYPE_ID', 5))
+            signature.columns.append(self._column_meta_data_factory(12, 'VIEW_CONSTANT', 12))
+
+            cursor.fetch(signature)
+            return cursor.fetchall()
+
+    def get_index_info(self, catalog=None, schema=None, table=None, unique=False, approximate=False):
+        if self._connection._closed:
+            raise ProgrammingError('The cursor is already closed.')
+
+        state = common_pb2.QueryState()
+        state.type = common_pb2.StateType.METADATA
+        state.op = common_pb2.MetaDataOperation.GET_INDEX_INFO
+        state.has_args = True
+        state.has_op = True
+
+        catalog_arg = self._moa_string_arg_factory(catalog)
+        schema_arg = self._moa_string_arg_factory(schema)
+        table_arg = self._moa_string_arg_factory(table)
+        unique_arg = self._moa_bool_arg_factory(unique)
+        approximate_arg = self._moa_bool_arg_factory(approximate)
+
+        state.args.extend([catalog_arg, schema_arg, table_arg, unique_arg, approximate_arg])
+
+        with DictCursor(self._connection) as cursor:
+            syncResultResponse = cursor.get_sync_results(state)
+            if not syncResultResponse.more_results:
+                return []
+
+            signature = common_pb2.Signature()
+            signature.columns.append(self._column_meta_data_factory(1, 'TABLE_CAT', 12))
+            signature.columns.append(self._column_meta_data_factory(2, 'TABLE_SCHEM', 12))
+            signature.columns.append(self._column_meta_data_factory(3, 'TABLE_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(4, 'NON_UNIQUE', 16))
+            signature.columns.append(self._column_meta_data_factory(5, 'INDEX_QUALIFIER', 12))
+            signature.columns.append(self._column_meta_data_factory(6, 'INDEX_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(7, 'TYPE', 5))
+            signature.columns.append(self._column_meta_data_factory(8, 'ORDINAL_POSITION', 5))
+            signature.columns.append(self._column_meta_data_factory(9, 'COLUMN_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(10, 'ASC_OR_DESC', 12))
+            signature.columns.append(self._column_meta_data_factory(11, 'CARDINALITY', 5))
+            signature.columns.append(self._column_meta_data_factory(12, 'PAGES', 5))
+            signature.columns.append(self._column_meta_data_factory(13, 'FILTER_CONDITION', 12))
+            # The following are non-standard Phoenix extensions
+            signature.columns.append(self._column_meta_data_factory(14, 'DATA_TYPE', 5))
+            signature.columns.append(self._column_meta_data_factory(15, 'TYPE_NAME', 12))
+            signature.columns.append(self._column_meta_data_factory(16, 'TYPE_ID', 5))
+            signature.columns.append(self._column_meta_data_factory(17, 'COLUMN_FAMILY', 12))
+            signature.columns.append(self._column_meta_data_factory(18, 'COLUMN_SIZE', 5))
+            signature.columns.append(self._column_meta_data_factory(19, 'ARRAY_SIZE', 5))
+
+            cursor.fetch(signature)
+            return cursor.fetchall()
+
+    def _column_meta_data_factory(self, ordinal, column_name, jdbc_code):
+        cmd = common_pb2.ColumnMetaData()
+        cmd.ordinal = ordinal
+        cmd.column_name = column_name
+        cmd.type.id = jdbc_code
+        cmd.nullable = 2
+        return cmd
+
+    def _moa_string_arg_factory(self, arg):
+        moa = common_pb2.MetaDataOperationArgument()
+        if arg is None:
+            moa.type = common_pb2.MetaDataOperationArgument.ArgumentType.NULL
+        else:
+            moa.type = common_pb2.MetaDataOperationArgument.ArgumentType.STRING
+            moa.string_value = arg
+        return moa
+
+    def _moa_bool_arg_factory(self, arg):
+        moa = common_pb2.MetaDataOperationArgument()
+        if arg is None:
+            moa.type = common_pb2.MetaDataOperationArgument.ArgumentType.NULL
+        else:
+            moa.type = common_pb2.MetaDataOperationArgument.ArgumentType.BOOL
+            moa.bool_value = arg
+        return moa
 
     def _fix_default(self, rows, catalog=None, schemaPattern=None):
         '''Workaround for PHOENIX-6003'''
