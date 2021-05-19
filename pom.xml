@@ -497,9 +497,9 @@
               <version>${jetty.version}</version>
             </dependency>
             <dependency>
-              <groupId>org.eclipse.jetty</groupId>
-              <artifactId>jetty-webapp</artifactId>
-              <version>${jetty.version}</version>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>

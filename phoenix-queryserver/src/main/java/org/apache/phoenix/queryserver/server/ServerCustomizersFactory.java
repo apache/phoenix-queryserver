@@ -17,6 +17,11 @@
  */
 package org.apache.phoenix.queryserver.server;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
@@ -27,11 +32,6 @@ import org.apache.phoenix.queryserver.server.customizers.JMXJsonEndpointServerCu
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Creates customizers for the underlying Avatica HTTP server.
