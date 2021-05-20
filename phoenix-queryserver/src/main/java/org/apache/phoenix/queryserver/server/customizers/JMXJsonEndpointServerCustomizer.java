@@ -30,12 +30,12 @@ public class JMXJsonEndpointServerCustomizer implements ServerCustomizer<Server>
     HandlerList list = (HandlerList) handlers[0];
 
     ServletContextHandler ctx = new ServletContextHandler();
-    ctx.setContextPath("/");
+    ctx.setContextPath("/jmx");
     ctx.getServletContext().setAttribute(CONF_CONTEXT_ATTRIBUTE, HBaseConfiguration.create());
 
     Servlet servlet = new JMXJsonServlet();
     ServletHolder holder = new ServletHolder(servlet);
-    ctx.addServlet(holder, "/jmx");
+    ctx.addServlet(holder, "/");
 
     Handler[] realHandlers = list.getChildHandlers();
     Handler[] newHandlers = new Handler[realHandlers.length + 1];
