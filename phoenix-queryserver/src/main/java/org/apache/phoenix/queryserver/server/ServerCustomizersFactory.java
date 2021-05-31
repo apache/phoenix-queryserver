@@ -72,7 +72,10 @@ public interface ServerCustomizersFactory {
                     LOG.warn("Empty value provided for {}, ignoring", QueryServerProperties.CLIENT_JARS_REPO_ATTRIB);
                 }
             }
-            customizers.add(new JMXJsonEndpointServerCustomizer());
+            if (!conf.getBoolean(QueryServerProperties.QUERY_SERVER_JMX_JSON_ENDPOINT_DISABLED,
+                QueryServerOptions.DEFAULT_QUERY_SERVER_JMXJSONENDPOINT_DISABLED)) {
+                customizers.add(new JMXJsonEndpointServerCustomizer());
+            }
             return Collections.unmodifiableList(customizers);
         }
     }
