@@ -82,6 +82,9 @@ def setPath():
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-queryserver-[!c]*.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
+    SLF4J_SIMPLE_JAR_PATTERN = "slf4j-simple-*[!s].jar"
+
+    OVERRIDE_SLF4J_BACKEND = "PHOENIX_THIN_OVERRIDE_SLF4J_BACKEND"
 
     # Backward support old env variable PHOENIX_LIB_DIR replaced by PHOENIX_CLASS_PATH
     global phoenix_class_path
@@ -153,6 +156,11 @@ def setPath():
     global sqlline_with_deps_jar
     sqlline_with_deps_jar = findFileInPathWithoutRecursion(SQLLINE_WITH_DEPS_PATTERN, os.path.join(current_dir, "..","lib"))
 
+    global slf4j_backend_jar
+    slf4j_backend_jar = os.environ.get(OVERRIDE_SLF4J_BACKEND)
+    if slf4j_backend_jar is None or slf4j_backend_jar == "":
+        slf4j_backend_jar = findFileInPathWithoutRecursion(SLF4J_SIMPLE_JAR_PATTERN, os.path.join(current_dir, "..","lib"))
+
     return ""
 
 def shell_quote(args):
@@ -188,3 +196,4 @@ if __name__ == "__main__":
     print "phoenix_queryserver_classpath", phoenix_queryserver_classpath
     print "phoenix_thin_client_jar:", phoenix_thin_client_jar
     print "sqlline_with_deps_jar", sqlline_with_deps_jar
+    print "slf4j_backend_jar:", slf4j_backend_jar
