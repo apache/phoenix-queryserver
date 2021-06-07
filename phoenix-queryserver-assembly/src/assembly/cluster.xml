@@ -68,5 +68,12 @@
           <include>org.apache.phoenix:${phoenix.client.artifactid}:jar</include>
         </includes>
       </dependencySet>
+      <dependencySet>
+        <unpack>false</unpack>
+        <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
+        <includes>
+          <include>org.slf4j:slf4j-simple</include>
+        </includes>
+      </dependencySet>
     </dependencySets>
 </assembly>
