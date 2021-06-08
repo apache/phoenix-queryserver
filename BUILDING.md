@@ -27,7 +27,7 @@ This repository will build a tarball which is capable of running the Phoenix Que
 
 By default, this tarball does not contain a Phoenix client jar as it is meant to be agnostic
 of Phoenix version (one PQS release can be used against any Phoenix version). Today, PQS builds against
-the Phoenix 4.15.0-HBase-1.4 release.
+the Phoenix 5.1.1 release with HBase 2.4.2.
 
 Note that the resulting Query Server binaries are not tied to any Phoenix, Hbase or Hadoop versions,
 and will work with all recent Phoenix versions.
@@ -40,33 +40,24 @@ $ mvn clean package
 
 To build a release of PQS which packages a specific version of Phoenix, specify the `package-phoenix-client` system property
 and specify the `phoenix.version` system property to indicate a specific Phoenix version, as well as
-the `phoenix.client.artifactid` to choose the phoenix-client HBase variant for 4.16+ / 5.1+.
+the `phoenix.client.artifactid` to choose the phoenix-client HBase variant.
 
 ```
-$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.client.artifactid=phoenix-client-hbase-2.4
+$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.client.artifactid=phoenix-client-hbase-2.4 -pl '!phoenix-queryserver-it'
+```
+```
+$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=4.15.0-HBase-1.4 -Dphoenix.client.artifactid=phoenix-client -pl '!phoenix-queryserver-it'
 ```
 
 ### Running integration tests
 
 `mvn package` will run the unit tests while building, but it will not run the integration test suite.
 
-The IT suite is run when executing `mvn install` or `mvn verify`. The Phoenix client artifact specified
-with `phoenix.version` and `phoenix.client.artifactid` is used for running the integration tests.
-
-When specifying `phoenix.version` and `phoenix.client.artifactid`, also specify the HBase version to
-be used for integration testing by activating the corresponding `hbase<minor.major>` profile.
-
-When using a Phoenix 5.1+ version, activate the `hbase-2.x` profile in addition to the
-profile for the minor 2.x version.
-
-**NOTE** that the integration tests cannot be currently run with Phoenix 4.16+ or 5.1+, so the
-examples below will fail. See https://issues.apache.org/jira/browse/PHOENIX-6324
+The integration tests will run with the default Phoenix and HBase version.
+Running the integration tests with non-default Phoenix and HBase versions is not supported.
 
 ```
-$ mvn clean verify -Dpackage.phoenix.client -Dphoenix.version=4.16.0-SNAPSHOT -Dphoenix.client.artifactid=phoenix-client-hbase-1.3 -Phbase-1.3
-```
-```
-$ mvn clean install -Dpackage.phoenix.client -Dphoenix.version=5.1.0-SNAPSHOT -Dphoenix.client.artifactid=phoenix-client-hbase-2.1 -Phbase-2.1 -Phbase-2.x
+$ mvn clean verify
 ```
 
 ### Running project reports

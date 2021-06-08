@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.ServerCustomizersFactory;
 import org.apache.phoenix.queryserver.server.customizers.BasicAuthenticationServerCustomizer;
 import org.apache.phoenix.queryserver.server.customizers.BasicAuthenticationServerCustomizer.BasicAuthServerCustomizerFactory;
 import org.apache.phoenix.util.InstanceResolver;
+import org.apache.phoenix.util.ReadOnlyProps;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,7 +39,7 @@ import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
+public class ServerCustomizersIT extends BaseTest {
     private static final Logger LOG = LoggerFactory.getLogger(ServerCustomizersIT.class);
     private static final String USER_NOT_AUTHORIZED = "user1";
 
@@ -48,7 +50,9 @@ public class ServerCustomizersIT extends BaseHBaseManagedTimeIT {
 
     @BeforeClass
     public static synchronized void setup() throws Exception {
-        Configuration conf = getTestClusterConfig();
+        setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
+
+        Configuration conf = config;
         PQS_UTIL = new QueryServerTestUtil(conf);
         PQS_UTIL.startLocalHBaseCluster(ServerCustomizersIT.class);
         // Register a test jetty server customizer

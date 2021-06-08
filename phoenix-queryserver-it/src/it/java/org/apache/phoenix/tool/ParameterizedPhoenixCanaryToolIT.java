@@ -74,6 +74,7 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 	private List<String> cmd = new ArrayList<>();
 	private String resultSinkOption;
 	private ByteArrayOutputStream out = new ByteArrayOutputStream();
+    private String tmpDir = System.getProperty("java.io.tmpdir");
 
 	public ParameterizedPhoenixCanaryToolIT(boolean isPositiveTestType,
 			boolean isNamespaceEnabled, String resultSinkOption) {
@@ -105,7 +106,12 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		if(needsNewCluster()) {
 			setClientSideNamespaceProperties();
 			setServerSideNamespaceProperties();
-			tearDownMiniClusterAsync(1);
+			tearDownMiniCluster(NUM_SLAVES_BASE);
+			System.setProperty("java.io.tmpdir", tmpDir);
+			// FIXME no idea why java.io.tmpdir gets deleted. We don't see this behaviour in 
+			// the main phoenix repo with same versions
+			File tempDir = new File(tmpDir);
+			tempDir.mkdirs();
 			setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()),
 					new ReadOnlyProps(clientProps.entrySet().iterator()));
 			LOGGER.info("New cluster is spinned up with test parameters " +
