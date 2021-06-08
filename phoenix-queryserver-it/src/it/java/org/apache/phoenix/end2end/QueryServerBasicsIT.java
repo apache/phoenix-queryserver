@@ -39,9 +39,13 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HConstants;
+import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
+import org.apache.phoenix.util.ReadOnlyProps;
 import org.apache.phoenix.util.ThinClientUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -55,7 +59,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Smoke test for query server.
  */
-public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
+public class QueryServerBasicsIT extends BaseTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryServerBasicsIT.class);
 
@@ -67,20 +71,22 @@ public class QueryServerBasicsIT extends BaseHBaseManagedTimeIT {
   public TestName name = new TestName();
 
   @BeforeClass
-  public static synchronized void beforeClass() throws Exception {
-    CONF = getTestClusterConfig();
-    if(System.getProperty("do.not.randomize.pqs.port") == null) {
-        CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
-    }
-    String url = getUrl();
-    AVATICA_SERVER = new QueryServerThread(new String[] { url }, CONF,
-            QueryServerBasicsIT.class.getName());
-    AVATICA_SERVER.start();
-    AVATICA_SERVER.getQueryServer().awaitRunning();
-    final int port = AVATICA_SERVER.getQueryServer().getPort();
-    LOG.info("Avatica server started on port " + port);
-    CONN_STRING = ThinClientUtil.getConnectionUrl("localhost", port);
-    LOG.info("JDBC connection string is " + CONN_STRING);
+  public static synchronized void doSetup() throws Exception {
+      setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
+
+      CONF = config;
+      if(System.getProperty("do.not.randomize.pqs.port") == null) {
+          CONF.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+      }
+      String url = getUrl();
+      AVATICA_SERVER = new QueryServerThread(new String[] { url }, CONF,
+              QueryServerBasicsIT.class.getName());
+      AVATICA_SERVER.start();
+      AVATICA_SERVER.getQueryServer().awaitRunning();
+      final int port = AVATICA_SERVER.getQueryServer().getPort();
+      LOG.info("Avatica server started on port " + port);
+      CONN_STRING = ThinClientUtil.getConnectionUrl("localhost", port);
+      LOG.info("JDBC connection string is " + CONN_STRING);
   }
 
   @AfterClass
