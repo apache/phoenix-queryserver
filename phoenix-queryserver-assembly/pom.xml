@@ -68,7 +68,7 @@
                             <descriptors>
                                 <descriptor>src/assembly/cluster.xml</descriptor>
                             </descriptors>
-                            <finalName>phoenix-queryserver-${project.version}</finalName>
+                            <finalName>phoenix-queryserver-${project.version}-bin</finalName>
                             <tarLongFileMode>posix</tarLongFileMode>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
