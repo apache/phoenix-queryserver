@@ -18,7 +18,7 @@
 -->
 # PHOENIX Changelog
 
-## Release queryserver-6.0.0 - Unreleased (as of 2021-07-08)
+## Release queryserver-6.0.0 - Unreleased (as of 2021-07-09)
 
 
 
