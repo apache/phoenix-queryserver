@@ -18,7 +18,7 @@
 -->
 # PHOENIX Changelog
 
-## Release queryserver-6.0.0 - Unreleased (as of 2021-07-09)
+## Release queryserver-6.0.0 - Unreleased (as of 2021-07-13)
 
 
 
@@ -71,6 +71,7 @@
 
 | JIRA | Summary | Priority | Component |
 |:---- |:---- | :--- |:---- |
+| [PHOENIX-6512](https://issues.apache.org/jira/browse/PHOENIX-6512) | Fix PQS Apache RAT check problems |  Major | queryserver |
 | [PHOENIX-6407](https://issues.apache.org/jira/browse/PHOENIX-6407) | phoenixdb for Python silently ignores placeholders \< placeholder arguments |  Minor | python |
 | [PHOENIX-6461](https://issues.apache.org/jira/browse/PHOENIX-6461) | sqlline-thin does not include slf4j logging backend |  Major | queryserver |
 | [PHOENIX-6324](https://issues.apache.org/jira/browse/PHOENIX-6324) | Queryserver IT suite incompatible with phoenix 5.1+ / 4.16+ shading |  Major | queryserver |
