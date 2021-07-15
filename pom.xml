@@ -314,6 +314,24 @@
                     <extensions>true</extensions>
                     <inherited>true</inherited>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.rat</groupId>
+                    <artifactId>apache-rat-plugin</artifactId>
+                    <configuration>
+                        <!-- This will be inherited by children, which is unintended, but causes no problems -->
+                        <excludes>
+                            <!-- precommit? -->
+                            <exclude>**/patchprocess/**</exclude>
+                            <!-- Python Software Foundation License -->
+                            <exclude>bin/argparse-1.4.0/argparse.py</exclude>
+                            <!-- short docs text files don't need header -->
+                            <exclude>python-phoenixdb/NEWS.rst</exclude>
+                            <exclude>python-phoenixdb/README.rst</exclude>
+                            <exclude>python-phoenixdb/dev-support/rat-excludes.txt</exclude>
+                            <exclude>python-phoenixdb/RELEASING.rst</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -354,20 +372,6 @@
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <!-- This will be inherited by children, which is unintended, but causes no problems -->
-                    <excludes>
-                        <!-- precommit? -->
-                        <exclude>**/patchprocess/**</exclude>
-                        <!-- Python Software Foundation License -->
-                        <exclude>bin/argparse-1.4.0/argparse.py</exclude>
-                        <!-- short docs text files don't need header -->
-                        <exclude>python-phoenixdb/NEWS.rst</exclude>
-                        <exclude>python-phoenixdb/README.rst</exclude>
-                        <exclude>python-phoenixdb/dev-support/rat-excludes.txt</exclude>
-                        <exclude>python-phoenixdb/RELEASING.rst</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <!-- Allows us to get the apache-ds bundle artifacts -->
