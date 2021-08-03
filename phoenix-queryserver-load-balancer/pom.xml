@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.apache.phoenix</groupId>
     <artifactId>phoenix-queryserver-parent</artifactId>
-    <version>6.0.0</version>
+    <version>6.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>phoenix-queryserver-load-balancer</artifactId>
   <name>Phoenix Query Server Load Balancer</name>
