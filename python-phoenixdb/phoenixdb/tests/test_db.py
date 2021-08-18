@@ -296,10 +296,13 @@ class PhoenixDatabaseTest(DatabaseTestCase):
             ])
             with self.assertRaises(ProgrammingError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_param_number VALUES (?, ?)", (123, 'John Doe', 'admin'))
-            self.assertEqual("Number of placeholders (?) must match number of parameters. Number of placeholders: 2. Number of parameters: 3", cm.exception.message)
+            self.assertEqual("Number of placeholders (?) must match number of parameters."
+                             " Number of placeholders: 2. Number of parameters: 3", cm.exception.message)
             with self.assertRaises(ProgrammingError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_param_number VALUES (?, ?, ?)", (123, 'John Doe', 'admin', 'asd'))
-            self.assertEqual("Number of placeholders (?) must match number of parameters. Number of placeholders: 3. Number of parameters: 4", cm.exception.message)
+            self.assertEqual("Number of placeholders (?) must match number of parameters."
+                             " Number of placeholders: 3. Number of parameters: 4", cm.exception.message)
             with self.assertRaises(ProgrammingError) as cm:
                 cursor.execute("UPSERT INTO phoenixdb_test_param_number VALUES (?, ?, ?)", (123, 'John Doe'))
-            self.assertEqual("Number of placeholders (?) must match number of parameters. Number of placeholders: 3. Number of parameters: 2", cm.exception.message)
+            self.assertEqual("Number of placeholders (?) must match number of parameters."
+                             " Number of placeholders: 3. Number of parameters: 2", cm.exception.message)

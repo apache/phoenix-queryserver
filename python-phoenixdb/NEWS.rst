@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 1.1.0
+-------------
+
+- Implemented get_primary_keys() and get_index_info() methods in meta object (PHOENIX-6410)
+- Fixed broken SqlAlchemy get_pk_constraint() method to use meta.get_primary_keys() (PHOENIX-6410)
+- Implemented SqlAlchemy get_indexes() method to expose meta.get_index_info() (PHOENIX-6410)
+- Fixed empty array column handling in result set (PHOENIX-6484)
+
 Version 1.0.1
 -------------
 
