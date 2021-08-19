@@ -70,12 +70,10 @@ function_sign() {
   if [[ "$OSTYPE" == "darwin"* ]]; then
     gpg --armor --output $phoenix_tar.asc --detach-sig $phoenix_tar;
     openssl dgst -sha512 $phoenix_tar > $phoenix_tar.sha512;
-    openssl dgst -sha256 $phoenix_tar >> $phoenix_tar.sha256;
   # all other OS
   else
     gpg --armor --output $phoenix_tar.asc --detach-sig $phoenix_tar;
     sha512sum -b $phoenix_tar > $phoenix_tar.sha512;
-    sha256sum -b $phoenix_tar >> $phoenix_tar.sha256;
   fi
 }
 
