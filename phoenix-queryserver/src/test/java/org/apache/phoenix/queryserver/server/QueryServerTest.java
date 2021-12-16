@@ -40,7 +40,7 @@ public class QueryServerTest {
 
   @BeforeClass
   public static void setupOnce() throws IOException {
-    EXPECTED_HOSTNAME = InetAddress.getLocalHost().getCanonicalHostName();
+    EXPECTED_HOSTNAME = InetAddress.getLocalHost().getCanonicalHostName().toLowerCase();
   }
 
   @Before
