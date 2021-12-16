@@ -54,7 +54,7 @@ public class TlsUtil {
     protected static final File KEYSTORE = new File(TARGET_DIR, "avatica-test-ks.jks");
     protected static final File TRUSTSTORE = new File(TARGET_DIR, "avatica-test-ts.jks");
 
-    private static final Logger LOG = LoggerFactory.getLogger(QueryServerBasicsIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TlsUtil.class);
 
     public static File getTrustStoreFile() {
         return TRUSTSTORE;
