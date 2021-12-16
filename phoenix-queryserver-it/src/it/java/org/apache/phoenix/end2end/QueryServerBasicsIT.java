@@ -395,4 +395,8 @@ public class QueryServerBasicsIT extends BaseTest {
       System.out.flush();
       Thread.sleep(24*60*60*1000);
   }
+
+  public static String getConnString() {
+    return CONN_STRING;
+  }
 }

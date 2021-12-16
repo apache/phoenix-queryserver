@@ -340,12 +340,10 @@ public final class QueryServer extends Configured implements Tool, Runnable {
    * the configured principal as-is if {@code _HOST} is not the "instance".
    */
   String getSpnegoPrincipal(Configuration conf) throws IOException {
-    String httpPrincipal = conf.get(
-        QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
+    String httpPrincipal = conf.get(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB, null);
     // Backwards compat for a configuration key change
     if (httpPrincipal == null) {
-      httpPrincipal = conf.get(
-          QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
+      httpPrincipal = conf.get(QueryServerProperties.QUERY_SERVER_KERBEROS_HTTP_PRINCIPAL_ATTRIB_LEGACY, null);
     }
 
     String hostname = Strings.domainNamePointerToHostName(DNS.getDefaultHost(
