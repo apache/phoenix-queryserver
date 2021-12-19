@@ -56,8 +56,12 @@ class Connection(object):
         self.set_session(**avatica_props_init)
 
     def __del__(self):
-        if not self._closed:
-            self.close()
+        try:
+            if not self._closed:
+                self.close()
+        except ImportError:
+            # Pass if Python is shutting down when this is called
+            pass
 
     def __enter__(self):
         return self

@@ -13,6 +13,7 @@ Unreleased
 - Replace deprecated failUnless methods in tests (PHOENIX-6892)
 - Add support for specifying custom HTTP headers (PHOENIX-6921)
 - Use JDBC/Avatica column label as column name when set (PHOENIX-6917)
+- Do not throw exception when shutting down Python with open connections (PHOENIX-6926)
 
 Version 1.2.1
 -------------
