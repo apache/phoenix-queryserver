@@ -162,6 +162,7 @@ if command == 'start':
             pidfile = daemon.PidFile(pid_file_path, 'Query Server already running, PID file found: %s' % pid_file_path),
             stdout = out,
             stderr = out,
+            umask = current_umask
         )
         print('starting Query Server, logging to %s' % log_file_path)
         with context:
@@ -176,12 +177,8 @@ if command == 'start':
                 sys.exit(0)
             signal.signal(signal.SIGTERM, handler)
 
-            def initsubproc():
-                # set the parent's umask
-                os.umask(current_umask)
-
             print('%s launching %s' % (datetime.datetime.now(), cmd))
-            child = subprocess.Popen(cmd.split(), preexec_fn=initsubproc)
+            child = subprocess.Popen(cmd.split())
             sys.exit(child.wait())
 
 elif command == 'stop':
@@ -207,7 +204,7 @@ elif command == 'stop':
 
     print("stopping Query Server pid %s" % pid)
     with open(out_file_path, 'a+') as out:
-        sys.stderr.write("daemon mode not supported on this platform{}".format(os.linesep))
+        sys.stderr.write("sending SIGTERM{}".format(os.linesep))
     os.kill(pid, signal.SIGTERM)
 
 else:
