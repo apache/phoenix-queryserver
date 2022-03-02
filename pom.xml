@@ -84,7 +84,8 @@
         <commons-io.version>2.11.0</commons-io.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <sqlline.version>1.9.0</sqlline.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <reload4j.version>1.2.19</reload4j.version>
         <avatica.version>1.19.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
         <jsr305.version>3.0.0</jsr305.version>
@@ -563,6 +564,16 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-reload4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.reload4j</groupId>
+                <artifactId>reload4j</artifactId>
+                <version>${reload4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.argparse4j</groupId>

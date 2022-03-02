@@ -82,9 +82,11 @@ def setPath():
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-queryserver-[!c]*.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
-    SLF4J_SIMPLE_JAR_PATTERN = "slf4j-simple-*[!s].jar"
+    SLF4J_BACKEND_JAR_PATTERN = "slf4j-reload4j-*[!s].jar"
+    LOGGING_JAR_PATTERN = "reload4j-*[!s].jar"
 
     OVERRIDE_SLF4J_BACKEND = "PHOENIX_THIN_OVERRIDE_SLF4J_BACKEND"
+    OVERRIDE_LOGGING = "OVERRIDE_LOGGING_JAR_LOCATION"
 
     # Backward support old env variable PHOENIX_LIB_DIR replaced by PHOENIX_CLASS_PATH
     global phoenix_class_path
@@ -159,7 +161,12 @@ def setPath():
     global slf4j_backend_jar
     slf4j_backend_jar = os.environ.get(OVERRIDE_SLF4J_BACKEND)
     if slf4j_backend_jar is None or slf4j_backend_jar == "":
-        slf4j_backend_jar = findFileInPathWithoutRecursion(SLF4J_SIMPLE_JAR_PATTERN, os.path.join(current_dir, "..","lib"))
+        slf4j_backend_jar = findFileInPathWithoutRecursion(SLF4J_BACKEND_JAR_PATTERN, os.path.join(current_dir, "..","lib"))
+
+    global logging_jar
+    logging_jar = os.environ.get(OVERRIDE_LOGGING)
+    if logging_jar is None or logging_jar == "":
+        logging_jar = findFileInPathWithoutRecursion(LOGGING_JAR_PATTERN, os.path.join(current_dir, "..","lib"))
 
     return ""
 

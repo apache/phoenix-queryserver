@@ -120,9 +120,13 @@ out_file_path = os.path.join(log_dir, phoenix_out_file)
 #    " -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true" + \
 
 # The command is run through subprocess so environment variables are automatically inherited
-java_cmd = '%(java)s -cp ' + hbase_conf_dir + os.pathsep + hadoop_conf_dir + os.pathsep + \
+java_cmd = '%(java)s -cp ' +\
+    hbase_conf_dir + os.pathsep + \
+    hadoop_conf_dir + os.pathsep + \
+    phoenix_queryserver_utils.slf4j_backend_jar + os.pathsep + \
+    phoenix_queryserver_utils.logging_jar + os.pathsep + \
     phoenix_queryserver_utils.phoenix_client_jar + os.pathsep + \
-    phoenix_queryserver_utils.phoenix_queryserver_jar + os.pathsep + \
+    phoenix_queryserver_utils.phoenix_queryserver_jar + \
     " -Dproc_phoenixserver" + \
     " -Dlog4j.configuration=file:" + os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
     " -Dpsql.root.logger=%(root_logger)s" + \
