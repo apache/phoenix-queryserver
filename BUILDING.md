@@ -29,8 +29,11 @@ By default, this tarball does not contain a Phoenix client jar as it is meant to
 of Phoenix version (one PQS release can be used against any Phoenix version). Today, PQS builds against
 the Phoenix 5.1.1 release with HBase 2.4.2.
 
+In order to use Phoenix Query Server, you need to copy the phoenix-client-embedded jar appropriate
+for your cluster into the Queryserver root directory.
+
 Note that the resulting Query Server binaries are not tied to any Phoenix, Hbase or Hadoop versions,
-and will work with all recent Phoenix versions.
+The current release requires at least Phoenix 4.16.0 or 5.1.0.
 
 ```
 $ mvn clean package
@@ -41,12 +44,10 @@ $ mvn clean package
 To build a release of PQS which packages a specific version of Phoenix, specify the `package-phoenix-client` system property
 and specify the `phoenix.version` system property to indicate a specific Phoenix version, as well as
 the `phoenix.client.artifactid` to choose the phoenix-client HBase variant.
+You need to bundle the embedded client variant, to avoid conflicts with the logging libraries.
 
 ```
-$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.client.artifactid=phoenix-client-hbase-2.4 -pl '!phoenix-queryserver-it'
-```
-```
-$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=4.15.0-HBase-1.4 -Dphoenix.client.artifactid=phoenix-client -pl '!phoenix-queryserver-it'
+$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.client.artifactid=phoenix-client-embedded-hbase-2.4 -pl '!phoenix-queryserver-it'
 ```
 
 ### Running integration tests

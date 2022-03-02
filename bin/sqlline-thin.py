@@ -209,9 +209,11 @@ if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == '
     jdbc_url += ';authentication=SPNEGO'
 
 java_cmd = java + ' $PHOENIX_OPTS ' + \
-    ' -cp "' + phoenix_queryserver_utils.sqlline_with_deps_jar \
-    + os.pathsep + phoenix_queryserver_utils.phoenix_thin_client_jar + \
-    os.pathsep + phoenix_queryserver_utils.slf4j_backend_jar + '" -Dlog4j.configuration=file:' + \
+    ' -cp "' + phoenix_queryserver_utils.sqlline_with_deps_jar + os.pathsep + \
+    phoenix_queryserver_utils.phoenix_thin_client_jar + os.pathsep + \
+    phoenix_queryserver_utils.slf4j_backend_jar + os.pathsep + \
+    phoenix_queryserver_utils.logging_jar +\
+    '" -Dlog4j.configuration=file:' + \
     os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
     ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     disable_jna + \
