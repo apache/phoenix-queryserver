@@ -145,6 +145,11 @@ colorSetting = tryDecode(args.color)
 if os.name == 'nt':
     colorSetting = "false"
 
+if os.uname()[4].startswith('ppc'):
+    disable_jna = " -Dorg.jline.terminal.jna=false "
+else:
+    disable_jna = ""
+
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
 hbase_config_path = os.getenv('HBASE_CONF_DIR', phoenix_queryserver_utils.current_dir)
@@ -209,6 +214,7 @@ java_cmd = java + ' $PHOENIX_OPTS ' + \
     os.pathsep + phoenix_queryserver_utils.slf4j_backend_jar + '" -Dlog4j.configuration=file:' + \
     os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
     ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
+    disable_jna + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
     ' -u "' + jdbc_url + '"' + " -n none -p none " + \
     " --color=" + colorSetting + " --fastConnect=" + tryDecode(args.fastconnect) + " --verbose=" + tryDecode(args.verbose) + \
