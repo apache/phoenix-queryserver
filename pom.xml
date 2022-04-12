@@ -72,7 +72,7 @@
 
         <!-- Hadoop/Hbase Versions -->
         <hbase.version>2.4.2</hbase.version>
-        <hadoop.version>3.1.4</hadoop.version>
+        <hadoop.version>3.2.3</hadoop.version>
         <phoenix.client.artifactid>phoenix-client-hbase-2.4</phoenix.client.artifactid>
 
         <!-- Dependency versions -->
