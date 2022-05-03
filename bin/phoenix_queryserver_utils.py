@@ -192,15 +192,15 @@ def common_sqlline_args(parser):
 
 if __name__ == "__main__":
     setPath()
-    print "phoenix_class_path:", phoenix_class_path
-    print "hbase_conf_dir:", hbase_conf_dir
-    print "hbase_conf_path:", hbase_conf_path
-    print "hadoop_conf_dir:", hadoop_conf_dir
-    print "current_dir:", current_dir
-    print "phoenix_client_jar:", phoenix_client_jar
-    print "phoenix_queryserver_jar:", phoenix_queryserver_jar
-    print "phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar
-    print "phoenix_queryserver_classpath", phoenix_queryserver_classpath
-    print "phoenix_thin_client_jar:", phoenix_thin_client_jar
-    print "sqlline_with_deps_jar", sqlline_with_deps_jar
-    print "slf4j_backend_jar:", slf4j_backend_jar
+    print("phoenix_class_path:", phoenix_class_path)
+    print("hbase_conf_dir:", hbase_conf_dir)
+    print("hbase_conf_path:", hbase_conf_path)
+    print("hadoop_conf_dir:", hadoop_conf_dir)
+    print("current_dir:", current_dir)
+    print("phoenix_client_jar:", phoenix_client_jar)
+    print("phoenix_queryserver_jar:", phoenix_queryserver_jar)
+    print("phoenix_loadbalancer_jar:", phoenix_loadbalancer_jar)
+    print("phoenix_queryserver_classpath", phoenix_queryserver_classpath)
+    print("phoenix_thin_client_jar:", phoenix_thin_client_jar)
+    print("sqlline_with_deps_jar", sqlline_with_deps_jar)
+    print("slf4j_backend_jar:", slf4j_backend_jar)
