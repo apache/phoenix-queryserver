@@ -254,8 +254,12 @@ class AvaticaClient(object):
         request.connection_id = connection_id
         if catalog is not None:
             request.catalog = catalog
+            if catalog == '':
+                request.has_catalog = True
         if schemaPattern is not None:
             request.schema_pattern = schemaPattern
+            if schemaPattern == '':
+                request.has_schema_pattern = True
         response_data = self._apply(request, 'ResultSetResponse')
         response = responses_pb2.ResultSetResponse()
         response.ParseFromString(response_data)
@@ -266,10 +270,16 @@ class AvaticaClient(object):
         request.connection_id = connection_id
         if catalog is not None:
             request.catalog = catalog
+            if catalog == '':
+                request.has_catalog = True
         if schemaPattern is not None:
             request.schema_pattern = schemaPattern
+            if schemaPattern == '':
+                request.has_schema_pattern = True
         if tableNamePattern is not None:
             request.table_name_pattern = tableNamePattern
+            if tableNamePattern == '':
+                request.has_table_name_pattern = True
         if typeList is not None:
             request.type_list.extend(typeList)
         request.has_type_list = typeList is not None
@@ -283,12 +293,20 @@ class AvaticaClient(object):
         request.connection_id = connection_id
         if catalog is not None:
             request.catalog = catalog
+            if catalog == '':
+                request.has_catalog = True
         if schemaPattern is not None:
             request.schema_pattern = schemaPattern
+            if schemaPattern == '':
+                request.has_schema_pattern = True
         if tableNamePattern is not None:
             request.table_name_pattern = tableNamePattern
+            if tableNamePattern == '':
+                request.has_table_name_pattern = True
         if columnNamePattern is not None:
             request.column_name_pattern = columnNamePattern
+            if columnNamePattern == '':
+                request.has_column_name_pattern = True
         response_data = self._apply(request, 'ResultSetResponse')
         response = responses_pb2.ResultSetResponse()
         response.ParseFromString(response_data)

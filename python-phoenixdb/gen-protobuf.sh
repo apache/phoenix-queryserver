@@ -16,7 +16,7 @@
 # limitations under the License.
 
 set -x
-AVATICA_VER=rel/avatica-1.10.0
+AVATICA_VER=rel/avatica-1.18.0
 
 set -e
 
