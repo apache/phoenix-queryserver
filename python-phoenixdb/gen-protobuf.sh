@@ -16,7 +16,7 @@
 # limitations under the License.
 
 set -x
-AVATICA_VER=rel/avatica-1.10.0
+AVATICA_VER=1.21.0
 
 set -e
 
@@ -24,7 +24,8 @@ rm -rf avatica-tmp
 
 mkdir avatica-tmp
 cd avatica-tmp
-wget -O avatica.tar.gz https://github.com/apache/calcite-avatica/archive/$AVATICA_VER.tar.gz
+
+wget -O avatica.tar.gz https://dlcdn.apache.org/calcite/apache-calcite-avatica-$AVATICA_VER/apache-calcite-avatica-$AVATICA_VER-src.tar.gz
 tar -x --strip-components=1 -f avatica.tar.gz
 
 cd ..
