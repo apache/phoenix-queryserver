@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.0
+-------------
+- Added supports_statement_cache attribute for SqlAlchemy dialect to avoid warnings (PHOENIX-6735)
+
 Version 1.1.0
 -------------
 
