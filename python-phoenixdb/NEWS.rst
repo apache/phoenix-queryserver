@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.2.0
+-------------
+
+- Re-generated the protobuf python files with protoc 3.19 from the Avatica 1.21 descriptors (PHOENIX-6731)
+- Fixed SqlAlchemy get_view_names() method (PHOENIX-6704)
+- Dropped support for Python 3.4
+
 Version 1.1.0
 -------------
 
