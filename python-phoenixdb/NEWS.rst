@@ -4,9 +4,10 @@ Changelog
 Version 1.2.0
 -------------
 
+- Updated test environment to support Python 3.9 and 3.10 (PHOENIX-6737)
+- Fixed get_view_names() in SqlAlchemy driver (PHOENIX-6727)
 - Added supports_statement_cache attribute for SqlAlchemy dialect to avoid warnings (PHOENIX-6735)
-- Re-generated the protobuf python files with protoc 3.19 from the Avatica 1.21 descriptors (PHOENIX-6731)
-- Fixed SqlAlchemy get_view_names() method (PHOENIX-6704)
+- Re-generated the protobuf Python files with protoc 3.19 from the Avatica 1.21 descriptors (PHOENIX-6731)
 - Dropped support for Python 3.4 (PHOENIX-6731)
 
 Version 1.1.0
