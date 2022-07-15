@@ -59,7 +59,7 @@ else:
         'Sphinx;python_version>="3.6"',
     ],
 
-version = "1.2.0"
+version = "1.2.1.dev0"
 
 setup(
     name="phoenixdb",
