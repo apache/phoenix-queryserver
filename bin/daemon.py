@@ -38,6 +38,7 @@
 #
 # Apache Phoenix note: this file is `daemon.py` from the package
 # `python-daemon 2.0.5`, https://pypi.python.org/pypi/python-daemon/
+# It has been modified in PHOENIX-6762
 #
 # The class `PidFile` was added for adapting the `lockfile` package's interface
 # without depending on yet another 3rd party package. Based on example from
@@ -727,9 +728,9 @@ def is_socket(fd):
         """
     result = False
 
-    file_socket = socket.fromfd(fd, socket.AF_INET, socket.SOCK_RAW)
 
     try:
+        file_socket = socket.fromfd(fd, socket.AF_INET, socket.SOCK_RAW)
         socket_type = file_socket.getsockopt(
                 socket.SOL_SOCKET, socket.SO_TYPE)
     except socket.error as exc:
