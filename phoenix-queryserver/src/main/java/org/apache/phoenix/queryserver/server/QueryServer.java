@@ -599,8 +599,9 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       // realm got removed from remoteUserName in CALCITE-4152
       // so we remove the instance name to avoid geting KerberosName$NoMatchingRule exception
 
+      int atSignIndex = remoteUserName.indexOf('@');
       int separatorIndex = remoteUserName.indexOf('/');
-      if (separatorIndex > 0) {
+      if (atSignIndex == -1 && separatorIndex > 0) {
         remoteUserName = remoteUserName.substring(0, separatorIndex);
       }
 
