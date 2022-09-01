@@ -204,6 +204,7 @@ public class SecureQueryServerPhoenixDBIT {
         checkForCommandOnPath("kinit");
 
         final Configuration conf = UTIL.getConfiguration();
+        conf.set("hbase.regionserver.wal.codec", "org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec");
         // Ensure the dirs we need are created/empty
         ensureIsEmptyDirectory(TEMP_DIR);
         ensureIsEmptyDirectory(KEYTAB_DIR);
