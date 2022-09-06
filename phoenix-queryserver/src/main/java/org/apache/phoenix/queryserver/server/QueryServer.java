@@ -595,6 +595,16 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
       // Proxy this user on top of the server's user (the real user). Get a cached instance, the
       // LoadingCache will create a new instance for us if one isn't cached.
+
+      // realm got removed from remoteUserName in CALCITE-4152
+      // so we remove the instance name to avoid geting KerberosName$NoMatchingRule exception
+
+      int atSignIndex = remoteUserName.indexOf('@');
+      int separatorIndex = remoteUserName.indexOf('/');
+      if (atSignIndex == -1 && separatorIndex > 0) {
+        remoteUserName = remoteUserName.substring(0, separatorIndex);
+      }
+
       UserGroupInformation proxyUser = createProxyUser(remoteUserName);
 
       // Execute the actual call as this proxy user
