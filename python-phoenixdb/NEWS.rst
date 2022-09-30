@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.2.1
+-------------
+- Defined authentication mechanism for SPNEGO explicitly (PHOENIX-6781)
+- Fixed flaky tests
+
 Version 1.2.0
 -------------
 
