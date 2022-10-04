@@ -26,14 +26,14 @@ echo "Presumes that you can sign a release as described at https://www.apache.or
 echo ""
 echo "Continuing will overwrite all uncommitted changes under the phoenix-queryserver repository."
 
-read -p "Y to continue or any other key to quit" prompt
+read -p "Y to continue or any other key to quit " prompt
 if [[ ! $prompt =~ [yY](es)* ]]
 then
   echo "Aborting."
   exit
  fi
 
-echo "Starting...";sleep 2s
+echo "Starting...";sleep 2
 
 # Set directory variables
 DIR_ROOT="$(cd $(dirname $0);pwd)/.."
@@ -80,12 +80,12 @@ function_sign() {
 cd $DIR_REL_SRC_TAR_PATH; function_sign;
 
 # Tag
-read -p "Do you want add tag for this RC in GIT? (Y for yes or any other key to continue)" prompt
+read -p "Do you want add tag for this RC in GIT? (Y for yes or any other key to continue) " prompt
 if [[ $prompt =~ [yY](es)* ]]
 then
   echo "Tagging..."
   read -p "Enter tag (Example python-phoenixdb-1.0.0.rc0):" prompt
-  echo "Setting tag: $prompt";sleep 5s
+  echo "Setting tag: $prompt";sleep 5
   git tag -a $prompt -m "$prompt"; git push origin $prompt
   mv $DIR_REL_ROOT $DIR_REL_BASE/$prompt
 fi
