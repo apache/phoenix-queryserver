@@ -26,7 +26,8 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $BUILD_PYTHON_VERSIONS` \
     && pyenv global $RESOLVED_VERSIONS $EXTRA_RESOLVED_VERSIONS \
     && pyenv local --unset \
     && python -m pip install -U tox \
-	&& apt-get install -y krb5-user libkrb5-dev
+    && apt-get update \
+    && apt-get install -y krb5-user libkrb5-dev
 
 ENV PHOENIXDB_TEST_DB_URL=http://host.docker.internal:8765
 ENV PHOENIXDB_TEST_DB_TRUSTSTORE=
