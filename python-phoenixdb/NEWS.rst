@@ -5,6 +5,7 @@ Version 1.2.1
 -------------
 - Defined authentication mechanism for SPNEGO explicitly (PHOENIX-6781)
 - Fixed failing docker build because of missing files (PHOENIX-6801)
+- Fixed make_rc.sh script on mac (PHOENIX-6803)
 - Fixed flaky tests
 
 Version 1.2.0
