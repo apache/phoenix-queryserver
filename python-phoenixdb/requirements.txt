@@ -16,4 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-# requirements are defined in setup.py
+protobuf>=3.0.0
+requests
+requests-gssapi
