@@ -60,7 +60,10 @@ as an email template.
 Publishing
 ----------
 
-#. If the vote passes, upload the package to PyPI (using the instructions linked above)
+#. If the vote passes, upload the package to PyPI (using the instructions linked above, and some extra notes here)
+    * Make sure to run the ``python setup.py sdist bdist_wheel`` with python 2 and 3 as well.
+    * To verify it you should have two ``.whl`` files under ``dist/`` folder
+    * ``pip install --index-url https://test.pypi.org/simple/ phoenixdb`` might not work for python2 because the test repo tends to miss the older versions of dependencies required for Python2.
 
 #. Bump the package version to <major>.<minor>.<patch>.dev0 in ``setup.py``, and commit the change
 
