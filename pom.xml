@@ -101,7 +101,8 @@
         <spotbugs-maven-plugin.version>4.1.3</spotbugs-maven-plugin.version>
         <spotbugs.version>4.1.3</spotbugs.version>
         <maven-owasp-plugin.version>6.5.3</maven-owasp-plugin.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <maven-sonar-plugin.version>3.9.1.2184</maven-sonar-plugin.version>
 
         <!-- Plugin options -->
         <it.failIfNoSpecifiedTests>false</it.failIfNoSpecifiedTests>
@@ -701,6 +702,13 @@
             <name>!skip.code-coverage</name>
         </property>
       </activation>
+      <properties>
+          <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+          <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
+          <sonar.coverage.jacoco.xmlReportPaths>
+              ${project.build.directory}/site/jacoco/jacoco.xml
+          </sonar.coverage.jacoco.xmlReportPaths>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -752,6 +760,11 @@
               </execution>
             </executions>
           </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${maven-sonar-plugin.version}</version>
+            </plugin>
         </plugins>
       </build>
     </profile>
