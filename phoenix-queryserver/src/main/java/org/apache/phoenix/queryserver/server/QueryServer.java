@@ -284,6 +284,8 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     final boolean useTls = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_ENABLED);
     if(useTls) {
       final String tlsKeystore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE);
+      final String keystoreType = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_TYPE_KEY, QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_TYPE_DEFAULT);
+
       final String tlsKeystorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD);
       final String tlsTruststore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE);
       final String tlsTruststorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD);
@@ -295,7 +297,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         throw new Exception(String.format("if %s is enabled, %s must be specfified" , QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE));
       }
       final File tlsTruststoreFile = new File(tlsTruststore);
-      builder.withTLS(tlsKeystoreFile, tlsKeystorePassword, tlsTruststoreFile, tlsTruststorePassword);
+      builder.withTLS(tlsKeystoreFile, tlsKeystorePassword, tlsTruststoreFile, tlsTruststorePassword, keystoreType);
     }
 }
 

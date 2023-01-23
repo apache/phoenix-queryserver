@@ -58,6 +58,10 @@ public class QueryServerProperties {
             "phoenix.queryserver.remoteUserExtractor.param";
     public static final String QUERY_SERVER_DISABLE_KERBEROS_LOGIN =
             "phoenix.queryserver.disable.kerberos.login";
+    public static final String QUERY_SERVER_TLS_KEYSTORE_TYPE_KEY =
+            "phoenix.queryserver.tls.keystore.type";
+    public static final String QUERY_SERVER_TLS_KEYSTORE_TYPE_DEFAULT =
+            "jks";
     public static final String QUERY_SERVER_TLS_ENABLED =
             "phoenix.queryserver.tls.enabled";
     public static final String QUERY_SERVER_TLS_KEYSTORE =
