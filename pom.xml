@@ -86,7 +86,7 @@
         <sqlline.version>1.9.0</sqlline.version>
         <slf4j.version>1.7.36</slf4j.version>
         <reload4j.version>1.2.19</reload4j.version>
-        <avatica.version>1.21.0</avatica.version>
+        <avatica.version>1.23.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
         <jsr305.version>3.0.0</jsr305.version>
 
