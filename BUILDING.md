@@ -26,14 +26,26 @@ Copyright ©2020 [Apache Software Foundation](http://www.apache.org/). All Right
 This repository will build a tarball which is capable of running the Phoenix Query Server.
 
 By default, this tarball does not contain a Phoenix client jar as it is meant to be agnostic
-of Phoenix version (one PQS release can be used against any Phoenix version). Today, PQS builds against
-the Phoenix 5.1.1 release with HBase 2.4.2.
+of Phoenix version (one PQS release should be usable against any Phoenix version).
+
+However, due to an incompatible change in the relocations used in the phoenix-client JAR, you need to build
+Phoenix Query Server with the `shade-javax-servlet` maven profile if you use Phoenix versions
+5.1.1, 5.1.2, 5.1.3 or 4.16.x with it. (See PHOENIX-6861 for more details)
+This applies whether you bundle the Phoenix client into the assembly or add it separately.
+Phoenix 5.2.0 and later requires that PQS is built WITHOUT the `shade-javax-servlet` maven profile.
 
 In order to use Phoenix Query Server, you need to copy the phoenix-client-embedded jar appropriate
 for your cluster into the Queryserver root directory.
 
 Note that the resulting Query Server binaries are not tied to any Phoenix, Hbase or Hadoop versions,
-The current release requires at least Phoenix 4.16.0 or 5.1.0.
+apart from the exception above.
+
+
+```
+$ mvn clean package -Pshade-javax-servlet
+```
+
+For other Phoenix versions build with the default settings
 
 ```
 $ mvn clean package
@@ -47,7 +59,7 @@ the `phoenix.client.artifactid` to choose the phoenix-client HBase variant.
 You need to bundle the embedded client variant, to avoid conflicts with the logging libraries.
 
 ```
-$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.client.artifactid=phoenix-client-embedded-hbase-2.4 -pl '!phoenix-queryserver-it'
+$ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.client.artifactid=phoenix-client-embedded-hbase-2.4 -Pshade-javax-servlet -pl '!phoenix-queryserver-it'
 ```
 
 ### Running integration tests
