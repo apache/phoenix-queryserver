@@ -38,6 +38,7 @@
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
     <shaded.package>org.apache.phoenix.shaded</shaded.package>
+    <javax.servlet.package>dummy.disable.shading</javax.servlet.package>
   </properties>
 
   <build>
@@ -130,8 +131,8 @@
               </filters>
               <relocations>
                 <relocation>
-                  <pattern>javax.servlet</pattern>
-                  <shadedPattern>${shaded.package}.javax.servlet</shadedPattern>
+                  <pattern>${javax.servlet.package}</pattern>
+                  <shadedPattern>${shaded.package}.${javax.servlet.package}</shadedPattern>
                 </relocation>
                 <!-- Calcite/Avatica is not relocated because the wire API (as of <=1.8.0) expects
                      consistent class names on client and server. Relocating these would break
@@ -245,4 +246,20 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <!-- This is required for operation with Phoenix 5.1.0 - 5.1.3 and 4.16.x -->
+      <!-- See PHOENIX-6861 -->
+      <id>shade-javax-servlet</id>
+      <activation>
+        <property>
+          <name>shade-javax-servlet</name>
+        </property>
+      </activation>
+      <properties>
+        <javax.servlet.package>javax.servlet</javax.servlet.package>
+      </properties>
+    </profile>
+  </profiles>
 </project>
