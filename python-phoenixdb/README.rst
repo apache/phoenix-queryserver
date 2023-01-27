@@ -126,6 +126,9 @@ phoenix-queryserver/phoenix-queryserver-it/target/python-stdout.log and python-s
 Known issues
 ------------
 
+- When using phoenixdb 1.2.0 or later with Python 2, phoenixdb will not work unless the Python
+  protobuf library uses the 'cpp' implementation.
+  See https://issues.apache.org/jira/browse/PHOENIX-6863 on how to work around the issue.
 - TIME and DATE columns in Phoenix are stored as full timestamps with a millisecond accuracy,
   but the remote protocol only exposes the time (hour/minute/second) or date (year/month/day)
   parts of the columns. (`CALCITE-797 <https://issues.apache.org/jira/browse/CALCITE-797>`_, `CALCITE-798 <https://issues.apache.org/jira/browse/CALCITE-798>`_)
