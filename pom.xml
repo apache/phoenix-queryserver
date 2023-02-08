@@ -626,6 +626,54 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-mapreduce</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-metrics-api</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-metrics</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-protocol</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-protocol-shaded</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-hadoop-compat</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-hadoop2-compat</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-zookeeper</artifactId>
+                <version>${hbase.version}</version>
+                <scope>test</scope>
+            </dependency>
 
             <!-- Hadoop test dependencies -->
             <dependency>
@@ -648,7 +696,42 @@
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-api</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-mapreduce-client-core</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-common</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs-client</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-annotations</artifactId>
+                <version>${hadoop.version}</version>
+                <scope>test</scope>
+            </dependency>
             <!-- Other test dependencies -->
             <dependency>
                 <groupId>org.apache.phoenix</groupId>
