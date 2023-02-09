@@ -10,8 +10,15 @@ standard `DB API 2.0 <https://www.python.org/dev/peps/pep-0249/>`_ interface and
 subset of `SQLAlchemy <https://www.sqlalchemy.org/>`_, either of which should be familiar
 to most Python programmers.
 
-Installation
-------------
+Installation from PyPI
+----------------------
+
+The easiest way to install the latest official release of phoenixdb is from PyPI::
+
+    pip install phoenixdb
+
+Installation from Source
+------------------------
 
 The source code is part of the phoenix-queryserver source distribution.
 You can download it from <https://phoenix.apache.org/>, or get the latest development version
@@ -20,6 +27,7 @@ from <https://github.com/apache/phoenix-queryserver>
 Extract the archive and then install it manually::
 
     cd /path/to/phoenix-queryserver-x.y.z/python/phoenixdb
+    pip install -r requirements.txt
     python setup.py install
 
 Usage
