@@ -51,7 +51,7 @@ public class ServerCustomizersTest {
         // the default factory creates an empty list of server customizers
         List<ServerCustomizer<Server>> customizers =
                 queryServer.createServerCustomizers(new Configuration(), avaticaServerConfiguration);
-        Assert.assertEquals(1, customizers.size());
+        Assert.assertEquals(2, customizers.size());
     }
 
     @Test
