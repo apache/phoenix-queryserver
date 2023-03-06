@@ -142,7 +142,6 @@ class TypesTest(DatabaseTestCase):
             self.assertEqual(cursor.description[1].type_code, phoenixdb.BOOLEAN)
             self.assertEqual(cursor.fetchall(), [[1, True], [2, False], [3, None], [4, True], [5, False], [6, None]])
 
-    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_time(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val time)")
         with self.conn.cursor() as cursor:
@@ -172,7 +171,6 @@ class TypesTest(DatabaseTestCase):
                 [2, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
             ])
 
-    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_date(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val date)")
         with self.conn.cursor() as cursor:
@@ -194,8 +192,8 @@ class TypesTest(DatabaseTestCase):
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, ?)", [datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)])
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
             self.assertEqual(cursor.fetchall(), [
-                [1, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
-                [2, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
+                [1, datetime.datetime(2015, 7, 12)],
+                [2, datetime.datetime(2015, 7, 12)],
             ])
 
     def test_date_null(self):
@@ -209,7 +207,6 @@ class TypesTest(DatabaseTestCase):
                 [2, None],
             ])
 
-    @unittest.skip("https://issues.apache.org/jira/browse/PHOENIX-4664")
     def test_timestamp(self):
         self.createTable("phoenixdb_test_tbl1", "CREATE TABLE {table} (id integer primary key, val timestamp)")
         with self.conn.cursor() as cursor:
