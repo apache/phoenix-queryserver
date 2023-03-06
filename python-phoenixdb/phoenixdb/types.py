@@ -16,6 +16,8 @@
 import datetime
 import sys
 import time
+from datetime import timedelta
+from datetime import tzinfo
 from decimal import Decimal
 
 from phoenixdb.avatica.proto import common_pb2
@@ -84,12 +86,18 @@ def date_to_java_sql_date(d):
 
 
 def datetime_from_java_sql_timestamp(n):
-    return datetime.datetime(1970, 1, 1) + datetime.timedelta(milliseconds=n)
+    return datetime.datetime.utcfromtimestamp(n/1000.0)
 
 
-def datetime_to_java_sql_timestamp(d):
-    td = d - datetime.datetime(1970, 1, 1)
-    return td.microseconds // 1000 + (td.seconds + td.days * 24 * 3600) * 1000
+if sys.version_info.major == 3:
+    def datetime_to_java_sql_timestamp(d):
+        return int(d.replace(tzinfo=datetime.timezone.utc).timestamp()*1000)
+else:
+    def datetime_to_java_sql_timestamp(d):
+        if d.tzinfo is None:
+            return int((d - _NAIVE_EPOCH).total_seconds() * 1000)
+        else:
+            return int((d - _UTC_EPOCH).total_seconds() * 1000)
 
 
 # FIXME This doesn't seem to be used anywhere in the code
@@ -306,3 +314,25 @@ class TypeHelper(object):
             raise NotImplementedError('JDBC TYPE CODE {} is not supported'.format(jdbc_code))
 
         return JDBC_MAP[jdbc_code]
+
+
+# UTC tzinfo implementation and constants for python 2.7
+if sys.version_info.major < 3:
+    class UTC(tzinfo):
+
+        ZERO = timedelta(0)
+
+        def utcoffset(self, dt):
+            return UTC.ZERO
+
+        def tzname(self, dt):
+            return "UTC"
+
+        def dst(self, dt):
+            return UTC.ZERO
+
+    utc = UTC()
+
+    _NAIVE_EPOCH = datetime.datetime(1970, 1, 1)
+
+    _UTC_EPOCH = datetime.datetime(1970, 1, 1, tzinfo=utc)
