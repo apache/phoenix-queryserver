@@ -354,7 +354,6 @@ public class QueryServerBasicsIT extends BaseTest {
     assertFalse(rs.next());
   }
 
-  @Ignore("PHOENIX-4664")
   @Test
   //This is the java reproducer for PHOENIX-4664
   //This test only works as intended when the system timezone is NOT GMT
@@ -370,6 +369,8 @@ public class QueryServerBasicsIT extends BaseTest {
       conn.commit();
 
       LocalDateTime now = LocalDateTime.now();
+      //Avatica has only millisecond timestamps
+      now = now.withNano((now.getNano()/1000000)*1000000);
       try(PreparedStatement upsert = conn.prepareStatement(
           "UPSERT INTO " + tableName + " VALUES (?, ?)")
       ) {
@@ -380,7 +381,7 @@ public class QueryServerBasicsIT extends BaseTest {
         ResultSet rs = stmt.executeQuery("select * from " + tableName);
         assertTrue(rs.next());
         LocalDateTime fromDB = rs.getTimestamp("i").toLocalDateTime();
-        assertTrue("Timestamps do not match. inserted:" + now.toString() + "returned:" + fromDB.toString(), fromDB.compareTo(now) == 0);
+        assertTrue("Timestamps do not match. inserted:" + now.toString() + " returned:" + fromDB.toString(), fromDB.compareTo(now) == 0);
       }
     }
   }
