@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Unreleased
+----------
+- Updated Update python-phoenixdb/RELEASING.rst (PHOENIX-6820)
+- Add Python 3.11 to supported languages and update docker test image for phoenixdb (PHOENIX-6858)
+- Document workaround for PhoenixDB 1.2+ not working with Python2 on some systems (PHOENIX-6863)
+- Update install instructions in README.rst (PHOENIX-6812)
+- Add support for SQLAlchemy 2.0 (PHOENIX-6892)
+- SQLAlchemy is no longer an install dependency ((PHOENIX-6892)
+- Run tests with all supported Python + SqlAlchemy versions (1.3, 1.4, 2.0) (PHOENIX-6892)
+- Replace deprecated failUnless methods in tests (PHOENIX-6892)
+
 Version 1.2.1
 -------------
 - Defined authentication mechanism for SPNEGO explicitly (PHOENIX-6781)

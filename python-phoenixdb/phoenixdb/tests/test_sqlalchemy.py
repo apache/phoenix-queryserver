@@ -28,41 +28,50 @@ if sys.version_info.major == 3:
 else:
     from urlparse import urlparse, urlunparse
 
+sql_alchemy_1_3 = db.__version__.startswith('1.3')
+sql_alchemy_2 = db.__version__.startswith('2')
+
 
 @unittest.skipIf(TEST_DB_URL is None, "these tests require the PHOENIXDB_TEST_DB_URL environment variable set to a clean database")
 class SQLAlchemyTest(unittest.TestCase):
 
     def test_connection(self):
         engine = self._create_engine()
-        # connection = engine.connect()
         metadata = db.MetaData()
-        catalog = db.Table('CATALOG', metadata, schema='SYSTEM', autoload=True, autoload_with=engine)
+        catalog = db.Table('CATALOG', metadata, schema='SYSTEM', autoload_with=engine)
         self.assertIn('TABLE_NAME', catalog.columns.keys())
 
     def test_textual(self):
         engine = self._create_engine()
         with engine.connect() as connection:
             try:
-                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute(text('drop table if exists ALCHEMY_TEST'))
                 connection.execute(text('create table ALCHEMY_TEST (id integer primary key)'))
                 connection.execute(text('upsert into ALCHEMY_TEST values (42)'))
-                # SQLAlchemy autocommit should kick in
+                if (sql_alchemy_2):
+                    # SQLAlchemy autocommit should kick in
+                    # But SqlAlchemy 2.0 has removed that feature
+                    connection.commit()
                 result = connection.execute(text('select * from ALCHEMY_TEST'))
                 row = result.fetchone()
                 self.assertEqual(row[0], 42)
             finally:
-                connection.execute('drop table if exists ALCHEMY_TEST')
+                connection.execute(text('drop table if exists ALCHEMY_TEST'))
 
     def test_schema_filtering(self):
         engine = self._create_engine()
         with engine.connect() as connection:
             try:
                 inspector = db.inspect(engine)
+                conn_inspector = db.inspect(connection)
 
-                connection.execute('drop table if exists USERS')
-                connection.execute('drop table if exists ALCHEMY_TEST')
-                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
-                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
+                connection.execute(text('drop table if exists USERS'))
+                connection.execute(text('drop table if exists ALCHEMY_TEST'))
+                connection.execute(text('drop table if exists A.ALCHEMY_TEST_A'))
+                connection.execute(text('drop table if exists B.ALCHEMY_TEST_B'))
+
+                # Check that Inspector works with Connection objects as well
+                self.assertEqual(conn_inspector.get_schema_names(), ['', 'SYSTEM'])
 
                 self.assertEqual(inspector.get_schema_names(), ['', 'SYSTEM'])
                 self.assertEqual(inspector.get_table_names(), [])
@@ -87,15 +96,22 @@ class SQLAlchemyTest(unittest.TestCase):
                 self.assertEqual(
                     inspector.get_columns('ALCHEMY_TEST_A', 'A').pop()['name'], 'ID_A')
 
-                self.assertTrue(engine.has_table('ALCHEMY_TEST'))
-                self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
-                self.assertTrue(engine.has_table('ALCHEMY_TEST_A', 'A'))
-                self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
+                if (sql_alchemy_1_3):
+                    # Inspector does not have this method
+                    self.assertTrue(engine.has_table('ALCHEMY_TEST'))
+                    self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
+                    self.assertTrue(engine.has_table('ALCHEMY_TEST_A', 'A'))
+                    self.assertFalse(engine.has_table('ALCHEMY_TEST', 'A'))
+                else:
+                    self.assertTrue(inspector.has_table('ALCHEMY_TEST'))
+                    self.assertFalse(inspector.has_table('ALCHEMY_TEST', 'A'))
+                    self.assertTrue(inspector.has_table('ALCHEMY_TEST_A', 'A'))
+                    self.assertFalse(inspector.has_table('ALCHEMY_TEST', 'A'))
             finally:
-                connection.execute('drop view if exists ALCHEMY_TEST_VIEW')
-                connection.execute('drop table if exists ALCHEMY_TEST')
-                connection.execute('drop table if exists A.ALCHEMY_TEST_A')
-                connection.execute('drop table if exists B.ALCHEMY_TEST_B')
+                connection.execute(text('drop view if exists ALCHEMY_TEST_VIEW'))
+                connection.execute(text('drop table if exists ALCHEMY_TEST'))
+                connection.execute(text('drop table if exists A.ALCHEMY_TEST_A'))
+                connection.execute(text('drop table if exists B.ALCHEMY_TEST_B'))
 
     def test_reflection(self):
         engine = self._create_engine()
@@ -104,14 +120,14 @@ class SQLAlchemyTest(unittest.TestCase):
                 inspector = db.inspect(engine)
                 columns_result = inspector.get_columns('DOES_NOT_EXIST')
                 self.assertEqual([], columns_result)
-                connection.execute('drop table if exists us_population')
+                connection.execute(text('drop table if exists us_population'))
                 connection.execute(text('''create table if not exists US_POPULATION (
                 state CHAR(2) NOT NULL,
                 city VARCHAR NOT NULL,
                 population BIGINT
                 CONSTRAINT my_pk PRIMARY KEY (state, city))'''))
-                connection.execute('CREATE INDEX GLOBAL_IDX ON US_POPULATION (state) INCLUDE (city)')
-                connection.execute('CREATE LOCAL INDEX LOCAL_IDX ON US_POPULATION (population)')
+                connection.execute(text('CREATE INDEX GLOBAL_IDX ON US_POPULATION (state) INCLUDE (city)'))
+                connection.execute(text('CREATE LOCAL INDEX LOCAL_IDX ON US_POPULATION (population)'))
 
                 columns_result = inspector.get_columns('US_POPULATION')
                 # The list is not equal to its represenatation
@@ -132,7 +148,7 @@ class SQLAlchemyTest(unittest.TestCase):
                 self.assertTrue(pk_result, {'constrained_columns': ['STATE', 'CITY'], 'name': 'MY_PK'})
 
             finally:
-                connection.execute('drop table if exists us_population')
+                connection.execute(text('drop table if exists us_population'))
 
     @unittest.skip("ORM feature not implemented")
     def test_orm(self):

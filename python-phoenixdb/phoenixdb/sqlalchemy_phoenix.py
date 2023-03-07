@@ -16,6 +16,7 @@ import re
 import sys
 
 import phoenixdb
+import sqlalchemy
 
 from sqlalchemy import types
 from sqlalchemy.engine.default import DefaultDialect, DefaultExecutionContext
@@ -42,6 +43,14 @@ class PhoenixDDLCompiler(DDLCompiler):
 AUTOCOMMIT_REGEXP = re.compile(
     r"\s*(?:UPDATE|UPSERT|CREATE|DELETE|DROP|ALTER)", re.I | re.UNICODE
 )
+
+
+if sqlalchemy.__version__.startswith('1.3'):
+    def _get_dbapi(connectable):
+        return connectable.connect().connection.connection
+else:
+    def _get_dbapi(connectable):
+        return connectable.connection
 
 
 class PhoenixExecutionContext(DefaultExecutionContext):
@@ -107,7 +116,11 @@ class PhoenixDialect(DefaultDialect):
         # There is no way to pass these via the SqlAlchemy url object
         self.tls = tls
         self.path = path
-        super(PhoenixDialect, self).__init__(self, **opts)
+        super(PhoenixDialect, self).__init__(**opts)
+
+    @classmethod
+    def import_dbapi(cls):
+        return phoenixdb
 
     @classmethod
     def dbapi(cls):
@@ -131,13 +144,13 @@ class PhoenixDialect(DefaultDialect):
     def has_table(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
-        return bool(connection.connect().connection.meta().get_tables(
+        return bool(_get_dbapi(connection).meta().get_tables(
             tableNamePattern=table_name,
             schemaPattern=schema,
             typeList=('TABLE', 'SYSTEM_TABLE')))
 
     def get_schema_names(self, connection, **kw):
-        schemas = connection.connect().connection.meta().get_schemas()
+        schemas = _get_dbapi(connection).meta().get_schemas()
         schema_names = [schema['TABLE_SCHEM'] for schema in schemas]
         # Phoenix won't return the default schema if there aren't any tables in it
         if '' not in schema_names:
@@ -148,27 +161,27 @@ class PhoenixDialect(DefaultDialect):
         '''order_by is ignored'''
         if schema is None:
             schema = ''
-        tables = connection.connect().connection.meta().get_tables(
+        tables = _get_dbapi(connection).meta().get_tables(
             schemaPattern=schema, typeList=('TABLE', 'SYSTEM TABLE'))
         return [table['TABLE_NAME'] for table in tables]
 
     def get_view_names(self, connection, schema=None, **kw):
         if schema is None:
             schema = ''
-        views = connection.connect().connection.meta().get_tables(schemaPattern=schema, typeList=('VIEW',))
+        views = _get_dbapi(connection).meta().get_tables(schemaPattern=schema, typeList=('VIEW',))
         return [view['TABLE_NAME'] for view in views]
 
     def get_columns(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
-        raw = connection.connect().connection.meta().get_columns(
+        raw = _get_dbapi(connection).meta().get_columns(
             schemaPattern=schema, tableNamePattern=table_name)
         return [self._map_column(row) for row in raw]
 
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
-        raw = connection.connect().connection.meta().get_primary_keys(
+        raw = _get_dbapi(connection).meta().get_primary_keys(
             schema=schema, table=table_name)
         cooked = {
             'constrained_columns': []
@@ -182,7 +195,7 @@ class PhoenixDialect(DefaultDialect):
     def get_indexes(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
-        raw = connection.connect().connection.meta().get_index_info(schema=schema, table=table_name)
+        raw = _get_dbapi(connection).meta().get_index_info(schema=schema, table=table_name)
         # We know that Phoenix returns the rows ordered by INDEX_NAME and ORDINAL_POSITION
         cooked = []
         current = None
