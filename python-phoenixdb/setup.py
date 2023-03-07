@@ -41,7 +41,6 @@ if setuptools.__version__ < '20.8.1':
         'protobuf>=3.0.0',
         'requests',
         'requests-gssapi',
-        'SQLAlchemy'
     ]
     if sys.version_info < (3,6):
         install_requires.append('gssapi<1.6.0')
@@ -53,7 +52,6 @@ else:
         'requests',
         'requests-gssapi',
         'gssapi<1.6.0;python_version<"3.6"',
-        'SQLAlchemy'
     ]
     setup_requires=[
         'Sphinx;python_version>="3.6"',
@@ -93,9 +91,6 @@ setup(
         'Programming Language :: Python :: 3.11'
     ],
     install_requires=install_requires,
-    extras_require={
-        'SQLAlchemy': ['SQLAlchemy'],
-    },
     tests_require=[
         'SQLAlchemy',
         'nose',
