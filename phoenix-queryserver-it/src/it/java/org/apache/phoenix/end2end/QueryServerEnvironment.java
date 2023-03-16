@@ -65,7 +65,7 @@ public class QueryServerEnvironment {
     private final File KEYTAB_DIR = new File(TEMP_DIR, "keytabs");
     private final List<File> USER_KEYTAB_FILES = new ArrayList<>();
 
-    private static final String LOCAL_HOST_REVERSE_DNS_LOOKUP_NAME;
+    static final String LOCAL_HOST_REVERSE_DNS_LOOKUP_NAME;
 
     static {
         try {
@@ -142,7 +142,7 @@ public class QueryServerEnvironment {
         for (int i = 1; i <= numUsers; i++) {
             String principal = "user" + i;
             File keytabFile = new File(KEYTAB_DIR, principal + ".keytab");
-            KDC.createPrincipal(keytabFile, principal);
+            KDC.createPrincipal(keytabFile, principal + "/"+ LOCAL_HOST_REVERSE_DNS_LOOKUP_NAME + "@" + KDC.getRealm());
             USER_KEYTAB_FILES.add(keytabFile);
         }
     }
@@ -151,7 +151,7 @@ public class QueryServerEnvironment {
         if (!(offset > 0 && offset <= NUM_CREATED_USERS)) {
           throw new IllegalArgumentException();
         }
-        return new AbstractMap.SimpleImmutableEntry<String, File>("user" + offset, USER_KEYTAB_FILES.get(offset - 1));
+        return new AbstractMap.SimpleImmutableEntry<String, File>("user" + offset + "/" + LOCAL_HOST_REVERSE_DNS_LOOKUP_NAME, USER_KEYTAB_FILES.get(offset - 1));
     }
 
     /**
@@ -323,6 +323,10 @@ public class QueryServerEnvironment {
                                 ? ";truststore=" + TlsUtil.getTrustStoreFile().getAbsolutePath()
                                         + ";truststore_password=" + TlsUtil.getTrustStorePassword()
                                 : "");
+    }
+
+    public String getRealm() {
+        return KDC.getRealm();
     }
 
     public void stop() throws Exception {

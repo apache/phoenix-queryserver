@@ -551,7 +551,9 @@ public final class QueryServer extends Configured implements Tool, Runnable {
     public String extract(HttpServletRequest request) throws RemoteUserExtractionException {
       if (request.getParameter(userExtractParam) != null) {
         String extractedUser = paramRemoteUserExtractor.extract(request);
-        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(request.getRemoteUser());
+        UserGroupInformation ugi =
+                UserGroupInformation
+                        .createRemoteUser(stripHostNameFromPrincipal(request.getRemoteUser()));
         UserGroupInformation proxyUser = UserGroupInformation.createProxyUser(extractedUser, ugi);
 
         // Check if this user is allowed to be impersonated.
@@ -597,17 +599,7 @@ public final class QueryServer extends Configured implements Tool, Runnable {
 
       // Proxy this user on top of the server's user (the real user). Get a cached instance, the
       // LoadingCache will create a new instance for us if one isn't cached.
-
-      // realm got removed from remoteUserName in CALCITE-4152
-      // so we remove the instance name to avoid geting KerberosName$NoMatchingRule exception
-
-      int atSignIndex = remoteUserName.indexOf('@');
-      int separatorIndex = remoteUserName.indexOf('/');
-      if (atSignIndex == -1 && separatorIndex > 0) {
-        remoteUserName = remoteUserName.substring(0, separatorIndex);
-      }
-
-      UserGroupInformation proxyUser = createProxyUser(remoteUserName);
+      UserGroupInformation proxyUser = createProxyUser(stripHostNameFromPrincipal(remoteUserName));
 
       // Execute the actual call as this proxy user
       return proxyUser.doAs(new PrivilegedExceptionAction<T>() {
@@ -631,6 +623,27 @@ public final class QueryServer extends Configured implements Tool, Runnable {
       SimpleLRUCache<String,UserGroupInformation> getCache() {
           return ugiCache;
       }
+  }
+
+  /**
+   * The new Jetty kerberos implementation that we use strips the realm from the principal, which
+   * and Hadoop cannot process that.
+   * This strips the hostname part as well, so that only the username remains.
+
+   * @param remoteUserName the principal as received from Jetty
+   * @return the principal without the hostname part
+   */
+  //TODO We are probably compensating for a Jetty a bug, which should really be fixed in Jetty
+  // See PHOENIX-6913
+  private static String stripHostNameFromPrincipal(String remoteUserName) {
+      // realm got removed from remoteUserName in CALCITE-4152
+      // so we remove the instance name to avoid geting KerberosName$NoMatchingRule exception
+      int atSignIndex = remoteUserName.indexOf('@');
+      int separatorIndex = remoteUserName.indexOf('/');
+      if (atSignIndex == -1 && separatorIndex > 0) {
+        remoteUserName = remoteUserName.substring(0, separatorIndex);
+      }
+      return remoteUserName;
   }
 
   public static void main(String[] argv) throws Exception {

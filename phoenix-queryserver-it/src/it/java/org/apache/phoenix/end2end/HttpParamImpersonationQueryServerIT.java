@@ -114,7 +114,7 @@ public class HttpParamImpersonationQueryServerIT {
         final String doAsUrlTemplate = getUrlTemplate();
         final String tableName = "POSITIVE_IMPERSONATION";
         final int numRows = 5;
-        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal(), environment.getServiceKeytab().getAbsolutePath());
+        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal() + "@" + environment.getRealm(), environment.getServiceKeytab().getAbsolutePath());
         serviceUgi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 createTable(tableName, numRows);
@@ -122,7 +122,7 @@ public class HttpParamImpersonationQueryServerIT {
                 return null;
             }
         });
-        UserGroupInformation user1Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user1.getKey(), user1.getValue().getAbsolutePath());
+        UserGroupInformation user1Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user1.getKey() + "@" + environment.getRealm(), user1.getValue().getAbsolutePath());
         user1Ugi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 // This user should not be able to read the table
@@ -146,7 +146,7 @@ public class HttpParamImpersonationQueryServerIT {
         final String doAsUrlTemplate = getUrlTemplate();
         final String tableName = "DISALLOWED_IMPERSONATION";
         final int numRows = 5;
-        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal(), environment.getServiceKeytab().getAbsolutePath());
+        final UserGroupInformation serviceUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(environment.getServicePrincipal() + "@" + environment.getRealm(), environment.getServiceKeytab().getAbsolutePath());
         serviceUgi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 createTable(tableName, numRows);
@@ -154,7 +154,7 @@ public class HttpParamImpersonationQueryServerIT {
                 return null;
             }
         });
-        UserGroupInformation user2Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user2.getKey(), user2.getValue().getAbsolutePath());
+        UserGroupInformation user2Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user2.getKey() + "@" + environment.getRealm(), user2.getValue().getAbsolutePath());
         user2Ugi.doAs(new PrivilegedExceptionAction<Void>() {
             @Override public Void run() throws Exception {
                 // This user is disallowed to read this table
