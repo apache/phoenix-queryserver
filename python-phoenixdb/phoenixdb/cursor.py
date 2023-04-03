@@ -115,7 +115,7 @@ class Cursor(object):
         description = []
         for column in self._signature.columns:
             description.append(ColumnDescription(
-                column.column_name,
+                self._get_column_name(column),
                 column.type.name,
                 column.display_size,
                 None,
@@ -124,6 +124,13 @@ class Cursor(object):
                 None if column.nullable == 2 else bool(column.nullable),
             ))
         return description
+
+    def _get_column_name(self, column):
+        if column.label:
+            # Not empty
+            return column.label
+        else:
+            return column.column_name
 
     def _set_id(self, id):
         if self._id is not None and self._id != id:
@@ -386,5 +393,5 @@ class DictCursor(Cursor):
         row = super(DictCursor, self)._transform_row(row)
         d = {}
         for ind, val in enumerate(row):
-            d[self._signature.columns[ind].column_name] = val
+            d[self._get_column_name(self._signature.columns[ind])] = val
         return d

@@ -251,6 +251,7 @@
     <profile>
       <!-- This is required for operation with Phoenix 5.1.0 - 5.1.3 and 4.16.x -->
       <!-- See PHOENIX-6861 -->
+      <!-- This should have been called relocate-java-servlet -->
       <id>shade-javax-servlet</id>
       <activation>
         <property>

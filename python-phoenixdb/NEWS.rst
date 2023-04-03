@@ -12,6 +12,7 @@ Unreleased
 - Run tests with all supported Python + SqlAlchemy versions (1.3, 1.4, 2.0) (PHOENIX-6892)
 - Replace deprecated failUnless methods in tests (PHOENIX-6892)
 - Add support for specifying custom HTTP headers (PHOENIX-6921)
+- Use JDBC/Avatica column label as column name when set (PHOENIX-6917)
 
 Version 1.2.1
 -------------
