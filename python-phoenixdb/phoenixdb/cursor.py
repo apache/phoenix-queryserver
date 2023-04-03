@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # TODO see note in Cursor.rowcount()
 MAX_INT = 2 ** 64 - 1
 
-ColumnDescription = collections.namedtuple('ColumnDescription', 'name type_code display_size internal_size precision scale null_ok')
+ColumnDescription = collections.namedtuple('ColumnDescription', 'label type_code display_size internal_size precision scale null_ok')
 """Named tuple for representing results from :attr:`Cursor.description`."""
 
 
@@ -115,7 +115,7 @@ class Cursor(object):
         description = []
         for column in self._signature.columns:
             description.append(ColumnDescription(
-                column.column_name,
+                column.label,
                 column.type.name,
                 column.display_size,
                 None,

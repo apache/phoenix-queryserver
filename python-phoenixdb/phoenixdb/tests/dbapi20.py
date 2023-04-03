@@ -74,7 +74,7 @@ class DatabaseAPI20Test(unittest.TestCase):
     insert = 'insert'
 
     lowerfunc = 'lower' # Name of stored procedure to convert string->lowercase
-        
+
     # Some drivers may need to override these helpers, for example adding
     # a 'commit' after the execute.
     def executeDDL1(self,cursor):
@@ -208,7 +208,7 @@ class DatabaseAPI20Test(unittest.TestCase):
                 con.rollback()
             except self.driver.NotSupportedError:
                 pass
-    
+
     def test_cursor(self):
         con = self._connect()
         try:
@@ -399,12 +399,12 @@ class DatabaseAPI20Test(unittest.TestCase):
         trouble = "thi%s :may ca%(u)se? troub:1e"
         self.assertEqual(res[0][1], trouble,
             'cursor.fetchall retrieved incorrect data, or data inserted '
-            'incorrectly. Got=%s, Expected=%s' % (repr(res[0][1]), repr(trouble)))      
+            'incorrectly. Got=%s, Expected=%s' % (repr(res[0][1]), repr(trouble)))
         self.assertEqual(res[1][1], trouble,
             'cursor.fetchall retrieved incorrect data, or data inserted '
             'incorrectly. Got=%s, Expected=%s' % (repr(res[1][1]), repr(trouble)
             ))
-        
+
     def test_executemany(self):
         con = self._connect()
         try:
@@ -575,7 +575,7 @@ class DatabaseAPI20Test(unittest.TestCase):
             self.assertEqual(len(rows),6)
             rows = [r[0] for r in rows]
             rows.sort()
-          
+
             # Make sure we get the right data back out
             for i in range(0,6):
                 self.assertEqual(rows[i],self.samples[i],
@@ -646,10 +646,10 @@ class DatabaseAPI20Test(unittest.TestCase):
                 'cursor.fetchall should return an empty list if '
                 'a select query returns no rows'
                 )
-            
+
         finally:
             con.close()
-    
+
     def test_mixedfetch(self):
         con = self._connect()
         try:
@@ -832,3 +832,18 @@ class DatabaseAPI20Test(unittest.TestCase):
         self.assertTrue(hasattr(self.driver,'ROWID'),
             'module.ROWID must be defined.'
             )
+
+    # https://issues.apache.org/jira/browse/PHOENIX-6917
+    def test_alias(self):
+        con = self._connect()
+        try:
+            cur = con.cursor()
+            self.executeDDL2(cur)
+            cur.execute("CREATE TABLE IF NOT EXISTS STOCK_SYMBOL (SYMBOL VARCHAR NOT NULL PRIMARY KEY, COMPANY VARCHAR)")
+            cur.execute("UPSERT INTO STOCK_SYMBOL VALUES ('CRM','SALESFORCE')")
+            cur.execute("UPSERT INTO STOCK_SYMBOL VALUES ('AAPL','APPLE Inc')")
+            cur.execute("SELECT symbol as symb, company as comp FROM STOCK_SYMBOL")
+            self.assertEqual(cur.description[0][0], 'SYMB')
+            self.assertEqual(cur.description[1][0], 'COMP')
+        finally:
+            con.close()
