@@ -386,5 +386,5 @@ class DictCursor(Cursor):
         row = super(DictCursor, self)._transform_row(row)
         d = {}
         for ind, val in enumerate(row):
-            d[self._signature.columns[ind].column_name] = val
+            d[self._signature.columns[ind].label] = val
         return d
