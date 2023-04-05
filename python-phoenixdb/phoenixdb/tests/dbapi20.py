@@ -32,6 +32,7 @@ __version__ = '1.14.3'
 import unittest
 import time
 import sys
+import phoenixdb
 
 def str2bytes(sval):
     if sys.version_info < (3,0) and isinstance(sval, str):
@@ -837,13 +838,12 @@ class DatabaseAPI20Test(unittest.TestCase):
     def test_alias(self):
         con = self._connect()
         try:
-            cur = con.cursor()
-            self.executeDDL2(cur)
-            cur.execute("CREATE TABLE IF NOT EXISTS STOCK_SYMBOL (SYMBOL VARCHAR NOT NULL PRIMARY KEY, COMPANY VARCHAR)")
-            cur.execute("UPSERT INTO STOCK_SYMBOL VALUES ('CRM','SALESFORCE')")
-            cur.execute("UPSERT INTO STOCK_SYMBOL VALUES ('AAPL','APPLE Inc')")
-            cur.execute("SELECT symbol as symb, company as comp FROM STOCK_SYMBOL")
-            self.assertEqual(cur.description[0][0], 'SYMB')
-            self.assertEqual(cur.description[1][0], 'COMP')
+            cur = con.cursor(cursor_factory=phoenixdb.cursor.DictCursor)
+            self.executeDDL1(cur)
+            for sql in self._populate():
+                cur.execute(sql)
+            cur.execute('select name as beverages from %sbooze' % self.table_prefix)
+            self.assertEqual(cur.description[0][0], 'BEVERAGES')
+            self.assertEqual(cur.fetchone()['BEVERAGES'], 'Carlton Cold')
         finally:
             con.close()
