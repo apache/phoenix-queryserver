@@ -138,7 +138,7 @@ class AvaticaClient(object):
     to a server using :func:`phoenixdb.connect`.
     """
 
-    def __init__(self, url, max_retries=None, auth=None, verify=None):
+    def __init__(self, url, max_retries=None, auth=None, verify=None, extra_headers=None):
         """Constructs a new client object.
 
         :param url:
@@ -148,6 +148,9 @@ class AvaticaClient(object):
         self.max_retries = max_retries if max_retries is not None else 3
         self.auth = auth
         self.verify = verify
+        self.headers = {'content-type': 'application/x-google-protobuf'}
+        if extra_headers:
+            self.headers.update(extra_headers)
         self.session = None
 
     def __del__(self):
@@ -163,12 +166,12 @@ class AvaticaClient(object):
             self.session.close()
             self.session = None
 
-    def _post_request(self, body, headers):
+    def _post_request(self, body):
         # Create the session if we haven't before
         if not self.session:
             logger.debug("Creating a new Session")
             self.session = requests.Session()
-            self.session.headers.update(headers)
+            self.session.headers.update(self.headers)
             self.session.stream = True
             if self.auth is not None:
                 self.session.auth = self.auth
@@ -213,9 +216,8 @@ class AvaticaClient(object):
         message.name = 'org.apache.calcite.avatica.proto.Requests${}'.format(request_name)
         message.wrapped_message = request_data.SerializeToString()
         body = message.SerializeToString()
-        headers = {'content-type': 'application/x-google-protobuf'}
 
-        response = self._post_request(body, headers)
+        response = self._post_request(body)
         response_body = response.raw.read()
 
         if response.status_code != requests.codes.ok:

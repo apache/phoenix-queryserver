@@ -56,7 +56,7 @@ For example::
 
 
 def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=None, avatica_password=None,
-            truststore=None, verify=None, do_as=None, user=None, password=None, **kwargs):
+            truststore=None, verify=None, do_as=None, user=None, password=None, extra_headers=None, **kwargs):
     """Connects to a Phoenix query server.
 
     :param url:
@@ -109,6 +109,9 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
     :param truststore:
         Alias for verify
 
+    :param extra_headers:
+        Additional HTTP headers as a dictionary
+
     :returns:
         :class:`~phoenixdb.connection.Connection` object.
     """
@@ -118,7 +121,7 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
         avatica_user=avatica_user, avatica_password=avatica_password,
         truststore=truststore, verify=verify, do_as=do_as, user=user, password=password)
 
-    client = AvaticaClient(url, max_retries=max_retries, auth=auth, verify=verify)
+    client = AvaticaClient(url, max_retries=max_retries, auth=auth, verify=verify, extra_headers=extra_headers)
     client.connect()
     return Connection(client, **kwargs)
 
