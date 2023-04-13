@@ -53,6 +53,9 @@ public class ServerCustomizersIT extends BaseTest {
         setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
 
         Configuration conf = config;
+        if(System.getProperty("do.not.randomize.pqs.port") == null) {
+            conf.setInt(QueryServerProperties.QUERY_SERVER_HTTP_PORT_ATTRIB, 0);
+        }
         PQS_UTIL = new QueryServerTestUtil(conf);
         PQS_UTIL.startLocalHBaseCluster(ServerCustomizersIT.class);
         // Register a test jetty server customizer
