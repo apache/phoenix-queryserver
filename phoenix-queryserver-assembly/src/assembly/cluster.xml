@@ -59,6 +59,10 @@
         <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
+          <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
+          <include>org.apache.logging.log4j:log4j-api</include>
+          <include>org.apache.logging.log4j:log4j-core</include>
+          <include>org.apache.logging.log4j:log4j-1.2-api</include>
         </includes>
       </dependencySet>
       <dependencySet>
@@ -66,20 +70,6 @@
         <outputDirectory>phoenix-queryserver-${project.parent.version}/</outputDirectory>
         <includes>
           <include>org.apache.phoenix:${phoenix.client.artifactid}:jar</include>
-        </includes>
-      </dependencySet>
-      <dependencySet>
-        <unpack>false</unpack>
-        <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
-        <includes>
-          <include>org.slf4j:slf4j-reload4j</include>
-        </includes>
-      </dependencySet>
-      <dependencySet>
-        <unpack>false</unpack>
-        <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
-        <includes>
-          <include>ch.qos.reload4j:reload4j</include>
         </includes>
       </dependencySet>
     </dependencySets>
