@@ -213,8 +213,7 @@ java_cmd = java + ' $PHOENIX_OPTS ' + \
     phoenix_queryserver_utils.phoenix_thin_client_jar + os.pathsep + \
     phoenix_queryserver_utils.slf4j_backend_jar + os.pathsep + \
     phoenix_queryserver_utils.logging_jar +\
-    '" -Dlog4j.configuration=file:' + \
-    os.path.join(phoenix_queryserver_utils.current_dir, "log4j.properties") + \
+    '" -Dlog4j2.configurationFile=file:' + os.path.join(phoenix_queryserver_utils.current_dir, "log4j2.properties") + \
     ' -Djavax.security.auth.useSubjectCredsOnly=false ' + \
     disable_jna + \
     " org.apache.phoenix.queryserver.client.SqllineWrapper -d org.apache.phoenix.queryserver.client.Driver " + \
