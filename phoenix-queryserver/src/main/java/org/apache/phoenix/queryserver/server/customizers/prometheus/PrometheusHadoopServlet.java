@@ -40,7 +40,7 @@ public class PrometheusHadoopServlet extends HttpServlet {
                 req.getParameter("qry"));
     }
 
-    static String toPrometheusName(String metricRecordName, String metricName) {
+    String toPrometheusName(String metricRecordName, String metricName) {
         String baseName = metricRecordName + metricName.substring(0,1).toUpperCase() + metricName.substring(1);
         String[] parts = SPLIT_PATTERN.split(baseName);
         return String.join("_", parts).toLowerCase();
