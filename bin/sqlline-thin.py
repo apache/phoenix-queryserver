@@ -69,6 +69,9 @@ parser.add_argument('-kt', '--keytab', help='Kerberos keytab file for SPNEGO aut
 # Avatica HTTPS truststore
 parser.add_argument('-t', '--truststore', help='Truststore file that contains the TLS certificate of the server.')
 parser.add_argument('-tp', '--truststore-password', help='Password for the server TLS certificate truststore')
+# Keystore type
+parser.add_argument('-st', '--keystore-type', help='Type of key- and truststore files (i.e. JKS).')
+
 # Common arguments across sqlline.py and sqlline-thin.py
 phoenix_queryserver_utils.common_sqlline_args(parser)
 # Parse the args
@@ -201,7 +204,8 @@ if args.truststore:
     jdbc_url += ';truststore=' + tryDecode(args.truststore)
 if args.truststore_password:
     jdbc_url += ';truststore_password=' + tryDecode(args.truststore_password)
-
+if args.keystore_type:
+    jdbc_url += ';keystore_type=' + tryDecode(args.keystore_type)
 
 # Add SPENGO auth if this cluster uses it, and there are no conflicting HBase parameters
 if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == 'false'
