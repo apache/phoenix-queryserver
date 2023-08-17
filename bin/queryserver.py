@@ -148,6 +148,10 @@ if command == 'makeWinServiceDesc':
     print("</service>")
     sys.exit()
 
+d = os.path.dirname(out_file_path)
+if not os.path.exists(d):
+    os.makedirs(d)
+
 if command == 'start':
     if not daemon_supported:
         sys.stderr.write("daemon mode not supported on this platform{}".format(os.linesep))
