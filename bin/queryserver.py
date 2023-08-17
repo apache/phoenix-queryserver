@@ -162,9 +162,6 @@ if command == 'start':
     os.umask(current_umask)
 
     # run in the background
-    d = os.path.dirname(out_file_path)
-    if not os.path.exists(d):
-        os.makedirs(d)
     with open(out_file_path, 'a+') as out:
         context = daemon.DaemonContext(
             pidfile = daemon.PidFile(pid_file_path, 'Query Server already running, PID file found: %s' % pid_file_path),
