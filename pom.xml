@@ -118,6 +118,45 @@
         <!-- The current setting does not mandate any coverage -->
         <jacoco.instruction.coverage.percentage>0.0</jacoco.instruction.coverage.percentage>
         <jacoco.branch.coverage.percentage>0.0</jacoco.branch.coverage.percentage>
+
+        <!-- Java version specific settings for tests -->
+        <compileSource>1.8</compileSource>
+        <maven.compiler.source>${compileSource}</maven.compiler.source>
+        <maven.compiler.target>${compileSource}</maven.compiler.target>
+
+        <surefire.Xmx>2200m</surefire.Xmx>
+
+        <phoenix-surefire.argLine>-enableassertions -Xmx${surefire.Xmx}
+          -Djava.security.egd=file:/dev/./urandom -Djava.net.preferIPv4Stack=true
+          -Djava.awt.headless=true -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+          -Dorg.apache.hbase.thirdparty.io.netty.leakDetection.level=advanced
+          -Dio.netty.eventLoopThreads=3 -Duser.timezone="America/Los_Angeles"
+          -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/
+          "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}"
+        </phoenix-surefire.argLine>
+        <phoenix-surefire.jdk8.tuning.flags>
+            -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC
+            -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled
+            -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68
+        </phoenix-surefire.jdk8.tuning.flags>
+        <phoenix-surefire.jdk11.flags>-Dorg.apache.hbase.thirdparty.io.netty.tryReflectionSetAccessible=true
+          --add-modules jdk.unsupported
+          --add-opens java.base/java.nio=ALL-UNNAMED
+          --add-opens java.base/sun.nio.ch=ALL-UNNAMED
+          --add-opens java.base/java.lang=ALL-UNNAMED
+          --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+          --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+          --add-opens java.base/java.util=ALL-UNNAMED
+          --add-opens java.base/java.util.concurrent=ALL-UNNAMED
+          --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+          --add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED</phoenix-surefire.jdk11.flags>
+        <phoenix-surefire.jdk11.tuning.flags>
+            ${phoenix-surefire.jdk8.tuning.flags}
+        </phoenix-surefire.jdk11.tuning.flags>
+        <phoenix-surefire.jdk17.flags>--add-opens java.base/jdk.internal.util.random=ALL-UNNAMED</phoenix-surefire.jdk17.flags>
+        <phoenix-surefire.jdk17.tuning.flags></phoenix-surefire.jdk17.tuning.flags>
+        <!-- Surefire argLine defaults for Linux + JDK8 -->
+        <argLine>${phoenix-surefire.argLine} ${phoenix-surefire.jdk8.tuning.flags} @{jacocoArgLine}</argLine>
     </properties>
 
     <build>
@@ -206,8 +245,6 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <reuseForks>true</reuseForks>
-                        <argLine>@{jacocoArgLine} -enableassertions -Xmx2250m -XX:MaxPermSize=128m
-                            -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <shutdown>kill</shutdown>
                         <trimStackTrace>false</trimStackTrace>
@@ -224,7 +261,6 @@
                                 <runOrder>alphabetical</runOrder>
                                 <reuseForks>false</reuseForks>
                                 <runOrder>alphabetical</runOrder>
-                                <argLine>@{jacocoArgLine} -Xmx2000m -XX:MaxPermSize=256m -Djava.security.egd=file:/dev/./urandom "-Djava.library.path=${hadoop.library.path}${path.separator}${java.library.path}" -XX:NewRatio=4 -XX:SurvivorRatio=8 -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:CMSInitiatingOccupancyFraction=68 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/</argLine>
                                 <redirectTestOutputToFile>true</redirectTestOutputToFile>
                                 <shutdown>kill</shutdown>
                                 <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
@@ -891,6 +927,38 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>build-with-jdk8</id>
+      <activation>
+        <jdk>[1.8,11)</jdk>
+      </activation>
+    </profile>
+    <!-- See PHOENIX-6997 when building with with Java9+ -->
+    <profile>
+      <id>build-with-jdk11</id>
+      <activation>
+        <jdk>[11,17)</jdk>
+      </activation>
+      <properties>
+        <argLine>${phoenix-surefire.jdk11.flags}
+          ${phoenix-surefire.jdk11.tuning.flags}
+          ${phoenix-surefire.argLine}
+          @{jacocoArgLine}</argLine>
+      </properties>
+    </profile>
+    <profile>
+      <id>build-with-jdk17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <properties>
+        <argLine>${phoenix-surefire.jdk11.flags}
+          ${phoenix-surefire.jdk17.flags}
+          ${phoenix-surefire.jdk17.tuning.flags}
+          ${phoenix-surefire.argLine}
+          @{jacocoArgLine}</argLine>
+      </properties>
     </profile>
   </profiles>
   <reporting>
