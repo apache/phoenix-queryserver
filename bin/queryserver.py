@@ -128,10 +128,11 @@ java_cmd = '%(java)s -cp ' +\
     phoenix_queryserver_utils.phoenix_client_jar + os.pathsep + \
     phoenix_queryserver_utils.phoenix_queryserver_jar + \
     " -Dproc_phoenixserver" + \
-    ' -Dlog4j2.configurationFile=file:' + os.path.join(phoenix_queryserver_utils.current_dir, "log4j2.properties") + \
-    " -Dpsql.root.logger=%(root_logger)s" + \
-    " -Dpsql.log.dir=%(log_dir)s" + \
-    " -Dpsql.log.file=%(log_file)s" + \
+    ('' if '-Dlog4j2.configurationFile' in opts else ' -Dlog4j2.configurationFile=file:'
+        + os.path.join(phoenix_queryserver_utils.current_dir, "log4j2.properties")) + \
+    ('' if '-Dpsql.root.logger' in opts else " -Dpsql.root.logger=%(root_logger)s") + \
+    ('' if '-Dpsql.log.dir' in opts else " -Dpsql.log.dir=%(log_dir)s") + \
+    ('' if '-Dpsql.log.file' in opts else " -Dpsql.log.file=%(log_file)s") + \
     " " + opts + \
     " org.apache.phoenix.queryserver.server.QueryServer " + args
 
