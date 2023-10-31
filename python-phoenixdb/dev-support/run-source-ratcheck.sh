@@ -53,11 +53,9 @@ fi
 echo "RAT binary installation localized, running RAT check"
 
 # Run the RAT check, excluding pyc files
-for src in 'phoenixdb' 'ci' 'examples' 'doc'; do 
-  echo "Running RAT check over $src"
-  java -jar "$ARTIFACTS_DIR/$RAT_BINARY_DIR/$RAT_JAR" -d "$DEV_SUPPORT/../$src" -E "$DEV_SUPPORT/rat-excludes.txt"
-  if [[ $? -ne 0 ]]; then
-    echo "Failed RAT check over $src"
-    exit 1
-  fi
-done
+echo "Running RAT check"
+java -jar "$ARTIFACTS_DIR/$RAT_BINARY_DIR/$RAT_JAR" -d "$DEV_SUPPORT/../" -E "$DEV_SUPPORT/rat-excludes.txt"
+if [[ $? -ne 0 ]]; then
+  echo "Failed RAT check"
+  exit 1
+fi
