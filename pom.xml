@@ -26,7 +26,7 @@
     <parent>
       <groupId>org.apache</groupId>
       <artifactId>apache</artifactId>
-      <version>23</version>
+      <version>30</version>
     </parent>
 
     <groupId>org.apache.phoenix</groupId>
@@ -95,14 +95,13 @@
         <junit.version>4.13.2</junit.version>
 
         <!-- Plugin versions -->
-        <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
-        <maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
-        <maven-build-helper-plugin.version>1.9.1</maven-build-helper-plugin.version>
-        <spotbugs-maven-plugin.version>4.1.3</spotbugs-maven-plugin.version>
-        <spotbugs.version>4.1.3</spotbugs.version>
-        <maven-owasp-plugin.version>6.5.3</maven-owasp-plugin.version>
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-        <maven-sonar-plugin.version>3.9.1.2184</maven-sonar-plugin.version>
+        <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
+        <maven-build-helper-plugin.version>3.5.0</maven-build-helper-plugin.version>
+        <spotbugs-maven-plugin.version>4.8.1.0</spotbugs-maven-plugin.version>
+        <spotbugs.version>4.8.1</spotbugs.version>
+        <maven-owasp-plugin.version>8.4.0</maven-owasp-plugin.version>
+        <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+        <maven-sonar-plugin.version>3.10.0.2594</maven-sonar-plugin.version>
 
         <!-- Plugin options -->
         <it.failIfNoSpecifiedTests>false</it.failIfNoSpecifiedTests>
@@ -211,7 +210,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
