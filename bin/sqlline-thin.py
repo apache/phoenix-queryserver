@@ -208,7 +208,8 @@ if (get_hbase_authentication() == 'kerberos' and get_spnego_auth_disabled() == '
    and 'authentication=' not in jdbc_url and 'avatica_user=' not in jdbc_url):
     jdbc_url += ';authentication=SPNEGO'
 
-java_cmd = java + ' $PHOENIX_OPTS ' + \
+java_cmd = phoenix_queryserver_utils.java + ' ' + phoenix_queryserver_utils.jvm_module_flags + \
+    ' $PHOENIX_OPTS ' + \
     ' -cp "' + phoenix_queryserver_utils.sqlline_with_deps_jar + os.pathsep + \
     phoenix_queryserver_utils.phoenix_thin_client_jar + os.pathsep + \
     phoenix_queryserver_utils.slf4j_backend_jar + os.pathsep + \

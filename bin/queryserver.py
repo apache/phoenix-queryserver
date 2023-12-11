@@ -82,33 +82,8 @@ phoenix_log_file = '%s.log' % phoenix_file_basename
 phoenix_out_file = '%s.out' % phoenix_file_basename
 phoenix_pid_file = '%s.pid' % phoenix_file_basename
 
-# load hbase-env.??? to extract JAVA_HOME, HBASE_PID_DIR, HBASE_LOG_DIR
-hbase_env_path = None
-hbase_env_cmd  = None
-if os.name == 'posix':
-    hbase_env_path = os.path.join(hbase_conf_dir, 'hbase-env.sh')
-    hbase_env_cmd = ['bash', '-c', 'source %s && env' % hbase_env_path]
-elif os.name == 'nt':
-    hbase_env_path = os.path.join(hbase_conf_dir, 'hbase-env.cmd')
-    hbase_env_cmd = ['cmd.exe', '/c', 'call %s & set' % hbase_env_path]
-if not hbase_env_path or not hbase_env_cmd:
-    sys.stderr.write("hbase-env file unknown on platform {}{}".format(os.name, os.linesep))
-    sys.exit(-1)
-
-hbase_env = {}
-if os.path.isfile(hbase_env_path):
-    p = subprocess.Popen(hbase_env_cmd, stdout = subprocess.PIPE)
-    for x in p.stdout:
-        (k, _, v) = tryDecode(x).partition('=')
-        hbase_env[k.strip()] = v.strip()
-
-java_home = hbase_env.get('JAVA_HOME') or os.getenv('JAVA_HOME')
-if java_home:
-    java = os.path.join(java_home, 'bin', 'java')
-else:
-    java = 'java'
-
 tmp_dir = os.path.join(tempfile.gettempdir(), 'phoenix')
+hbase_env = phoenix_queryserver_utils.hbase_env
 opts = os.getenv('PHOENIX_QUERYSERVER_OPTS') or hbase_env.get('PHOENIX_QUERYSERVER_OPTS') or ''
 pid_dir = os.getenv('PHOENIX_QUERYSERVER_PID_DIR') or hbase_env.get('HBASE_PID_DIR') or tmp_dir
 log_dir = os.getenv('PHOENIX_QUERYSERVER_LOG_DIR') or hbase_env.get('HBASE_LOG_DIR') or tmp_dir
@@ -120,7 +95,7 @@ out_file_path = os.path.join(log_dir, phoenix_out_file)
 #    " -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true" + \
 
 # The command is run through subprocess so environment variables are automatically inherited
-java_cmd = '%(java)s -cp ' +\
+java_cmd = '%(java)s %(jvm_module_flags)s -cp ' +\
     hbase_conf_dir + os.pathsep + \
     hadoop_conf_dir + os.pathsep + \
     phoenix_queryserver_utils.slf4j_backend_jar + os.pathsep + \
@@ -137,7 +112,11 @@ java_cmd = '%(java)s -cp ' +\
     " org.apache.phoenix.queryserver.server.QueryServer " + args
 
 if command == 'makeWinServiceDesc':
-    cmd = java_cmd % {'java': java, 'root_logger': 'INFO,DRFA,console', 'log_dir': log_dir, 'log_file': phoenix_log_file}
+    cmd = (java_cmd % {'java': phoenix_queryserver_utils.java,
+                      'jvm_module_flags':phoenix_queryserver_utils.jvm_module_flags,
+                      'root_logger': 'INFO,DRFA,console',
+                      'log_dir': log_dir,
+                      'log_file': phoenix_log_file})
     slices = cmd.split(' ')
 
     print("<service>")
@@ -174,7 +153,11 @@ if command == 'start':
         with context:
             # this block is the main() for the forked daemon process
             child = None
-            cmd = java_cmd % {'java': java, 'root_logger': 'INFO,DRFA', 'log_dir': log_dir, 'log_file': phoenix_log_file}
+            cmd = (java_cmd % {'java': phoenix_queryserver_utils.java,
+                      'jvm_module_flags':phoenix_queryserver_utils.jvm_module_flags,
+                      'root_logger': 'INFO,DRFA',
+                      'log_dir': log_dir,
+                      'log_file': phoenix_log_file})
 
             # notify the child when we're killed
             def handler(signum, frame):
@@ -215,6 +198,10 @@ elif command == 'stop':
 
 else:
     # run in the foreground using defaults from log4j.properties
-    cmd = java_cmd % {'java': java, 'root_logger': 'INFO,console', 'log_dir': '.', 'log_file': 'psql.log'}
+    cmd = (java_cmd % {'java': phoenix_queryserver_utils.java,
+                      'jvm_module_flags':phoenix_queryserver_utils.jvm_module_flags,
+                      'root_logger': 'INFO,console',
+                      'log_dir': '.',
+                      'log_file': 'psql.log'})
     splitcmd = cmd.split()
     os.execvp(splitcmd[0], splitcmd)
