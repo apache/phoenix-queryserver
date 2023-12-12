@@ -21,6 +21,7 @@
 
 import os
 import fnmatch
+import re
 import subprocess
 
 def find(pattern, classPaths):
@@ -172,6 +173,81 @@ def setPath():
         logging_jar += ":"+findFileInPathWithoutRecursion(LOGGING_JAR_PATTERN2, os.path.join(current_dir, "..","lib"))
         logging_jar += ":"+findFileInPathWithoutRecursion(LOGGING_JAR_PATTERN3, os.path.join(current_dir, "..","lib"))
 
+    __set_java_home()
+    __set_jvm_flags()
+    return ""
+
+
+def __set_java_home():
+    global hbase_env
+    global java_home
+    global java
+    java_home = os.getenv('JAVA_HOME')
+    java = 'java'
+
+    # HBase configuration folder path (where hbase-site.xml reside) for
+    # HBase/Phoenix client side property override
+    hbase_config_path = hbase_conf_dir
+
+    # load hbase-env.??? to extract JAVA_HOME, HBASE_PID_DIR, HBASE_LOG_DIR
+    hbase_env_path = None
+    hbase_env_cmd  = None
+    if os.name == 'posix':
+        hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.sh')
+        hbase_env_cmd = ['bash', '-c', 'source %s && env' % hbase_env_path]
+    elif os.name == 'nt':
+        hbase_env_path = os.path.join(hbase_config_path, 'hbase-env.cmd')
+        hbase_env_cmd = ['cmd.exe', '/c', 'call %s & set' % hbase_env_path]
+    if not hbase_env_path or not hbase_env_cmd:
+        sys.stderr.write("hbase-env file unknown on platform {}{}".format(os.name, os.linesep))
+        sys.exit(-1)
+
+    hbase_env = {}
+    if os.path.isfile(hbase_env_path):
+        p = subprocess.Popen(hbase_env_cmd, stdout = subprocess.PIPE)
+        for x in p.stdout:
+            (k, _, v) = tryDecode(x).partition('=')
+            hbase_env[k.strip()] = v.strip()
+
+    if 'JAVA_HOME' in hbase_env:
+        java_home = hbase_env['JAVA_HOME']
+
+    if java_home:
+        java = os.path.join(java_home, 'bin', 'java')
+
+    return ""
+
+
+def __set_jvm_flags():
+    global jvm_module_flags
+    jvm_module_flags = ""
+    # This should be ASCII
+    version_output = subprocess.check_output([java, "-version"], stderr=subprocess.STDOUT).decode()
+    version_output = tryDecode(version_output)
+    m = re.search(r'version\s"(\d+)\.(\d+)', version_output)
+    if (m is None):
+        # Could not find version
+        return ""
+    major = m.group(1)
+    minor = m.group(2)
+    if (major is None or minor is None):
+        #Could not identify version
+        return ""
+    if (minor == "1"):
+        major = minor
+    if (int(major) >= 11):
+        # Copied from hbase startup script
+        jvm_module_flags = "-Dorg.apache.hbase.thirdparty.io.netty.tryReflectionSetAccessible=true \
+--add-modules jdk.unsupported \
+--add-opens java.base/java.nio=ALL-UNNAMED \
+--add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+--add-opens java.base/java.lang=ALL-UNNAMED \
+--add-opens java.base/jdk.internal.ref=ALL-UNNAMED \
+--add-opens java.base/java.lang.reflect=ALL-UNNAMED \
+--add-exports java.base/jdk.internal.misc=ALL-UNNAMED \
+--add-exports java.security.jgss/sun.security.krb5=ALL-UNNAMED \
+--add-exports java.base/sun.net.dns=ALL-UNNAMED \
+--add-exports java.base/sun.net.util=ALL-UNNAMED"
     return ""
 
 def shell_quote(args):
@@ -208,3 +284,8 @@ if __name__ == "__main__":
     print("phoenix_thin_client_jar:", phoenix_thin_client_jar)
     print("sqlline_with_deps_jar", sqlline_with_deps_jar)
     print("slf4j_backend_jar:", slf4j_backend_jar)
+    print("java_home:", java_home)
+    print("java:", java)
+    print("jvm_module_flags:", jvm_module_flags)
+    print("hbase_env:", hbase_env)
+
