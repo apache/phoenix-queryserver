@@ -110,7 +110,7 @@ public class QueryServerBasicsIT extends BaseTest {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         assertFalse("unexpected populated resultSet", resultSet.next());
         assertEquals(1, metaData.getColumnCount());
-        assertEquals(TABLE_CAT, metaData.getColumnName(1));
+        assertEquals(TABLE_CAT, metaData.getColumnLabel(1));
       }
     }
   }
@@ -126,8 +126,8 @@ public class QueryServerBasicsIT extends BaseTest {
         final ResultSetMetaData metaData = resultSet.getMetaData();
         assertTrue("unexpected empty resultset", resultSet.next());
         assertEquals(2, metaData.getColumnCount());
-        assertEquals(TABLE_SCHEM, metaData.getColumnName(1));
-        assertEquals(TABLE_CATALOG, metaData.getColumnName(2));
+        assertEquals(TABLE_SCHEM, metaData.getColumnLabel(1));
+        assertEquals(TABLE_CATALOG, metaData.getColumnLabel(2));
         boolean containsSystem = false;
         do {
           if (resultSet.getString(1).equalsIgnoreCase(SYSTEM_SCHEMA_NAME)) containsSystem = true;
