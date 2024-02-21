@@ -68,19 +68,22 @@ necessary requirements::
 You can start a Phoenix QueryServer instance on http://localhost:8765 for testing by running
 the following command in the pohoenix-queryserver-parent directory::
 
-    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
+    mvn clean verify -Pshade-javax-servlet -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=QueryServerBasicsIT#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.unsecure.pqs=true
 
 You can start a secure (https+kerberos) Phoenix QueryServer instance on https://localhost:8765
 for testing by running the following command in the phoenix-queryserver-parent directory::
 
-    mvn clean verify -am -pl phoenix-queryserver-it -Dtest=foo \
+    mvn clean verify -Pshade-javax-servlet -am -pl phoenix-queryserver-it -Dtest=foo \
     -Dit.test=SecureQueryServerPhoenixDBIT#startLocalPQS \
     -Ddo.not.randomize.pqs.port=true -Dstart.secure.pqs=true
 
-this will also create a shell script in phoenix-queryserver-it/target/krb_setup.sh, that you can use to set
-up the environment for the tests.
+this will also create a shell script in phoenix-queryserver-it/target/krb_setup.sh, that you can
+use to set up the environment for the tests.
+
+Note: Depending on the Phoenix version used for building, you may or may not need the
+`-Pshade-javax-servlet` option. Check BUILDING.md in the repository root.
 
 If you want to use the library without installing the phoenixdb library, you can use
 the `PYTHONPATH` environment variable to point to the library directly::
