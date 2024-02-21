@@ -22,7 +22,7 @@ from sqlalchemy import types
 from sqlalchemy.engine.default import DefaultDialect, DefaultExecutionContext
 from sqlalchemy.exc import CompileError
 from sqlalchemy.sql.compiler import DDLCompiler
-from sqlalchemy.types import BIGINT, BOOLEAN, CHAR, DATE, DECIMAL, FLOAT, INTEGER, NUMERIC,\
+from sqlalchemy.types import BIGINT, BOOLEAN, CHAR, DATE, DECIMAL, FLOAT, INTEGER, NUMERIC, \
     SMALLINT, TIME, TIMESTAMP, VARBINARY, VARCHAR
 
 if sys.version_info.major == 3:
