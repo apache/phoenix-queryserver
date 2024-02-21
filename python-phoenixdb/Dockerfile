@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from advian/tox-base:ubuntu as tox
+from advian/tox-base:ubuntu-jammy-2024-02-07 as tox
 
 ###########################
 # Prebuild given versions #
 ###########################
 ARG BUILD_PYTHON_VERSIONS="3.11 3.10 3.9 3.8" #Can we take this from the parent image ?
-ARG EXTRA_PYTHON_VERSIONS="3.5 3.6 3.7 2.7"
+ARG EXTRA_PYTHON_VERSIONS="3.12 3.5 3.6 3.7 2.7"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $BUILD_PYTHON_VERSIONS` \
     && export EXTRA_RESOLVED_VERSIONS=`pyenv_resolve $EXTRA_PYTHON_VERSIONS` \
     && for pyver in $EXTRA_RESOLVED_VERSIONS; do pyenv install $pyver; done \

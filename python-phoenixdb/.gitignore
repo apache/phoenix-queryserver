@@ -11,3 +11,4 @@ dev-support/work
 phoenixdb/.eggs
 phoenixdb/build
 phoenixdb/e
+phoenixdb/.python-version
