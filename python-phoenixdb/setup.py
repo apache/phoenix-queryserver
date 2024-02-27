@@ -40,8 +40,11 @@ if setuptools.__version__ < '20.8.1':
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
-        'requests-gssapi',
     ]
+    if sys.version_info < (3,8):
+        install_requires.append('requests-gssapi<1.3.0')
+    else:
+        install_requires.append('requests-gssapi')
     if sys.version_info < (3,6):
         install_requires.append('gssapi<1.6.0')
     #Don't build the docs on an old stack
@@ -50,8 +53,9 @@ else:
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
-        'requests-gssapi',
-        'gssapi<1.6.0;python_version<"3.6"',
+        'requests-gssapi; python_version>="3.8.0"',
+        'requests-gssapi<1.30; python_version<"3.8.0"',
+        'gssapi<1.6.0; python_version<"3.6.0"',
     ]
     setup_requires=[
         'Sphinx;python_version>="3.6"',

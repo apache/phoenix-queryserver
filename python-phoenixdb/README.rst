@@ -26,9 +26,16 @@ from <https://github.com/apache/phoenix-queryserver>
 
 Extract the archive and then install it manually::
 
-    cd /path/to/phoenix-queryserver-x.y.z/python/phoenixdb
+    cd /path/to/phoenix-queryserver-x.y.z/python-phoenixdb
     pip install -r requirements.txt
     python setup.py install
+
+Note that old versions of pip and setuptools have various bugs and incompatibilities that
+may result in installation errors, especially on old python versions.
+If you encounter problems while building, update your pip and setuptools, and try again::
+    pip install --upgrade pip
+    pip install --upgrade setuptools
+
 
 Usage
 -----
@@ -83,7 +90,7 @@ this will also create a shell script in phoenix-queryserver-it/target/krb_setup.
 use to set up the environment for the tests.
 
 Note: Depending on the Phoenix version used for building, you may or may not need the
-`-Pshade-javax-servlet` option. Check BUILDING.md in the repository root.
+`-Pshade-javax-servlet` option. See BUILDING.md in the repository root for more information.
 
 If you want to use the library without installing the phoenixdb library, you can use
 the `PYTHONPATH` environment variable to point to the library directly::
