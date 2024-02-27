@@ -54,7 +54,7 @@ else:
         'protobuf>=3.0.0',
         'requests',
         'requests-gssapi; python_version>="3.8.0"',
-        'requests-gssapi<1.30; python_version<"3.8.0"',
+        'requests-gssapi<1.3.0; python_version<"3.8.0"',
         'gssapi<1.6.0; python_version<"3.6.0"',
     ]
     setup_requires=[
