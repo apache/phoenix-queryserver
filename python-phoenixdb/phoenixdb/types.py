@@ -166,6 +166,9 @@ FIELD_MAP = {
     'double_value': [
         (common_pb2.DOUBLE, float, float),
         (common_pb2.PRIMITIVE_DOUBLE, float, float)
+    ],
+    "null_value":[
+        (common_pb2.NULL, None, None)
     ]
 }
 """The master map that describes how to handle types, keyed by TypedData field"""
@@ -222,9 +225,9 @@ JDBC_TO_REP = dict([
     (2011, common_pb2.STRING),  # NCLOB
     (2009, common_pb2.STRING),  # SQLXML
     # Returned by Avatica for Arrays in EMPTY resultsets
-    (2000, common_pb2.BYTE_STRING)  # JAVA_OBJECT
+    (2000, common_pb2.BYTE_STRING),  # JAVA_OBJECT
     # These are defined by JDBC, but cannot be mapped
-    # NULL
+    (0, common_pb2.NULL) # NULL
     # OTHER
     # DISTINCT
     # STRUCT
@@ -298,8 +301,6 @@ class TypeHelper(object):
 
     @staticmethod
     def _from_jdbc(jdbc_code):
-        if jdbc_code == 0:
-            return ('null_value', common_pb2.NULL, None, None)
         if jdbc_code not in JDBC_MAP:
             # This should not happen. It's either a bug, or Avatica has added new types
             raise NotImplementedError('JDBC TYPE CODE {} is not supported'.format(jdbc_code))
