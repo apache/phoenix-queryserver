@@ -84,12 +84,11 @@ def date_to_java_sql_date(d):
 
 
 def datetime_from_java_sql_timestamp(n):
-    return datetime.datetime(1970, 1, 1) + datetime.timedelta(milliseconds=n)
+    return datetime.datetime.utcfromtimestamp(n/1000.0)
 
 
 def datetime_to_java_sql_timestamp(d):
-    td = d - datetime.datetime(1970, 1, 1)
-    return td.microseconds // 1000 + (td.seconds + td.days * 24 * 3600) * 1000
+    return int(d.replace(tzinfo=datetime.timezone.utc).timestamp()*1000)
 
 
 # FIXME This doesn't seem to be used anywhere in the code
