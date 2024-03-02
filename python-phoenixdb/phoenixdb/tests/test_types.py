@@ -378,3 +378,7 @@ class TypesTest(DatabaseTestCase):
                 [4, [True, True, True]],
                 [5, None]
             ])
+    def test_select_null(self):
+        with self.conn.cursor() as cursor:
+            cursor.execute("SELECT NULL")
+            self.assertEqual(cursor.fetchall(),[[None]])

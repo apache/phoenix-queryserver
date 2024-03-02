@@ -8,7 +8,8 @@
 .tox
 dev-support/artifacts
 dev-support/work
-phoenixdb/.eggs
-phoenixdb/build
-phoenixdb/e
-phoenixdb/.python-version
+/*eggs
+/build
+/e
+/.python-version
+/*venv

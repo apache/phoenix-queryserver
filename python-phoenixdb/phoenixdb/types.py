@@ -298,6 +298,8 @@ class TypeHelper(object):
 
     @staticmethod
     def _from_jdbc(jdbc_code):
+        if jdbc_code == 0:
+            return ('null_value', common_pb2.NULL, None, None)
         if jdbc_code not in JDBC_MAP:
             # This should not happen. It's either a bug, or Avatica has added new types
             raise NotImplementedError('JDBC TYPE CODE {} is not supported'.format(jdbc_code))
