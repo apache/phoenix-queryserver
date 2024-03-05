@@ -67,6 +67,7 @@
     <properties>
         <!-- General Properties -->
         <top.dir>${project.basedir}</top.dir>
+        <test.tmp.dir>${project.build.directory}</test.tmp.dir>
 
         <phoenix.version>5.1.3</phoenix.version>
 
@@ -246,6 +247,9 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <shutdown>kill</shutdown>
                         <trimStackTrace>false</trimStackTrace>
+                        <systemPropertyVariables>
+                            <java.io.tmpdir>${test.tmp.dir}</java.io.tmpdir>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -263,6 +267,9 @@
                                 <shutdown>kill</shutdown>
                                 <testSourceDirectory>${basedir}/src/it/java</testSourceDirectory>
                                 <trimStackTrace>false</trimStackTrace>
+                                <systemPropertyVariables>
+                                    <java.io.tmpdir>${test.tmp.dir}</java.io.tmpdir>
+                                </systemPropertyVariables>
                             </configuration>
                             <goals>
                                 <goal>integration-test</goal>
