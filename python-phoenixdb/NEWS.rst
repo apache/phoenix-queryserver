@@ -1,10 +1,13 @@
 Changelog
 =========
 
-Unreleased
+Version 1.2.2
 ----------
 - Update python-phoenixdb/RELEASING.rst (PHOENIX-6820)
+- Crash Due to Unhandled JDBC Type Code 0 for NULL Values (PHOENIX-7246)
+- Manage requests-gssapi version for Phython 3.7 and lower (PHOENIX-7221)
 - Add Python 3.11 to supported languages and update docker test image for phoenixdb (PHOENIX-6858)
+- Add Python 3.12 to supported versions and the test matrix (PHOENIX-7222)
 - Document workaround for PhoenixDB 1.2+ not working with Python2 on some systems (PHOENIX-6863)
 - Update install instructions in README.rst (PHOENIX-6812)
 - Add support for SQLAlchemy 2.0 (PHOENIX-6892)
