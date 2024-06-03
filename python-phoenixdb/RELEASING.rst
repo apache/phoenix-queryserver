@@ -25,6 +25,11 @@ Prepare the RC
 
 #. Make sure the dockerized tests described in README.rst run successfully
 
+#. Make sure to run twine check on the phoenixdb package files for python 2 and 3 and ensure they pass:
+
+    python setup.py sdist bdist_wheel
+    twine check dist/*
+
 #. Discuss release plans on dev@phoenix.a.o
 
 #. Open a ticket like https://issues.apache.org/jira/browse/PHOENIX-6529
