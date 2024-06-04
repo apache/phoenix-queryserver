@@ -33,6 +33,7 @@ Extract the archive and then install it manually::
 Note that old versions of pip and setuptools have various bugs and incompatibilities that
 may result in installation errors, especially on old python versions.
 If you encounter problems while building, update your pip and setuptools, and try again::
+
     pip install --upgrade pip
     pip install --upgrade setuptools
 

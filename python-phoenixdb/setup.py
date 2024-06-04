@@ -67,6 +67,7 @@ setup(
     name="phoenixdb",
     version=version,
     description="Phoenix database adapter for Python",
+    long_description_content_type="text/x-rst",
     long_description=readme(),
     author="Apache Software Foundation",
     author_email="dev@phoenix.apache.org",
