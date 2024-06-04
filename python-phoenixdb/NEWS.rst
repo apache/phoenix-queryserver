@@ -2,7 +2,7 @@ Changelog
 =========
 
 Version 1.2.2
-----------
+-------------
 - Update python-phoenixdb/RELEASING.rst (PHOENIX-6820)
 - Crash Due to Unhandled JDBC Type Code 0 for NULL Values (PHOENIX-7246)
 - Manage requests-gssapi version for Phython 3.7 and lower (PHOENIX-7221)
@@ -17,6 +17,7 @@ Version 1.2.2
 - Add support for specifying custom HTTP headers (PHOENIX-6921)
 - Use JDBC/Avatica column label as column name when set (PHOENIX-6917)
 - Do not throw exception when shutting down Python with open connections (PHOENIX-6926)
+- Fix twine check error and add a steps to Releasing guide (PHOENIX-7323)
 
 Version 1.2.1
 -------------
