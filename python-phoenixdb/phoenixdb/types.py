@@ -315,6 +315,7 @@ class TypeHelper(object):
 
         return JDBC_MAP[jdbc_code]
 
+
 # UTC tzinfo implementation and constants for python 2.7
 if sys.version_info.major < 3:
     class UTC(tzinfo):
