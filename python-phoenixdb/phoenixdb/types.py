@@ -89,10 +89,15 @@ def datetime_from_java_sql_timestamp(n):
     return datetime.datetime.utcfromtimestamp(n/1000.0)
 
 
-def datetime_to_java_sql_timestamp(d):
-    return int(time.mktime(d.replace(tzinfo=utc).timetuple())*1000 + d.microsecond // 1000)
-    # This is the python 3.3+ version:
-    # return int(d.replace(tzinfo=datetime.timezone.utc).timestamp()*1000)
+if sys.version_info.major == 3:
+    def datetime_to_java_sql_timestamp(d):
+        return int(d.replace(tzinfo=datetime.timezone.utc).timestamp()*1000)
+else:
+    def datetime_to_java_sql_timestamp(d):
+        if d.tzinfo is None:
+            return int((d - _NAIVE_EPOCH).total_seconds() * 1000)
+        else:
+            return int((d - _UTC_EPOCH).total_seconds() * 1000)
 
 
 # FIXME This doesn't seem to be used anywhere in the code
@@ -310,21 +315,23 @@ class TypeHelper(object):
 
         return JDBC_MAP[jdbc_code]
 
+# UTC tzinfo implementation and constants for python 2.7
+if sys.version_info.major < 3:
+    class UTC(tzinfo):
 
-class UTC(tzinfo):
-    """This should be equivalent to datetime.timezone.utc, which does not exist in Python 2.7
-    Use datetime.timezone.utc instead after Python 2.7 support has been dropped"""
+        ZERO = timedelta(0)
 
-    ZERO = timedelta(0)
+        def utcoffset(self, dt):
+            return UTC.ZERO
 
-    def utcoffset(self, dt):
-        return UTC.ZERO
+        def tzname(self, dt):
+            return "UTC"
 
-    def tzname(self, dt):
-        return "UTC"
+        def dst(self, dt):
+            return UTC.ZERO
 
-    def dst(self, dt):
-        return UTC.ZERO
+    utc = UTC()
 
+    _NAIVE_EPOCH = datetime.datetime(1970, 1, 1)
 
-utc = UTC()
+    _UTC_EPOCH = datetime.datetime(1970, 1, 1, tzinfo=utc)

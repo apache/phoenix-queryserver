@@ -15,8 +15,12 @@
 
 import datetime
 import sys
+import time
 import unittest
+from datetime import timedelta
+from datetime import tzinfo
 from decimal import Decimal
+
 
 import phoenixdb
 from phoenixdb.tests import DatabaseTestCase
@@ -214,14 +218,17 @@ class TypesTest(DatabaseTestCase):
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (2, NULL)")
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (3, ?)", [phoenixdb.Timestamp(2015, 7, 12, 13, 1, 2)])
             cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (4, ?)", [datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)])
-            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (5, ?)", [None])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (5, ?)", [datetime.datetime(2015, 7, 12, 13, 1, 2, 123000,
+                                                                                               self._get_local_tzinfo())])
+            cursor.execute("UPSERT INTO phoenixdb_test_tbl1 VALUES (6, ?)", [None])
             cursor.execute("SELECT id, val FROM phoenixdb_test_tbl1 ORDER BY id")
             self.assertEqual(cursor.fetchall(), [
                 [1, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
                 [2, None],
                 [3, datetime.datetime(2015, 7, 12, 13, 1, 2)],
                 [4, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
-                [5, None],
+                [5, datetime.datetime(2015, 7, 12, 13, 1, 2, 123000)],
+                [6, None],
             ])
 
     # Minimal date/time/timestamp type test that doesn't trigger PHOENIX-4664
@@ -380,3 +387,40 @@ class TypesTest(DatabaseTestCase):
         with self.conn.cursor() as cursor:
             cursor.execute("SELECT NULL")
             self.assertEqual(cursor.fetchall(), [[None]])
+
+    # Hack to get a local tzinfo object on Python 2.7 copied from Python docs
+    def _get_local_tzinfo(self):
+        ZERO = timedelta(0)
+
+        STDOFFSET = timedelta(seconds=-time.timezone)
+        if time.daylight:
+            DSTOFFSET = timedelta(seconds=-time.altzone)
+        else:
+            DSTOFFSET = STDOFFSET
+
+        DSTDIFF = DSTOFFSET - STDOFFSET
+
+        class LocalTimezone(tzinfo):
+
+            def utcoffset(self, dt):
+                if self._isdst(dt):
+                    return DSTOFFSET
+                else:
+                    return STDOFFSET
+
+            def dst(self, dt):
+                if self._isdst(dt):
+                    return DSTDIFF
+                else:
+                    return ZERO
+
+            def tzname(self, dt):
+                return time.tzname[self._isdst(dt)]
+
+            def _isdst(self, dt):
+                tt = (dt.year, dt.month, dt.day,
+                      dt.hour, dt.minute, dt.second,
+                      dt.weekday(), 0, 0)
+                stamp = time.mktime(tt)
+                tt = time.localtime(stamp)
+                return tt.tm_isdst > 0
