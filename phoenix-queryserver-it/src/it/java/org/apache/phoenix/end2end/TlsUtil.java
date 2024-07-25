@@ -51,6 +51,10 @@ public class TlsUtil {
     protected static final String TARGET_DIR_NAME = System.getProperty("target.dir", "target");
     protected static final File TARGET_DIR =
             new File(System.getProperty("user.dir"), TARGET_DIR_NAME);
+    protected static final String TEST_CLASSES_DIR_NAME =
+            System.getProperty("test-classes.dir", "test-classes");
+    public static final File TEST_CLASSES_DIR =
+            new File(TARGET_DIR, TEST_CLASSES_DIR_NAME);
     protected static final File KEYSTORE = new File(TARGET_DIR, "avatica-test-ks.jks");
     protected static final File TRUSTSTORE = new File(TARGET_DIR, "avatica-test-ts.jks");
 
@@ -140,15 +144,6 @@ public class TlsUtil {
         certGen.setSignatureAlgorithm(algorithm);
         X509Certificate cert = certGen.generate(pair.getPrivate());
         return cert;
-    }
-
-    public static String getClasspathDir(Class<?> klass) throws Exception {
-        String file = klass.getName();
-        file = file.replace('.', '/') + ".class";
-        URL url = Thread.currentThread().getContextClassLoader().getResource(file);
-        String baseDir = url.toURI().getPath();
-        baseDir = baseDir.substring(0, baseDir.length() - file.length() - 1);
-        return baseDir;
     }
 
     /**
