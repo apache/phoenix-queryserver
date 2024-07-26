@@ -77,6 +77,7 @@ def findClasspath(command_name):
     return tryDecode(subprocess.Popen(command, shell=True, stdout=subprocess.PIPE).stdout.read())
 
 def setPath():
+    PHOENIX_CLIENT_EMBEDDED_JAR_PATTERN = "phoenix-client-embedded*.jar"
     PHOENIX_CLIENT_JAR_PATTERN = "phoenix-client-*.jar"
     OLD_PHOENIX_CLIENT_JAR_PATTERN = "phoenix-*[!n]-client.jar"
     PHOENIX_THIN_CLIENT_JAR_PATTERN = "phoenix-queryserver-client-*.jar"
@@ -131,11 +132,16 @@ def setPath():
     phoenix_queryserver_classpath = os.path.join(current_dir, "../lib/*")
 
     global phoenix_client_jar
-    phoenix_client_jar = find(PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
+    phoenix_client_jar = find(PHOENIX_CLIENT_EMBEDDED_JAR_PATTERN, phoenix_class_path)
     if phoenix_client_jar == "":
-        phoenix_client_jar = find(OLD_PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
+        phoenix_client_jar = findFileInPathWithoutRecursion(PHOENIX_CLIENT_EMBEDDED_JAR_PATTERN, os.path.join(current_dir, ".."))
+    if phoenix_client_jar == "":
+        print ("could not find embedded client jar, falling back to old client variants")
+        phoenix_client_jar = find(PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
     if phoenix_client_jar == "":
         phoenix_client_jar = findFileInPathWithoutRecursion(PHOENIX_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
+    if phoenix_client_jar == "":
+        phoenix_client_jar = find(OLD_PHOENIX_CLIENT_JAR_PATTERN, phoenix_class_path)
     if phoenix_client_jar == "":
         phoenix_client_jar = findFileInPathWithoutRecursion(OLD_PHOENIX_CLIENT_JAR_PATTERN, os.path.join(current_dir, ".."))
 
