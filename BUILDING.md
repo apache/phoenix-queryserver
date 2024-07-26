@@ -67,11 +67,23 @@ $ mvn clean package -Dpackage.phoenix.client -Dphoenix.version=5.1.1 -Dphoenix.c
 `mvn package` will run the unit tests while building, but it will not run the integration test suite.
 
 The integration tests will run with the default Phoenix and HBase version.
-Running the integration tests with non-default Phoenix and HBase versions is not supported.
+Running the integration tests with non-default Phoenix and HBase versions may or may not work.
 
 ```
 $ mvn clean verify
 ```
+
+
+If a different Phoenix version is used for testing, then at least the *hbase.version*
+and *hadoop.version* properties must be set to the versions used to build phoenix-client-embdedd,
+but other changes may also be needed, or there may be un-resolvable conflicts.
+
+```
+$ mvn clean verify -Dphoenix.version=5.1.3 -Pshade-javax-servlet -Dphoenix.client.artifactid=phoenix-client-embedded-hbase-2.4 -Dhadoop.version=3.1.3 -Dhbase.version=2.4.15  -DforkCount=6'
+```
+
+(At the time of writing, the above will run, but fail because 5.1.3 does not have PHOENIX-5066
+required by the failing test)
 
 ### Running project reports
 
