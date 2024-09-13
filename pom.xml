@@ -103,7 +103,7 @@
         <maven-build-helper-plugin.version>3.5.0</maven-build-helper-plugin.version>
         <spotbugs-maven-plugin.version>4.8.1.0</spotbugs-maven-plugin.version>
         <spotbugs.version>4.8.1</spotbugs.version>
-        <maven-owasp-plugin.version>8.4.0</maven-owasp-plugin.version>
+        <maven-owasp-plugin.version>10.0.2</maven-owasp-plugin.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <maven-sonar-plugin.version>3.10.0.2594</maven-sonar-plugin.version>
 
