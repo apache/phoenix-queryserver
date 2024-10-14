@@ -17,8 +17,7 @@
  */
 package org.apache.phoenix.util;
 
-import org.apache.commons.collections.IteratorUtils;
-
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -68,10 +67,13 @@ public class InstanceResolver {
     @SuppressWarnings("unchecked")
     public static <T> List get(Class<T> clazz, List<T> defaultInstances) {
         Iterator<T> iterator = ServiceLoader.load(clazz).iterator();
+        List<T> instances = new ArrayList<>();
+        iterator.forEachRemaining(instances::add);
+
         if (defaultInstances != null) {
-            defaultInstances.addAll(IteratorUtils.toList(iterator));
+            defaultInstances.addAll(instances);
         } else {
-            defaultInstances = IteratorUtils.toList(iterator);
+            defaultInstances = instances;
         }
 
         return defaultInstances;
