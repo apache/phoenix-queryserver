@@ -17,8 +17,9 @@
  */
 package org.apache.phoenix.queryserver.server;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -59,7 +60,7 @@ public class QueryServerConfigurationTest {
   public void testSpnegoEnabled() throws IOException {
     setupKeytabForSpnego();
     // SPENEGO settings will be provided to the builder when enabled
-    doReturn(builder).when(builder).withSpnego(anyString(), any(String[].class));
+    doReturn(builder).when(builder).withSpnego(anyString(), nullable(String[].class));
     configureAndVerifyImpersonation(builder, false);
     // A keytab file will also be provided for automatic login
     verify(builder).withAutomaticLogin(any(File.class));
@@ -78,8 +79,8 @@ public class QueryServerConfigurationTest {
   @Test
   public void testCustomServerConfiguration() {
     queryServer.enableCustomAuth(builder, CONF, ugi);
-    verify(builder).withCustomAuthentication(any(AvaticaServerConfiguration.class));
-    verify(builder, never()).withSpnego(anyString(), any(String[].class));
+    verify(builder).withCustomAuthentication(nullable(AvaticaServerConfiguration.class));
+    verify(builder, never()).withSpnego(anyString(), nullable(String[].class));
     verify(builder, never()).withAutomaticLogin(any(File.class));
     verify(builder, never()).withImpersonation(any(DoAsRemoteUserCallback.class));
   }
