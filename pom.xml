@@ -85,7 +85,6 @@
         <jetty.version>9.4.53.v20231009</jetty.version>
         <netty-bom.version>4.1.108.Final</netty-bom.version>
         <commons-io.version>2.14.0</commons-io.version>
-        <commons-collections.version>3.2.2</commons-collections.version>
         <sqlline.version>1.9.0</sqlline.version>
         <slf4j.version>1.7.36</slf4j.version>
         <avatica.version>1.25.0</avatica.version>
@@ -728,12 +727,6 @@
                     <artifactId>junit-jupiter-api</artifactId>
                   </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-              <groupId>commons-collections</groupId>
-              <artifactId>commons-collections</artifactId>
-              <version>${commons-collections.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.calcite.avatica</groupId>
