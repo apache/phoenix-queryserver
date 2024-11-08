@@ -94,7 +94,7 @@
 
         <!-- Test Dependency versions -->
         <testng.version>6.10</testng.version>
-        <mockito-all.version>1.8.5</mockito-all.version>
+        <mockito.version>4.11.0</mockito.version>
         <junit.version>4.13.2</junit.version>
 
         <!-- Plugin versions -->
@@ -1205,9 +1205,10 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito-all.version}</version>
-                <scope>test</scope>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
