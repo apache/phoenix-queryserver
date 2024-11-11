@@ -52,7 +52,6 @@
 
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
-    <shaded.package>org.apache.phoenix.shaded</shaded.package>
   </properties>
 
   <build>
