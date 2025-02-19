@@ -54,7 +54,7 @@ pushd ${PY_ENV_PATH}/bin
 
 # conda activate does stuff with unbound variables :(
 set +u
-. activate ""
+. ./activate ""
 
 popd
 
