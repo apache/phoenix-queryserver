@@ -87,7 +87,7 @@
         <commons-io.version>2.18.0</commons-io.version>
         <sqlline.version>1.9.0</sqlline.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <avatica.version>1.25.0</avatica.version>
+        <avatica.version>1.26.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
         <jsr305.version>3.0.0</jsr305.version>
         <log4j2.version>2.20.0</log4j2.version>
