@@ -43,6 +43,15 @@ except ImportError:
     # daemon script not supported on some platforms (windows?)
     daemon_supported = False
 
+def tryQuote(unquoted_input):
+    """ Python 2/3 compatibility hack
+    """
+    try:
+        from shlex import quote as cmd_quote
+    except ImportError:
+        from pipes import quote as cmd_quote
+    return cmd_quote(unquoted_input)
+
 import phoenix_queryserver_utils
 
 phoenix_queryserver_utils.setPath()
@@ -68,8 +77,8 @@ else:
 if os.name == 'nt':
     args = subprocess.list2cmdline(args)
 else:
-    import pipes    # pipes module isn't available on Windows
-    args = " ".join([pipes.quote(tryDecode(v)) for v in args])
+    # pipes module isn't available on Windows
+    args = " ".join([tryQuote(tryDecode(v)) for v in args])
 
 # HBase configuration folder path (where hbase-site.xml reside) for
 # HBase/Phoenix client side property override
