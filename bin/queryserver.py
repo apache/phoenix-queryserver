@@ -92,10 +92,9 @@ phoenix_out_file = '%s.out' % phoenix_file_basename
 phoenix_pid_file = '%s.pid' % phoenix_file_basename
 
 tmp_dir = os.path.join(tempfile.gettempdir(), 'phoenix')
-hbase_env = phoenix_queryserver_utils.hbase_env
-opts = os.getenv('PHOENIX_QUERYSERVER_OPTS') or hbase_env.get('PHOENIX_QUERYSERVER_OPTS') or ''
-pid_dir = os.getenv('PHOENIX_QUERYSERVER_PID_DIR') or hbase_env.get('HBASE_PID_DIR') or tmp_dir
-log_dir = os.getenv('PHOENIX_QUERYSERVER_LOG_DIR') or hbase_env.get('HBASE_LOG_DIR') or tmp_dir
+opts = os.getenv('PHOENIX_QUERYSERVER_OPTS') or os.getenv('HBASE_OPTS') or ''
+pid_dir = os.getenv('PHOENIX_QUERYSERVER_PID_DIR') or os.getenv('HBASE_PID_DIR') or tmp_dir
+log_dir = os.getenv('PHOENIX_QUERYSERVER_LOG_DIR') or os.getenv('HBASE_LOG_DIR') or tmp_dir
 pid_file_path = os.path.join(pid_dir, phoenix_pid_file)
 log_file_path = os.path.join(log_dir, phoenix_log_file)
 out_file_path = os.path.join(log_dir, phoenix_out_file)
