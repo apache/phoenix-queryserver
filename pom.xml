@@ -82,7 +82,7 @@
         <curator.version>5.6.0</curator.version>
 
         <gson.version>2.10.1</gson.version>
-        <jetty.version>9.4.56.v20240826</jetty.version>
+        <jetty.version>9.4.57.v20241219</jetty.version>
         <netty-bom.version>4.1.119.Final</netty-bom.version>
         <commons-io.version>2.18.0</commons-io.version>
         <sqlline.version>1.9.0</sqlline.version>
