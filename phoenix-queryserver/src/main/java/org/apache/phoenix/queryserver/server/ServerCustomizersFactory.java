@@ -29,6 +29,7 @@ import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.customizers.HostedClientJarsServerCustomizer;
 import org.apache.phoenix.queryserver.server.customizers.JMXJsonEndpointServerCustomizer;
+import org.apache.phoenix.queryserver.server.customizers.prometheus.PrometheusEndpointServerCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,12 @@ public interface ServerCustomizersFactory {
                 QueryServerOptions.DEFAULT_QUERY_SERVER_JMXJSONENDPOINT_DISABLED)) {
                 customizers.add(new JMXJsonEndpointServerCustomizer());
             }
+
+            if (conf.getBoolean(QueryServerProperties.QUERY_SERVER_PROMETHEUS_ENDPOINT_ENABLED,
+                    QueryServerOptions.DEFAULT_QUERY_SERVER_PROMETHEUS_ENDPOINT_ENABLED)) {
+                customizers.add(new PrometheusEndpointServerCustomizer());
+            }
+
             return Collections.unmodifiableList(customizers);
         }
     }
