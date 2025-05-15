@@ -49,6 +49,8 @@
               org.apache.hbase:hbase-it
             </ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+          <!-- dependency:analyze is quite useless for hadoop test dependencies -->
+          <ignoreNonCompile>true</ignoreNonCompile>
         </configuration>
       </plugin>
 </plugins>
