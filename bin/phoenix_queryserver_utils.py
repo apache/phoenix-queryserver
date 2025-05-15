@@ -86,6 +86,7 @@ def setPath():
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
     SLF4J_BACKEND_JAR_PATTERN = "log4j-slf4j*.jar"
+    JCL_OVER_SLF4J_PATTERN = "jcl-over-slf4j*.jar"
     LOGGING_JAR_PATTERN = "log4j-core*.jar"
     LOGGING_JAR_PATTERN2 = "log4j-api*.jar"
     LOGGING_JAR_PATTERN3 = "log4j-1.2-api*.jar"
@@ -172,6 +173,9 @@ def setPath():
     slf4j_backend_jar = os.environ.get(OVERRIDE_SLF4J_BACKEND)
     if slf4j_backend_jar is None or slf4j_backend_jar == "":
         slf4j_backend_jar = findFileInPathWithoutRecursion(SLF4J_BACKEND_JAR_PATTERN, os.path.join(current_dir, "..","lib"))
+
+    global jcl_over_slf4j
+    jcl_over_slf4j = findFileInPathWithoutRecursion(JCL_OVER_SLF4J_PATTERN, os.path.join(current_dir, "..","lib"))
 
     global logging_jar
     logging_jar = os.environ.get(OVERRIDE_LOGGING)
@@ -292,6 +296,7 @@ if __name__ == "__main__":
     print("phoenix_thin_client_jar:", phoenix_thin_client_jar)
     print("sqlline_with_deps_jar", sqlline_with_deps_jar)
     print("slf4j_backend_jar:", slf4j_backend_jar)
+    print("jcl_over_slf4j:", jcl_over_slf4j)
     print("java_home:", java_home)
     print("java:", java)
     print("jvm_module_flags:", jvm_module_flags)

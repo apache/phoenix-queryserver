@@ -63,6 +63,7 @@
           <include>org.apache.logging.log4j:log4j-api</include>
           <include>org.apache.logging.log4j:log4j-core</include>
           <include>org.apache.logging.log4j:log4j-1.2-api</include>
+          <include>org.slf4j:jcl-over-slf4j</include>
         </includes>
       </dependencySet>
       <dependencySet>

@@ -49,6 +49,8 @@
               org.apache.hbase:hbase-it
             </ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+          <!-- dependency:analyze is quite useless for hadoop test dependencies -->
+          <ignoreNonCompile>true</ignoreNonCompile>
         </configuration>
       </plugin>
 </plugins>
@@ -58,6 +60,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.argparse4j</groupId>
