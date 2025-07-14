@@ -72,6 +72,10 @@ public class QueryServerProperties {
             "phoenix.queryserver.tls.truststore";
     public static final String QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD =
             "phoenix.queryserver.tls.truststore.password";
+    public static final String QUERY_SERVER_TLS_ENABLED_PROTCOLS =
+            "phoenix.queryserver.tls.protocols";
+    public static final String QUERY_SERVER_TLS_ENABLED_CIPHERSUITES =
+            "phoenix.queryserver.tls.ciphersuites";
     public static final String QUERY_SERVER_JMX_JSON_ENDPOINT_DISABLED =
             "phoenix.queryserver.jmxjsonendpoint.disabled";
 
