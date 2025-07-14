@@ -297,7 +297,19 @@ public final class QueryServer extends Configured implements Tool, Runnable {
         throw new Exception(String.format("if %s is enabled, %s must be specfified" , QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE));
       }
       final File tlsTruststoreFile = new File(tlsTruststore);
-      builder.withTLS(tlsKeystoreFile, tlsKeystorePassword, tlsTruststoreFile, tlsTruststorePassword, keystoreType);
+
+      final String tlsEnabledProtocolsString = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_ENABLED_PROTCOLS);
+      String[] tlsEnabledProtocols = null;
+      if (tlsEnabledProtocolsString != null) {
+          tlsEnabledProtocols = tlsEnabledProtocolsString.trim().split(",");
+      }
+      final String tlsEnabledChiphersuitesString = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_ENABLED_CIPHERSUITES);
+      String[] tlsEnabledChiphersuites = null;
+      if (tlsEnabledChiphersuitesString != null) {
+          tlsEnabledChiphersuites = tlsEnabledChiphersuitesString.trim().split(",");
+      }
+
+      builder.withTLS(tlsKeystoreFile, tlsKeystorePassword, tlsTruststoreFile, tlsTruststorePassword, keystoreType, tlsEnabledProtocols, tlsEnabledChiphersuites);
     }
 }
 
