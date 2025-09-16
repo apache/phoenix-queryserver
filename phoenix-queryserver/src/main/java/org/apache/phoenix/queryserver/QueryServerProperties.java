@@ -75,6 +75,9 @@ public class QueryServerProperties {
     public static final String QUERY_SERVER_JMX_JSON_ENDPOINT_DISABLED =
             "phoenix.queryserver.jmxjsonendpoint.disabled";
 
+    public static final String QUERY_SERVER_PROMETHEUS_ENDPOINT_ENABLED =
+            "phoenix.queryserver.prometheusendpoint.enabled";
+
     // keys for load balancer
     public static final String PHOENIX_QUERY_SERVER_LOADBALANCER_ENABLED =
             "phoenix.queryserver.loadbalancer.enabled";
