@@ -158,7 +158,7 @@ public class SecureQueryServerPhoenixDBIT {
         // Generate SSL certs
         File keystoresDir = new File(UTIL.getDataTestDir("keystore").toUri().getPath());
         keystoresDir.mkdirs();
-        String sslConfDir = TlsUtil.getClasspathDir(SecureQueryServerPhoenixDBIT.class);
+        String sslConfDir = TlsUtil.TEST_CLASSES_DIR.getPath();
         TlsUtil.setupSSLConfig(keystoresDir.getAbsolutePath(), sslConfDir, conf, false);
 
         // Magic flag to tell hdfs to not fail on using ports above 1024
