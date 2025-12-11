@@ -141,6 +141,9 @@ class PhoenixDialect(DefaultDialect):
         ))
         return [phoenix_url], connect_args
 
+    def detect_autocommit_setting(self, dbapi_conn):
+        return bool(dbapi_conn.autocommit)
+
     def has_table(self, connection, table_name, schema=None, **kw):
         if schema is None:
             schema = ''
