@@ -86,11 +86,11 @@
         <netty-bom.version>4.1.119.Final</netty-bom.version>
         <commons-io.version>2.18.0</commons-io.version>
         <sqlline.version>1.9.0</sqlline.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.17</slf4j.version>
         <avatica.version>1.27.0</avatica.version>
         <servlet.api.version>3.1.0</servlet.api.version>
         <jsr305.version>3.0.0</jsr305.version>
-        <log4j2.version>2.20.0</log4j2.version>
+        <log4j2.version>2.25.1</log4j2.version>
 
         <!-- Test Dependency versions -->
         <testng.version>6.10</testng.version>
@@ -778,7 +778,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
                 <version>${log4j2.version}</version>
             </dependency>
             <dependency>

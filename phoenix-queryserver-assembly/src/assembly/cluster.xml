@@ -59,7 +59,7 @@
         <outputDirectory>phoenix-queryserver-${project.parent.version}/lib</outputDirectory>
         <includes>
           <include>sqlline:sqlline:jar:jar-with-dependencies</include>
-          <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
+          <include>org.apache.logging.log4j:log4j-slf4j2-impl</include>
           <include>org.apache.logging.log4j:log4j-api</include>
           <include>org.apache.logging.log4j:log4j-core</include>
           <include>org.apache.logging.log4j:log4j-1.2-api</include>

@@ -85,7 +85,7 @@ def setPath():
     PHOENIX_QUERYSERVER_JAR_PATTERN = "phoenix-queryserver-[!c]*.jar"
     PHOENIX_LOADBALANCER_JAR_PATTERN = "load-balancer-*[!t][!e][!s][!t][!s].jar"
     SQLLINE_WITH_DEPS_PATTERN = "sqlline-*-jar-with-dependencies.jar"
-    SLF4J_BACKEND_JAR_PATTERN = "log4j-slf4j*.jar"
+    SLF4J_BACKEND_JAR_PATTERN = "log4j-slf4j2*.jar"
     JCL_OVER_SLF4J_PATTERN = "jcl-over-slf4j*.jar"
     LOGGING_JAR_PATTERN = "log4j-core*.jar"
     LOGGING_JAR_PATTERN2 = "log4j-api*.jar"
