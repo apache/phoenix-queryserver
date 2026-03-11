@@ -95,7 +95,7 @@
         <!-- Test Dependency versions -->
         <testng.version>6.10</testng.version>
         <mockito.version>4.11.0</mockito.version>
-        <junit.version>4.13.2</junit.version>
+        <junit.version>5.10.2</junit.version>
 
         <!-- Plugin versions -->
         <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
@@ -1207,10 +1207,15 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
