@@ -28,17 +28,17 @@ import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.server.Server;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class ServerCustomizersTest {
-    @Before @After
+    @BeforeEach @AfterEach
     public void clearSingletons() {
         // clean up singletons
         InstanceResolver.clearSingletons();
@@ -51,7 +51,7 @@ public class ServerCustomizersTest {
         // the default factory creates an empty list of server customizers
         List<ServerCustomizer<Server>> customizers =
                 queryServer.createServerCustomizers(new Configuration(), avaticaServerConfiguration);
-        Assert.assertEquals(1, customizers.size());
+        assertEquals(1, customizers.size());
     }
 
     @Test
@@ -75,6 +75,6 @@ public class ServerCustomizersTest {
         Configuration conf = new Configuration(false);
         QueryServer queryServer = new QueryServer();
         List<ServerCustomizer<Server>> actual = queryServer.createServerCustomizers(conf, avaticaServerConfiguration);
-        Assert.assertEquals("Customizers are different", expected, actual);
+        assertEquals(expected, actual, "Customizers are different");
     }
 }

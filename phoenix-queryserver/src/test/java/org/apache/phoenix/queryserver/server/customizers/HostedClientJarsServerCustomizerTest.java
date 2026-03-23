@@ -17,8 +17,8 @@
  */
 package org.apache.phoenix.queryserver.server.customizers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class HostedClientJarsServerCustomizerTest {
@@ -47,7 +47,7 @@ public class HostedClientJarsServerCustomizerTest {
 
     assertEquals(1, svr.getHandlers().length);
     Handler actualHandler = svr.getHandler();
-    assertTrue("Handler was " + actualHandler.getClass(), actualHandler instanceof HandlerList);
+    assertTrue(actualHandler instanceof HandlerList,"Handler was " + actualHandler.getClass());
 
     HandlerList actualHandlerList = (HandlerList) actualHandler;
     assertEquals(3, actualHandlerList.getHandlers().length);
@@ -55,9 +55,9 @@ public class HostedClientJarsServerCustomizerTest {
     assertEquals(handler2, actualHandlerList.getHandlers()[2]);
 
     Handler injectedHandler = actualHandlerList.getHandlers()[0];
-    assertTrue("Handler was " + injectedHandler.getClass(), injectedHandler instanceof ContextHandler);
+    assertTrue(injectedHandler instanceof ContextHandler,"Handler was " + injectedHandler.getClass());
     ContextHandler ctx = (ContextHandler) injectedHandler;
-    assertTrue("Handler was " + ctx.getHandler().getClass(), ctx.getHandler() instanceof ResourceHandler);
+    assertTrue(ctx.getHandler() instanceof ResourceHandler, "Handler was " + ctx.getHandler().getClass());
     assertEquals(context, ctx.getContextPath());
     ResourceHandler res = (ResourceHandler) ctx.getHandler();
     // Jetty puts in a proper URI for the file we give it

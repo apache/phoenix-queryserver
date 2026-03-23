@@ -19,16 +19,16 @@ package org.apache.phoenix;
 
 import org.apache.phoenix.util.QueryUtil;
 import org.apache.phoenix.util.ThinClientUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collections;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Ensure the "thick" Phoenix driver and it's "thin" counterpart can coexist on
@@ -48,18 +48,14 @@ public class DriverCohabitationTest {
         thinDriver = d;
       }
     }
-    assertNotNull("Thick driver not registered with DriverManager.", thickDriver);
-    assertNotNull("Thin driver not registered with DriverManager.", thinDriver);
+    assertNotNull(thickDriver,"Thick driver not registered with DriverManager.");
+    assertNotNull(thinDriver,"Thin driver not registered with DriverManager.");
 
     final String thickUrl = QueryUtil.getUrl("localhost");
     final String thinUrl = ThinClientUtil.getConnectionUrl("localhost", 1234);
-    assertTrue("Thick driver should accept connections like " + thickUrl,
-        thickDriver.acceptsURL(thickUrl));
-    assertFalse("Thick driver should reject connections like " + thinUrl,
-        thickDriver.acceptsURL(thinUrl));
-    assertTrue("Thin driver should accept connections like " + thinUrl,
-        thinDriver.acceptsURL(thinUrl));
-    assertFalse("Thin driver should reject connections like " + thickUrl,
-        thinDriver.acceptsURL(thickUrl));
+    assertTrue(thickDriver.acceptsURL(thickUrl), "Thick driver should accept connections like " + thickUrl);
+    assertFalse(thickDriver.acceptsURL(thinUrl),"Thick driver should reject connections like " + thinUrl);
+    assertTrue(thinDriver.acceptsURL(thinUrl),"Thin driver should accept connections like " + thinUrl);
+    assertFalse(thinDriver.acceptsURL(thickUrl),"Thin driver should reject connections like " + thickUrl);
   }
 }

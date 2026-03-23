@@ -17,16 +17,16 @@
  */
 package org.apache.phoenix.queryserver.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.queryserver.QueryServerProperties;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class QueryServerTest {
 
@@ -38,12 +38,12 @@ public class QueryServerTest {
   private QueryServer qs;
   private Configuration conf;
 
-  @BeforeClass
+  @BeforeAll
   public static void setupOnce() throws IOException {
     EXPECTED_HOSTNAME = InetAddress.getLocalHost().getCanonicalHostName().toLowerCase();
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     this.conf = new Configuration(false);
     this.qs = new QueryServer();

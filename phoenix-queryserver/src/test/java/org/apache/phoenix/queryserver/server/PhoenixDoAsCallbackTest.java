@@ -16,9 +16,9 @@
  */
 package org.apache.phoenix.queryserver.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.Callable;
 
@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.phoenix.queryserver.server.QueryServer.PhoenixDoAsCallback;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the authorization callback hook Avatica provides for Phoenix to implement.
@@ -83,7 +83,7 @@ public class PhoenixDoAsCallbackTest {
       // The UserGroupInformation.getCurrentUser() actually returns a new UGI instance, but the internal
       // subject is the same. We can verify things will work as expected that way.
       assertNotEquals(user1.hashCode(), user2.hashCode());
-      assertEquals("These should be the same (cached) instance", user1.hashCode(), user1Reference.hashCode());
-      assertEquals("These should be the same (cached) instance", user1, user1Reference);
+      assertEquals(user1.hashCode(), user1Reference.hashCode(), "These should be the same (cached) instance");
+      assertEquals(user1, user1Reference, "These should be the same (cached) instance");
     }
 }

@@ -19,8 +19,8 @@ package org.apache.phoenix.queryserver.server;
 
 import org.apache.calcite.avatica.server.RemoteUserExtractor;
 import org.apache.hadoop.conf.Configuration;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class RemoteUserExtractorFactoryTest {
 
@@ -28,8 +28,7 @@ public class RemoteUserExtractorFactoryTest {
   public void testProvidesDefaultFactory() {
     QueryServer queryServer = new QueryServer();
     RemoteUserExtractor extractor = queryServer.createRemoteUserExtractor(new Configuration());
-    Assert.assertTrue(
-      "Not an instance of PhoenixRemoteUserExtractor: " + extractor.getClass().getName(),
-      extractor instanceof QueryServer.PhoenixRemoteUserExtractor);
+    assertTrue(extractor instanceof QueryServer.PhoenixRemoteUserExtractor,
+            "Not an instance of PhoenixRemoteUserExtractor: " + extractor.getClass().getName());
   }
 }

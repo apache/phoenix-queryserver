@@ -17,10 +17,10 @@
  */
 package org.apache.phoenix.queryserver.util;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.phoenix.util.SimpleLRUCache;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SimpleLRUCacheTest {
 

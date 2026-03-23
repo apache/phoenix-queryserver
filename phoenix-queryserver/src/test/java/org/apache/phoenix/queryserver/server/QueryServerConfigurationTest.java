@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.apache.calcite.avatica.server.AvaticaServerConfiguration;
 import org.apache.calcite.avatica.server.DoAsRemoteUserCallback;
@@ -35,21 +36,21 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.queryserver.QueryServerProperties;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.Test;
 
 public class QueryServerConfigurationTest {
   private static final Configuration CONF = HBaseConfiguration.create();
 
-  @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  public Path testFolder;
 
   private HttpServer.Builder builder;
   private QueryServer queryServer;
   private UserGroupInformation ugi;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
     builder = mock(HttpServer.Builder.class);
     queryServer = new QueryServer(new String[0], CONF);
@@ -86,7 +87,7 @@ public class QueryServerConfigurationTest {
   }
 
   private void setupKeytabForSpnego() throws IOException {
-    File keytabFile = testFolder.newFile("test.keytab");
+    File keytabFile = testFolder.resolve("test.keytab").toFile();
     CONF.set(QueryServerProperties.QUERY_SERVER_KEYTAB_FILENAME_ATTRIB, keytabFile.getAbsolutePath());
   }
 
