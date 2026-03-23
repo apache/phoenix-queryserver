@@ -48,7 +48,9 @@ shift 5
 
 PY_ENV_PATH=$( mktemp -d )
 
-virtualenv $PY_ENV_PATH
+#virtualenv $PY_ENV_PATH
+python -m venv "$PY_ENV_PATH"
+python --version
 
 pushd ${PY_ENV_PATH}/bin
 
@@ -60,7 +62,8 @@ popd
 
 set -u
 echo "INSTALLING COMPONENTS"
-pip install -e file:///${LOCAL_PY}/
+echo ${LOCAL_PY}
+pip3 install -e file:///${LOCAL_PY}/
 
 export KRB5_CONFIG=$KRB5_CFG_FILE
 cat $KRB5_CONFIG
