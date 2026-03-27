@@ -22,11 +22,12 @@ import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CAT;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_CATALOG;
 import static org.apache.phoenix.jdbc.PhoenixDatabaseMetaData.TABLE_SCHEM;
 import static org.apache.phoenix.query.QueryConstants.SYSTEM_SCHEMA_NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,20 +40,16 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HConstants;
 import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.util.ReadOnlyProps;
 import org.apache.phoenix.util.ThinClientUtil;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assume;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,10 +64,8 @@ public class QueryServerBasicsIT extends BaseTest {
   private static Configuration CONF;
   private static String CONN_STRING;
 
-  @Rule
-  public TestName name = new TestName();
 
-  @BeforeClass
+  @BeforeAll
   public static synchronized void doSetup() throws Exception {
       setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
 
@@ -89,7 +84,7 @@ public class QueryServerBasicsIT extends BaseTest {
       LOG.info("JDBC connection string is " + CONN_STRING);
   }
 
-  @AfterClass
+  @AfterAll
   public static synchronized void afterClass() throws Exception {
     if (AVATICA_SERVER != null) {
       AVATICA_SERVER.join(TimeUnit.MINUTES.toMillis(1));
@@ -97,8 +92,8 @@ public class QueryServerBasicsIT extends BaseTest {
       if (t != null) {
         fail("query server threw. " + t.getMessage());
       }
-      assertEquals("query server didn't exit cleanly", 0, AVATICA_SERVER.getQueryServer()
-        .getRetCode());
+      assertEquals(0, AVATICA_SERVER.getQueryServer()
+        .getRetCode(),"query server didn't exit cleanly");
     }
   }
 
@@ -108,7 +103,7 @@ public class QueryServerBasicsIT extends BaseTest {
       assertFalse(connection.isClosed());
       try (final ResultSet resultSet = connection.getMetaData().getCatalogs()) {
         final ResultSetMetaData metaData = resultSet.getMetaData();
-        assertFalse("unexpected populated resultSet", resultSet.next());
+        assertFalse(resultSet.next(),"unexpected populated resultSet");
         assertEquals(1, metaData.getColumnCount());
         assertEquals(TABLE_CAT, metaData.getColumnLabel(1));
       }
@@ -124,7 +119,7 @@ public class QueryServerBasicsIT extends BaseTest {
       assertFalse(connection.isClosed());
       try (final ResultSet resultSet = connection.getMetaData().getSchemas()) {
         final ResultSetMetaData metaData = resultSet.getMetaData();
-        assertTrue("unexpected empty resultset", resultSet.next());
+        assertTrue(resultSet.next(),"unexpected empty resultset");
         assertEquals(2, metaData.getColumnCount());
         assertEquals(TABLE_SCHEM, metaData.getColumnLabel(1));
         assertEquals(TABLE_CATALOG, metaData.getColumnLabel(2));
@@ -132,14 +127,14 @@ public class QueryServerBasicsIT extends BaseTest {
         do {
           if (resultSet.getString(1).equalsIgnoreCase(SYSTEM_SCHEMA_NAME)) containsSystem = true;
         } while (resultSet.next());
-        assertTrue(format("should contain at least %s schema.", SYSTEM_SCHEMA_NAME), containsSystem);
+        assertTrue(containsSystem, format("should contain at least %s schema.", SYSTEM_SCHEMA_NAME));
       }
     }
   }
 
   @Test
-  public void smokeTest() throws Exception {
-    final String tableName = name.getMethodName();
+  public void smokeTest(TestInfo testInfo) throws Exception {
+    final String tableName = testInfo.getTestMethod().map(Method::getName).orElseThrow(IllegalStateException::new);
     try (final Connection connection = DriverManager.getConnection(CONN_STRING)) {
       assertFalse(connection.isClosed());
       connection.setAutoCommit(true);
@@ -180,8 +175,8 @@ public class QueryServerBasicsIT extends BaseTest {
   }
 
   @Test
-  public void arrayTest() throws Exception {
-      final String tableName = name.getMethodName();
+  public void arrayTest(TestInfo testInfo) throws Exception {
+      final String tableName = testInfo.getTestMethod().map(Method::getName).orElseThrow(IllegalStateException::new);
       try (Connection conn = DriverManager.getConnection(CONN_STRING);
               Statement stmt = conn.createStatement()) {
           conn.setAutoCommit(false);
@@ -213,7 +208,8 @@ public class QueryServerBasicsIT extends BaseTest {
                   assertEquals(i, Integer.parseInt(rs.getString(1)));
                   Array array = rs.getArray(2);
                   Object untypedArrayData = array.getArray();
-                  assertTrue("Expected array data to be an int array, but was " + untypedArrayData.getClass(), untypedArrayData instanceof Object[]);
+                  assertTrue(untypedArrayData instanceof Object[],
+                          "Expected array data to be an int array, but was " + untypedArrayData.getClass());
                   Object[] arrayData = (Object[]) untypedArrayData;
                   int expectedArrayLength = i % 2 == 0 ? numEvenElements : numOddElements;
                   assertEquals(expectedArrayLength, arrayData.length);
@@ -227,8 +223,8 @@ public class QueryServerBasicsIT extends BaseTest {
   }
 
   @Test
-  public void preparedStatementArrayTest() throws Exception {
-      final String tableName = name.getMethodName();
+  public void preparedStatementArrayTest(TestInfo testInfo) throws Exception {
+      final String tableName = testInfo.getTestMethod().map(Method::getName).orElseThrow(IllegalStateException::new);
       try (Connection conn = DriverManager.getConnection(CONN_STRING);
               Statement stmt = conn.createStatement()) {
           conn.setAutoCommit(false);
@@ -261,7 +257,8 @@ public class QueryServerBasicsIT extends BaseTest {
                   assertEquals(i, Integer.parseInt(rs.getString(1)));
                   Array array = rs.getArray(2);
                   Object untypedArrayData = array.getArray();
-                  assertTrue("Expected array data to be an int array, but was " + untypedArrayData.getClass(), untypedArrayData instanceof Object[]);
+                  assertTrue(untypedArrayData instanceof Object[],
+                          "Expected array data to be an int array, but was " + untypedArrayData.getClass());
                   Object[] arrayData = (Object[]) untypedArrayData;
                   int expectedArrayLength = i % 2 == 0 ? numEvenElements : numOddElements;
                   assertEquals(expectedArrayLength, arrayData.length);
@@ -275,8 +272,8 @@ public class QueryServerBasicsIT extends BaseTest {
   }
 
   @Test
-  public void preparedStatementVarcharArrayTest() throws Exception {
-      final String tableName = name.getMethodName();
+  public void preparedStatementVarcharArrayTest(TestInfo testInfo) throws Exception {
+      final String tableName = testInfo.getTestMethod().map(Method::getName).orElseThrow(IllegalStateException::new);
       try (Connection conn = DriverManager.getConnection(CONN_STRING);
               Statement stmt = conn.createStatement()) {
           conn.setAutoCommit(false);
@@ -309,7 +306,8 @@ public class QueryServerBasicsIT extends BaseTest {
                   assertEquals(i, Integer.parseInt(rs.getString(1)));
                   Array array = rs.getArray(2);
                   Object untypedArrayData = array.getArray();
-                  assertTrue("Expected array data to be an int array, but was " + untypedArrayData.getClass(), untypedArrayData instanceof Object[]);
+                  assertTrue(untypedArrayData instanceof Object[],
+                          "Expected array data to be an int array, but was " + untypedArrayData.getClass());
                   Object[] arrayData = (Object[]) untypedArrayData;
                   int expectedArrayLength = i % 2 == 0 ? numEvenElements : numOddElements;
                   assertEquals(expectedArrayLength, arrayData.length);
@@ -381,7 +379,8 @@ public class QueryServerBasicsIT extends BaseTest {
         ResultSet rs = stmt.executeQuery("select * from " + tableName);
         assertTrue(rs.next());
         LocalDateTime fromDB = rs.getTimestamp("i").toLocalDateTime();
-        assertTrue("Timestamps do not match. inserted:" + now.toString() + " returned:" + fromDB.toString(), fromDB.compareTo(now) == 0);
+        assertTrue(fromDB.compareTo(now) == 0,
+                "Timestamps do not match. inserted:" + now.toString() + " returned:" + fromDB.toString());
       }
     }
   }
@@ -389,7 +388,7 @@ public class QueryServerBasicsIT extends BaseTest {
   @Test
   //Quick and dirty way start up a local Phoenix+PQS instance for testing against
   public void startLocalPQS() throws Exception {
-      Assume.assumeNotNull(System.getProperty("start.unsecure.pqs"));
+      Assumptions.assumeTrue(System.getProperty("start.unsecure.pqs") != null);
       System.out.println("CONN STRING:" + CONN_STRING);
       System.out.println("Tests suspended!!!");
       System.out.println("Kill maven run to stop server");

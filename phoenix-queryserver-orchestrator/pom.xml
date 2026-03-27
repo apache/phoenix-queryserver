@@ -48,6 +48,9 @@
             <ignoredUnusedDeclaredDependency>
               org.apache.hbase:hbase-it
             </ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>
+              org.junit.jupiter:junit-jupiter-engine
+            </ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
           <!-- dependency:analyze is quite useless for hadoop test dependencies -->
           <ignoreNonCompile>true</ignoreNonCompile>
@@ -95,11 +98,17 @@
             <artifactId>gson</artifactId>
         </dependency>
         <!-- test -->
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <scope>test</scope>
+    </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

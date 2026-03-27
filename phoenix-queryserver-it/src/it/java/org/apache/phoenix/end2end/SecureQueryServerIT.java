@@ -16,43 +16,34 @@
  */
 package org.apache.phoenix.end2end;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 import org.apache.hadoop.hbase.security.token.TokenProvider;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(Parameterized.class)
-@Category(NeedsOwnMiniClusterTest.class)
+@Tag("NeedsOwnMiniClusterTest")
 public class SecureQueryServerIT {
     private static final Logger LOG = LoggerFactory.getLogger(SecureQueryServerIT.class);
     private static QueryServerEnvironment environment;
 
-    @Parameters(name = "tls = {0}")
-    public static synchronized Iterable<Boolean> data() {
-        return Arrays.asList(new Boolean[] {false, true});
-    }
-
-    public SecureQueryServerIT(Boolean tls) throws Exception {
+    public void restartEnvironmentForTls(Boolean tls) throws Exception {
         //Clean up previous environment if any (Junit 4.13 @BeforeParam / @AfterParam would be an alternative)
         if(environment != null) {
             stopEnvironment();
@@ -65,13 +56,15 @@ public class SecureQueryServerIT {
     }
 
 
-    @AfterClass
+    @AfterAll
     public static synchronized void stopEnvironment() throws Exception {
         environment.stop();
     }
 
-    @Test
-    public void testBasicReadWrite() throws Exception {
+    @ParameterizedTest(name = "tls = {0}")
+    @ValueSource(booleans = { false, true })
+    public void testBasicReadWrite(Boolean tls) throws Exception {
+        restartEnvironmentForTls(tls);
         final Entry<String,File> user1 = environment.getUser(1);
         UserGroupInformation user1Ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(user1.getKey(), user1.getValue().getAbsolutePath());
         user1Ugi.doAs(new PrivilegedExceptionAction<Void>() {

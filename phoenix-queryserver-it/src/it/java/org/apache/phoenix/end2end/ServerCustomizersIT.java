@@ -30,12 +30,10 @@ import org.apache.phoenix.queryserver.server.customizers.BasicAuthenticationServ
 import org.apache.phoenix.queryserver.server.customizers.BasicAuthenticationServerCustomizer.BasicAuthServerCustomizerFactory;
 import org.apache.phoenix.util.InstanceResolver;
 import org.apache.phoenix.util.ReadOnlyProps;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +43,7 @@ public class ServerCustomizersIT extends BaseTest {
 
     private static QueryServerTestUtil PQS_UTIL;
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
-    @BeforeClass
+    @BeforeAll
     public static synchronized void setup() throws Exception {
         setUpTestDriver(ReadOnlyProps.EMPTY_PROPS);
 
@@ -64,7 +59,7 @@ public class ServerCustomizersIT extends BaseTest {
         PQS_UTIL.startQueryServer();
     }
 
-    @AfterClass
+    @AfterAll
     public static synchronized void teardown() throws Exception {
         // Remove custom singletons for future tests
         InstanceResolver.clearSingletons();
@@ -79,21 +74,22 @@ public class ServerCustomizersIT extends BaseTest {
         try (Connection conn = DriverManager.getConnection(PQS_UTIL.getUrl(
                 getBasicAuthParams(BasicAuthenticationServerCustomizer.USER_AUTHORIZED)));
                 Statement stmt = conn.createStatement()) {
-            Assert.assertFalse("user3 should have access", stmt.execute(
-                "create table "+ServerCustomizersIT.class.getSimpleName()+" (pk integer not null primary key)"));
+            assertFalse(stmt.execute(
+                "create table "+ServerCustomizersIT.class.getSimpleName()+" (pk integer not null primary key)"),
+                    "user3 should have access");
         }
     }
 
     @Test
-    public void testUserNotAuthorized() throws Exception {
-        expected.expect(RuntimeException.class);
-        expected.expectMessage("HTTP/401");
-        try (Connection conn = DriverManager.getConnection(PQS_UTIL.getUrl(
-                getBasicAuthParams(USER_NOT_AUTHORIZED)));
-                Statement stmt = conn.createStatement()) {
-            Assert.assertFalse(stmt.execute(
-                    "select access from database"));
-        }
+    void testUserNotAuthorized() {
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            try (Connection conn = DriverManager.getConnection(PQS_UTIL.getUrl(
+                    getBasicAuthParams(USER_NOT_AUTHORIZED)));
+                 Statement stmt = conn.createStatement()) {
+                stmt.execute("select access from database");
+            }
+        });
+        assertTrue(ex.getMessage().contains("HTTP/401"));
     }
 
     private Map<String, String> getBasicAuthParams(String user) {

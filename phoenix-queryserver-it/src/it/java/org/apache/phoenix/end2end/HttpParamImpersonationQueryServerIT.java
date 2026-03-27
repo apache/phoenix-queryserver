@@ -16,10 +16,10 @@
  */
 package org.apache.phoenix.end2end;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
@@ -44,17 +44,14 @@ import org.apache.phoenix.jdbc.PhoenixDatabaseMetaData;
 import org.apache.phoenix.queryserver.QueryServerOptions;
 import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.client.Driver;
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(Parameterized.class)
-@Category(NeedsOwnMiniClusterTest.class)
+@Tag("NeedsOwnMiniClusterTest")
 public class HttpParamImpersonationQueryServerIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpParamImpersonationQueryServerIT.class);
@@ -67,12 +64,7 @@ public class HttpParamImpersonationQueryServerIT {
         PhoenixDatabaseMetaData.SYSTEM_SEQUENCE_HBASE_TABLE_NAME,
         PhoenixDatabaseMetaData.SYSTEM_STATS_HBASE_TABLE_NAME);
 
-    @Parameters(name = "tls = {0}")
-    public static synchronized Iterable<Boolean> data() {
-        return Arrays.asList(new Boolean[] {false, true});
-    }
-
-    public HttpParamImpersonationQueryServerIT(Boolean tls) throws Exception {
+    public void restartEnvironmentForTls(Boolean tls) throws Exception {
         //Clean up previous environment if any (Junit 4.13 @BeforeParam / @AfterParam would be an alternative)
         if(environment != null) {
             stopEnvironment();
@@ -90,7 +82,7 @@ public class HttpParamImpersonationQueryServerIT {
         environment = new QueryServerEnvironment(conf, 2, tls);
     }
 
-    @AfterClass
+    @AfterAll
     public static synchronized void stopEnvironment() throws Exception {
         environment.stop();
     }
@@ -106,8 +98,10 @@ public class HttpParamImpersonationQueryServerIT {
         }
     }
 
-    @Test
-    public void testSuccessfulImpersonation() throws Exception {
+    @ParameterizedTest(name = "tls = {0}")
+    @ValueSource(booleans = { false, true })
+    public void testSuccessfulImpersonation(Boolean tls) throws Exception {
+        restartEnvironmentForTls(tls);
         final Entry<String,File> user1 = environment.getUser(1);
         final Entry<String,File> user2 = environment.getUser(2);
         // Build the JDBC URL by hand with the doAs
@@ -139,8 +133,10 @@ public class HttpParamImpersonationQueryServerIT {
         });
     }
 
-    @Test
-    public void testDisallowedImpersonation() throws Exception {
+    @ParameterizedTest(name = "tls = {0}")
+    @ValueSource(booleans = { false, true })
+    public void testDisallowedImpersonation(Boolean tls) throws Exception {
+        restartEnvironmentForTls(tls);
         final Entry<String,File> user2 = environment.getUser(2);
         // Build the JDBC URL by hand with the doAs
         final String doAsUrlTemplate = getUrlTemplate();
@@ -209,10 +205,10 @@ public class HttpParamImpersonationQueryServerIT {
             LOG.debug("Caught expected exception", e);
             // Avatica doesn't re-create new exceptions across the wire. Need to just look at the contents of the message.
             String errorMessage = e.getMessage();
-            assertTrue("Expected the error message to contain an HBase AccessDeniedException", errorMessage.contains("org.apache.hadoop.hbase.security.AccessDeniedException"));
+            assertTrue(errorMessage.contains("org.apache.hadoop.hbase.security.AccessDeniedException"),"Expected the error message to contain an HBase AccessDeniedException");
             // Expecting an error message like: "Insufficient permissions for user 'user1' (table=POSITIVE_IMPERSONATION, action=READ)"
             // Being overly cautious to make sure we don't inadvertently pass the test due to permission errors on phoenix system tables.
-            assertTrue("Expected message to contain " + tableName + " and READ", errorMessage.contains(tableName) && errorMessage.contains("READ"));
+            assertTrue(errorMessage.contains(tableName) && errorMessage.contains("READ"),"Expected message to contain " + tableName + " and READ");
         }
     }
 

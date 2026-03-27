@@ -11,8 +11,8 @@
 package org.apache.phoenix.end2end;
 
 import static org.apache.hadoop.hbase.HConstants.HBASE_DIR;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,7 +137,7 @@ public class QueryServerEnvironment {
     }
 
     private void createUsers(int numUsers) throws Exception {
-        assertNotNull("KDC is null, was setup method called?", KDC);
+        assertNotNull(KDC,"KDC is null, was setup method called?");
         NUM_CREATED_USERS = numUsers;
         for (int i = 1; i <= numUsers; i++) {
             String principal = "user" + i;
@@ -190,10 +190,10 @@ public class QueryServerEnvironment {
             if (f.isDirectory()) {
                 FileUtils.deleteDirectory(f);
             } else {
-                assertTrue("Failed to delete keytab directory", f.delete());
+                assertTrue(f.delete(),"Failed to delete keytab directory");
             }
         }
-        assertTrue("Failed to create keytab directory", f.mkdirs());
+        assertTrue(f.mkdirs(),"Failed to create keytab directory");
     }
 
     /**

@@ -21,8 +21,9 @@ package org.apache.phoenix.loadbalancer.service;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.phoenix.queryserver.QueryServerProperties;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class LoadBalanceZookeeperConfImplTest {
     @Test
@@ -48,12 +49,12 @@ public class LoadBalanceZookeeperConfImplTest {
         final LoadBalanceZookeeperConfImpl loadBalanceZookeeperConf = new LoadBalanceZookeeperConfImpl(conf);
         String[] connectStrings = loadBalanceZookeeperConf.getZkConnectString().split(",");
         String[] quorums = quorum.split(",");
-        Assert.assertTrue( connectStrings.length == quorums.length);
+        assertTrue( connectStrings.length == quorums.length);
         for (int i = 0; i< connectStrings.length; ++i) {
             if (quorums[i].contains(":")) {
-                Assert.assertEquals(quorums[i], connectStrings[i]);
+                assertEquals(quorums[i], connectStrings[i]);
             } else {
-                Assert.assertEquals(quorums[i] + ":" + port, connectStrings[i]);
+                assertEquals(quorums[i] + ":" + port, connectStrings[i]);
             }
         }
     }

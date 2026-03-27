@@ -31,12 +31,19 @@ import org.apache.phoenix.queryserver.register.Registry;
 import org.apache.phoenix.queryserver.register.ZookeeperRegistry;
 import org.apache.phoenix.util.HostAndPort;
 import org.apache.zookeeper.KeeperException;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+
 
 public class LoadBalancerEnd2EndIT {
     private static TestingServer testingServer;
@@ -51,7 +58,7 @@ public class LoadBalancerEnd2EndIT {
     public static String zkConnectString;
     public static Registry registry;
 
-    @BeforeClass
+    @BeforeAll
     public static synchronized void setup() throws Exception{
 
         registry = new ZookeeperRegistry();
@@ -69,7 +76,7 @@ public class LoadBalancerEnd2EndIT {
         loadBalancer = LoadBalancer.getLoadBalancer();
     }
 
-    @AfterClass
+    @AfterAll
     public static synchronized void tearDown() throws Exception {
         CloseableUtils.closeQuietly(curatorFramework);
         CloseableUtils.closeQuietly(testingServer);
@@ -85,58 +92,62 @@ public class LoadBalancerEnd2EndIT {
 
     @Test
     public void testGetAllServiceLocation() throws Exception {
-        Assert.assertNotNull(loadBalancer);
+        assertNotNull(loadBalancer);
         List<HostAndPort> serviceLocations = loadBalancer.getAllServiceLocation();
-        Assert.assertTrue(" must contains 3 service location",serviceLocations.size() == 3);
+        assertSame(3, serviceLocations.size(), " must contains 3 service location");
     }
 
     @Test
     public void testGetSingleServiceLocation() throws Exception {
-        Assert.assertNotNull(loadBalancer);
+        assertNotNull(loadBalancer);
         HostAndPort serviceLocation = loadBalancer.getSingleServiceLocation();
-        Assert.assertNotNull(serviceLocation);
+        assertNotNull(serviceLocation);
     }
 
-    @Test(expected=Exception.class)
-    public void testZookeeperDown() throws Exception{
-       testingServer.stop();
-       CuratorZookeeperClient zookeeperClient =  curatorFramework.getZookeeperClient();
-        //check to see if zookeeper is really down.
-       while (zookeeperClient.isConnected()){
-            Thread.sleep(1000);
-       };
-       loadBalancer.getSingleServiceLocation();
-    }
-
-    @Test(expected = KeeperException.NoNodeException.class)
-    public void testNoPhoenixQueryServerNodeInZookeeper() throws Exception{
-        List<HostAndPort> hostAndPorts = Arrays.asList(pqs1, pqs2, pqs3);
-        for(HostAndPort pqs: hostAndPorts) {
-            String fullPathToNode = LOAD_BALANCER_CONFIGURATION.getFullPathToNode(pqs);
-            curatorFramework.delete().deletingChildrenIfNeeded().forPath(fullPathToNode);
-            while (curatorFramework.checkExists().forPath(fullPathToNode) != null){
-                //wait for the node to deleted
+    @Test
+    public void testZookeeperDown() {
+       assertThrows(Exception.class, () -> {
+           testingServer.stop();
+           CuratorZookeeperClient zookeeperClient =  curatorFramework.getZookeeperClient();
+            //check to see if zookeeper is really down.
+           while (zookeeperClient.isConnected()){
                 Thread.sleep(1000);
-            };
-        }
-        //delete the parent
-        curatorFramework.delete().forPath(path);
-        // should throw an exception as there is
-        // no node in the zookeeper
-        try {
-            loadBalancer.getSingleServiceLocation();
-        } catch(Exception e) {
-            throw e;
-        } finally {
-            // need to create node for other tests to run.
-            createNodeForTesting(hostAndPorts);
-        }
+           };
+           loadBalancer.getSingleServiceLocation();
+       });
+    }
+
+    @Test
+    public void testNoPhoenixQueryServerNodeInZookeeper() {
+        assertThrows(KeeperException.NoNodeException.class, () -> {
+            List<HostAndPort> hostAndPorts = Arrays.asList(pqs1, pqs2, pqs3);
+            for(HostAndPort pqs: hostAndPorts) {
+                String fullPathToNode = LOAD_BALANCER_CONFIGURATION.getFullPathToNode(pqs);
+                curatorFramework.delete().deletingChildrenIfNeeded().forPath(fullPathToNode);
+                while (curatorFramework.checkExists().forPath(fullPathToNode) != null){
+                    //wait for the node to deleted
+                    Thread.sleep(1000);
+                };
+            }
+            //delete the parent
+            curatorFramework.delete().forPath(path);
+            // should throw an exception as there is
+            // no node in the zookeeper
+            try {
+                loadBalancer.getSingleServiceLocation();
+            } catch(Exception e) {
+                throw e;
+            } finally {
+                // need to create node for other tests to run.
+                createNodeForTesting(hostAndPorts);
+            }
+        });
     }
 
     @Test
     public void testSingletonPropertyForLoadBalancer(){
         LoadBalancer anotherloadBalancerRef = LoadBalancer.getLoadBalancer();
-        Assert.assertTrue(" the load balancer is not singleton",loadBalancer == anotherloadBalancerRef );
+        assertSame(loadBalancer, anotherloadBalancerRef, " the load balancer is not singleton");
     }
 
 

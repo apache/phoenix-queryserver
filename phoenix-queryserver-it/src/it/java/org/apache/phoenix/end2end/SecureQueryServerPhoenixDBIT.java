@@ -17,9 +17,9 @@
 package org.apache.phoenix.end2end;
 
 import static org.apache.hadoop.hbase.HConstants.HBASE_DIR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,12 +62,11 @@ import org.apache.phoenix.queryserver.QueryServerProperties;
 import org.apache.phoenix.queryserver.server.QueryServer;
 import org.apache.phoenix.util.InstanceResolver;
 import org.apache.phoenix.util.ThinClientUtil;
-import org.junit.AfterClass;
-import org.junit.Assume;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * This integration test stands up a secured PQS and runs Python code against it. See supporting
  * files in phoenix-queryserver/src/it/bin.
  */
-@Category(NeedsOwnMiniClusterTest.class)
+@Tag("NeedsOwnMiniClusterTest")
 public class SecureQueryServerPhoenixDBIT {
     private static enum Kdc {
       MIT,
@@ -120,7 +119,7 @@ public class SecureQueryServerPhoenixDBIT {
     }
 
     private static void createUsers(int numUsers) throws Exception {
-        assertNotNull("KDC is null, was setup method called?", KDC);
+        assertNotNull(KDC, "KDC is null, was setup method called?");
         NUM_CREATED_USERS = numUsers;
         for (int i = 1; i <= numUsers; i++) {
             String principal = "user" + i;
@@ -170,10 +169,10 @@ public class SecureQueryServerPhoenixDBIT {
             if (f.isDirectory()) {
                 FileUtils.deleteDirectory(f);
             } else {
-                assertTrue("Failed to delete keytab directory", f.delete());
+                assertTrue(f.delete(), "Failed to delete keytab directory");
             }
         }
-        assertTrue("Failed to create keytab directory", f.mkdirs());
+        assertTrue(f.mkdirs(), "Failed to create keytab directory");
     }
 
     /**
@@ -191,13 +190,13 @@ public class SecureQueryServerPhoenixDBIT {
         while (processError.ready()) {
             LOG.error(processError.readLine());
         }
-        Assume.assumeTrue("Could not find '" + command + "' on the PATH", exitCode == 0);
+        Assumptions.assumeTrue( exitCode == 0,"Could not find '" + command + "' on the PATH");
     }
 
     /**
      * Setup and start kerberos, hbase
      */
-    @BeforeClass
+    @BeforeAll
     public static synchronized void setUp() throws Exception {
         checkForCommandOnPath("python");
         checkForCommandOnPath("virtualenv");
@@ -306,7 +305,7 @@ public class SecureQueryServerPhoenixDBIT {
         PQS_URL = ThinClientUtil.getConnectionUrl("localhost", PQS_PORT) + ";authentication=SPNEGO";
     }
 
-    @AfterClass
+    @AfterAll
     public static synchronized void stopKdc() throws Exception {
         // Remove our custom ConfigurationFactory for future tests
         InstanceResolver.clearSingletons();
@@ -338,7 +337,7 @@ public class SecureQueryServerPhoenixDBIT {
     //This takes about 300s, so we are not running this by default
     @Test
     public void testFullSuite() throws Exception {
-        Assume.assumeNotNull(System.getProperty("run.full.python.testsuite"));
+        Assumptions.assumeTrue(System.getProperty("run.full.python.testsuite") != null);
         File file = new File(".");
         runShellScript("python", "-m", "unittest", "discover", "-v",  "-s", Paths.get(file.getAbsolutePath(), "..","python-phoenixdb").toString());
     }
@@ -350,7 +349,7 @@ public class SecureQueryServerPhoenixDBIT {
     //and set the environment so that the python unit tests can run against this instance.
     //You'll need to kill the test manually
     public void startLocalPQS() throws Exception {
-        Assume.assumeNotNull(System.getProperty("start.secure.pqs"));
+        Assumptions.assumeTrue(System.getProperty("start.secure.pqs") != null);
         runShellScript("sleep", "86400");
     }
 
@@ -457,7 +456,7 @@ public class SecureQueryServerPhoenixDBIT {
           if (krb5ConfFile != null)
               krb5ConfFile.delete();
 
-          assertEquals("Subprocess exited with errors", 0, exitCode);
+          assertEquals(0, exitCode, "Subprocess exited with errors");
         } finally {
           LOG.info("Test exiting");
           if (outWriter != null) {

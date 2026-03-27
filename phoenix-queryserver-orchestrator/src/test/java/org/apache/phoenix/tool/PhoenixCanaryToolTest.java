@@ -17,10 +17,12 @@
  */
 package org.apache.phoenix.tool;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
@@ -48,7 +50,7 @@ public class PhoenixCanaryToolTest {
     @Mock
     private DatabaseMetaData dbm;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
@@ -59,7 +61,7 @@ public class PhoenixCanaryToolTest {
         when(connection.prepareStatement(Mockito.anyString())).thenReturn(ps);
         when(statement.executeUpdate(Mockito.anyString())).thenReturn(1);
         CanaryTestResult result = new PhoenixCanaryTool.UpsertTableTest().runTest(connection);
-        assertEquals(true, result.isSuccessful());
+        assertTrue(result.isSuccessful());
         assertEquals("Test upsertTable successful", result.getMessage());
     }
 
@@ -71,7 +73,7 @@ public class PhoenixCanaryToolTest {
         when(rs.getInt(1)).thenReturn(1);
         when(rs.getString(2)).thenReturn("Hello World");
         CanaryTestResult result = new PhoenixCanaryTool.ReadTableTest().runTest(connection);
-        assertEquals(true, result.isSuccessful());
+        assertTrue(result.isSuccessful());
         assertEquals("Test readTable successful", result.getMessage());
     }
 
@@ -83,7 +85,7 @@ public class PhoenixCanaryToolTest {
         when(rs.getString(2)).thenReturn("Incorrect data");
         when(rs.next()).thenReturn(true).thenReturn(false);
         CanaryTestResult result = new PhoenixCanaryTool.ReadTableTest().runTest(connection);
-        assertEquals(false, result.isSuccessful());
+        assertFalse(result.isSuccessful());
         assert (result.getMessage().contains("Retrieved values do not match the inserted values"));
     }
 }

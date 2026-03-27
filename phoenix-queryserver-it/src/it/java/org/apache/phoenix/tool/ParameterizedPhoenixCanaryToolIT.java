@@ -23,12 +23,11 @@ import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.util.ReadOnlyProps;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,19 +41,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import static org.apache.phoenix.tool.PhoenixCanaryTool.propFileName;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@RunWith(Parameterized.class)
-@Category(NeedsOwnMiniClusterTest.class)
+@Tag("NeedsOwnMiniClusterTest")
 public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 
 	private static final Logger LOGGER =
@@ -76,36 +74,28 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 	private ByteArrayOutputStream out = new ByteArrayOutputStream();
     private String tmpDir = System.getProperty("java.io.tmpdir");
 
-	public ParameterizedPhoenixCanaryToolIT(boolean isPositiveTestType,
-			boolean isNamespaceEnabled, String resultSinkOption) {
-		this.isPositiveTestType = isPositiveTestType;
-		this.isNamespaceEnabled = isNamespaceEnabled;
-		this.resultSinkOption = resultSinkOption;
-	}
+    public static Stream<Arguments> parametersList() {
+        return Stream.of(
+                Arguments.arguments(true, true, stdOutSink),
+                Arguments.arguments(true, true, fileOutSink),
+                Arguments.arguments(false, true, stdOutSink),
+                Arguments.arguments(false, true, fileOutSink),
+                Arguments.arguments(true, false, stdOutSink),
+                Arguments.arguments(true, false, fileOutSink),
+                Arguments.arguments(false, false, stdOutSink),
+                Arguments.arguments(false, false, fileOutSink)
+        );
+    }
 
-	@Parameterized.Parameters(name = "ParameterizedPhoenixCanaryToolIT_isPositiveTestType={0}," +
-			"isNamespaceEnabled={1},resultSinkOption={2}")
-	public static Collection parametersList() {
-		return Arrays.asList(new Object[][] {
-			{true, true, stdOutSink},
-			{true, true, fileOutSink},
-			{false, true, stdOutSink},
-			{false, true, fileOutSink},
-			{true, false, stdOutSink},
-			{true, false, fileOutSink},
-			{false, false, stdOutSink},
-			{false, false, fileOutSink}
-		});
-	}
-
-	@Before
-	public void setup() throws Exception {
+	public void setup(
+            Boolean isPositiveTestType, Boolean isNamespaceEnabled, String resultSinkOption) throws Exception {
 		String createSchema;
 		String createTable;
+		cmd.clear();
 
-		if(needsNewCluster()) {
-			setClientSideNamespaceProperties();
-			setServerSideNamespaceProperties();
+		if(needsNewCluster(isNamespaceEnabled)) {
+			setClientSideNamespaceProperties(isNamespaceEnabled);
+			setServerSideNamespaceProperties(isNamespaceEnabled);
 			tearDownMiniCluster(NUM_SLAVES_BASE);
 			System.setProperty("java.io.tmpdir", tmpDir);
 			// FIXME no idea why java.io.tmpdir gets deleted. We don't see this behaviour in 
@@ -115,14 +105,14 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 			setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()),
 					new ReadOnlyProps(clientProps.entrySet().iterator()));
 			LOGGER.info("New cluster is spinned up with test parameters " +
-					"isPositiveTestType" + this.isPositiveTestType +
-					"isNamespaceEnabled" + this.isNamespaceEnabled +
-					"resultSinkOption" + this.resultSinkOption);
+					"isPositiveTestType" + isPositiveTestType +
+					"isNamespaceEnabled" + isNamespaceEnabled +
+					"resultSinkOption" + resultSinkOption);
 			connString = BaseTest.getUrl();
-			connection = getConnection();
+			connection = getConnection(isNamespaceEnabled);
 		}
 
-		if (this.isNamespaceEnabled) {
+		if (isNamespaceEnabled) {
 			createSchema = "CREATE SCHEMA IF NOT EXISTS TEST";
 			connection.createStatement().execute(createSchema);
 		}
@@ -133,49 +123,50 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		cmd.add("--constring");
 		cmd.add(connString);
 		cmd.add("--logsinkclass");
-		cmd.add(this.resultSinkOption);
-		if (this.resultSinkOption.contains(stdOutSink)) {
+		cmd.add(resultSinkOption);
+		if (resultSinkOption.contains(stdOutSink)) {
+			out.reset();
 			System.setOut(new java.io.PrintStream(out));
 		} else {
 			loadCanaryPropertiesFile(canaryProp);
 		}
 	}
 
-	private boolean needsNewCluster() {
+	private boolean needsNewCluster(Boolean isNamespaceEnabled) {
 		if (connection == null) {
 			return true;
 		}
 		if (!clientProps.get(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE)
-				.equalsIgnoreCase(String.valueOf(this.isNamespaceEnabled))) {
+				.equalsIgnoreCase(String.valueOf(isNamespaceEnabled))) {
 			return true;
 		}
 		return false;
 	}
 
-	private void setClientSideNamespaceProperties() {
+	private void setClientSideNamespaceProperties(Boolean isNamespaceEnabled) {
 
 		clientProps.put(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 
 		clientProps.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 	}
 
-	private Connection getConnection() throws SQLException {
+	private Connection getConnection(Boolean isNamespaceEnabled) throws SQLException {
 		Properties props = new Properties();
 		props.setProperty(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 
 		props.setProperty(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 		return DriverManager.getConnection(connString, props);
 	}
 
-	void setServerSideNamespaceProperties() {
+	void setServerSideNamespaceProperties(Boolean isNamespaceEnabled) {
 		serverProps.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 		serverProps.put(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(this.isNamespaceEnabled));
+				String.valueOf(isNamespaceEnabled));
 	}
 
 	/*
@@ -184,8 +175,19 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 	*	It tests the tool in positive type where test expects to pass
 	*	and negative type where test expects to fail.
  	*/
-	@Test
-	public void phoenixCanaryToolTest() throws SQLException, IOException {
+    @ParameterizedTest(name = "isPositiveTestType={0}, isNamespaceEnabled={1}, resultSinkOption={2}")
+    @MethodSource("parametersList")
+	public void phoenixCanaryToolTest(
+            Boolean isPositiveTestType, Boolean isNamespaceEnabled, String resultSinkOption) throws SQLException, IOException {
+        // Per-invocation state for @AfterEach (replaces JUnit 4 parameterized constructor)
+        this.isPositiveTestType = isPositiveTestType;
+        this.isNamespaceEnabled = isNamespaceEnabled;
+        this.resultSinkOption = resultSinkOption;
+        try{
+            setup(isPositiveTestType, isNamespaceEnabled, resultSinkOption);
+        } catch (Exception e) {
+            fail("Error during setup" + e.getMessage());
+        }
 		if (!isPositiveTestType) {
 			dropTestTable();
 		}
@@ -232,14 +234,17 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		return files[0];
 	}
 
-	@After
+	@AfterEach
 	public void teardown() throws SQLException {
+		if (connection == null) {
+			return;
+		}
 		if (this.isNamespaceEnabled) {
 			dropTestTableAndSchema();
 		} else {
 			dropTestTable();
 		}
-		if (this.resultSinkOption.contains(fileOutSink)) {
+		if (this.resultSinkOption != null && this.resultSinkOption.contains(fileOutSink)) {
 			deleteResultSinkFile();
 		}
 	}

@@ -217,12 +217,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <configuration>
-                        <ignoredDependencies>
-                            <ignoredDependency>junit:junit:jar:4.13.2</ignoredDependency>
-                            <ignoredDependency>org.junit.vintage:junit-vintage-engine:jar:5.10.2</ignoredDependency>
-                        </ignoredDependencies>
-                    </configuration>
                     <executions>
                         <execution>
                             <id>enforce-dependencies</id>
@@ -1217,11 +1211,6 @@
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.vintage</groupId>
-                <artifactId>junit-vintage-engine</artifactId>
-                <version>${junit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
