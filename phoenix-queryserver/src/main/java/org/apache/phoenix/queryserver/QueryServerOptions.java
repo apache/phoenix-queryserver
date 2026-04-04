@@ -38,6 +38,7 @@ public class QueryServerOptions {
     public static final String DEFAULT_QUERY_SERVER_REMOTEUSEREXTRACTOR_PARAM = "doAs";
     public static final boolean DEFAULT_QUERY_SERVER_DISABLE_KERBEROS_LOGIN = false;
     public static final boolean DEFAULT_QUERY_SERVER_JMXJSONENDPOINT_DISABLED = false;
+    public static final boolean DEFAULT_QUERY_SERVER_PROMETHEUS_ENDPOINT_ENABLED = true;
 
     public static final boolean DEFAULT_QUERY_SERVER_TLS_ENABLED = false;
     //We default to empty *store password

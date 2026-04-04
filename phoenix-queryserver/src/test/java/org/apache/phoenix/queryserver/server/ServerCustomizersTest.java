@@ -26,6 +26,7 @@ import org.apache.calcite.avatica.server.ServerCustomizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.queryserver.QueryServerProperties;
+import org.apache.phoenix.queryserver.server.customizers.prometheus.PrometheusEndpointServerCustomizer;
 import org.apache.phoenix.util.InstanceResolver;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
@@ -51,7 +52,7 @@ public class ServerCustomizersTest {
         // the default factory creates an empty list of server customizers
         List<ServerCustomizer<Server>> customizers =
                 queryServer.createServerCustomizers(new Configuration(), avaticaServerConfiguration);
-        Assert.assertEquals(1, customizers.size());
+        Assert.assertEquals(2, customizers.size());
     }
 
     @Test
@@ -76,5 +77,15 @@ public class ServerCustomizersTest {
         QueryServer queryServer = new QueryServer();
         List<ServerCustomizer<Server>> actual = queryServer.createServerCustomizers(conf, avaticaServerConfiguration);
         Assert.assertEquals("Customizers are different", expected, actual);
+    }
+
+    @Test
+    public void testPrometheusServletCustomizer() {
+        QueryServer queryServer = new QueryServer();
+
+        List<ServerCustomizer<Server>> customizers =
+                queryServer.createServerCustomizers(new Configuration(), null);
+
+        Assert.assertTrue(customizers.get(1) instanceof PrometheusEndpointServerCustomizer);
     }
 }
