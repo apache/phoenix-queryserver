@@ -19,7 +19,6 @@ package org.apache.phoenix.tool;
 
 import com.google.gson.Gson;
 
-import org.apache.phoenix.end2end.NeedsOwnMiniClusterTest;
 import org.apache.phoenix.query.BaseTest;
 import org.apache.phoenix.query.QueryServices;
 import org.apache.phoenix.util.ReadOnlyProps;
@@ -93,9 +92,13 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		String createTable;
 		cmd.clear();
 
-		if(needsNewCluster(isNamespaceEnabled)) {
-			setClientSideNamespaceProperties(isNamespaceEnabled);
-			setServerSideNamespaceProperties(isNamespaceEnabled);
+        this.isPositiveTestType = isPositiveTestType;
+        this.isNamespaceEnabled = isNamespaceEnabled;
+        this.resultSinkOption = resultSinkOption;
+
+		if(needsNewCluster()) {
+			setClientSideNamespaceProperties();
+			setServerSideNamespaceProperties();
 			tearDownMiniCluster(NUM_SLAVES_BASE);
 			System.setProperty("java.io.tmpdir", tmpDir);
 			// FIXME no idea why java.io.tmpdir gets deleted. We don't see this behaviour in 
@@ -105,14 +108,14 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 			setUpTestDriver(new ReadOnlyProps(serverProps.entrySet().iterator()),
 					new ReadOnlyProps(clientProps.entrySet().iterator()));
 			LOGGER.info("New cluster is spinned up with test parameters " +
-					"isPositiveTestType" + isPositiveTestType +
-					"isNamespaceEnabled" + isNamespaceEnabled +
-					"resultSinkOption" + resultSinkOption);
+					"isPositiveTestType " + this.isPositiveTestType +
+					"isNamespaceEnabled " + this.isNamespaceEnabled +
+					"resultSinkOption " + this.resultSinkOption);
 			connString = BaseTest.getUrl();
-			connection = getConnection(isNamespaceEnabled);
+			connection = getConnection();
 		}
 
-		if (isNamespaceEnabled) {
+		if (this.isNamespaceEnabled) {
 			createSchema = "CREATE SCHEMA IF NOT EXISTS TEST";
 			connection.createStatement().execute(createSchema);
 		}
@@ -123,8 +126,8 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		cmd.add("--constring");
 		cmd.add(connString);
 		cmd.add("--logsinkclass");
-		cmd.add(resultSinkOption);
-		if (resultSinkOption.contains(stdOutSink)) {
+		cmd.add(this.resultSinkOption);
+		if (this.resultSinkOption.contains(stdOutSink)) {
 			out.reset();
 			System.setOut(new java.io.PrintStream(out));
 		} else {
@@ -132,41 +135,41 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 		}
 	}
 
-	private boolean needsNewCluster(Boolean isNamespaceEnabled) {
+	private boolean needsNewCluster() {
 		if (connection == null) {
 			return true;
 		}
 		if (!clientProps.get(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE)
-				.equalsIgnoreCase(String.valueOf(isNamespaceEnabled))) {
+				.equalsIgnoreCase(String.valueOf(this.isNamespaceEnabled))) {
 			return true;
 		}
 		return false;
 	}
 
-	private void setClientSideNamespaceProperties(Boolean isNamespaceEnabled) {
+	private void setClientSideNamespaceProperties() {
 
 		clientProps.put(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 
 		clientProps.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 	}
 
-	private Connection getConnection(Boolean isNamespaceEnabled) throws SQLException {
+	private Connection getConnection() throws SQLException {
 		Properties props = new Properties();
 		props.setProperty(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 
 		props.setProperty(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 		return DriverManager.getConnection(connString, props);
 	}
 
-	void setServerSideNamespaceProperties(Boolean isNamespaceEnabled) {
+	void setServerSideNamespaceProperties() {
 		serverProps.put(QueryServices.IS_NAMESPACE_MAPPING_ENABLED,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 		serverProps.put(QueryServices.IS_SYSTEM_TABLE_MAPPED_TO_NAMESPACE,
-				String.valueOf(isNamespaceEnabled));
+				String.valueOf(this.isNamespaceEnabled));
 	}
 
 	/*
@@ -180,9 +183,6 @@ public class ParameterizedPhoenixCanaryToolIT extends BaseTest {
 	public void phoenixCanaryToolTest(
             Boolean isPositiveTestType, Boolean isNamespaceEnabled, String resultSinkOption) throws SQLException, IOException {
         // Per-invocation state for @AfterEach (replaces JUnit 4 parameterized constructor)
-        this.isPositiveTestType = isPositiveTestType;
-        this.isNamespaceEnabled = isNamespaceEnabled;
-        this.resultSinkOption = resultSinkOption;
         try{
             setup(isPositiveTestType, isNamespaceEnabled, resultSinkOption);
         } catch (Exception e) {
