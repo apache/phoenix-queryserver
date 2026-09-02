@@ -283,12 +283,28 @@ public final class QueryServer extends Configured implements Tool, Runnable {
   private void setTlsIfNeccessary(Builder<Server> builder, Configuration conf) throws Exception {
     final boolean useTls = getConf().getBoolean(QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_ENABLED);
     if(useTls) {
-      final String tlsKeystore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE);
       final String keystoreType = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_TYPE_KEY, QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_TYPE_DEFAULT);
 
-      final String tlsKeystorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD);
-      final String tlsTruststore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE);
-      final String tlsTruststorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD);
+      String tlsKeystore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_SERVER_KEYSTORE);
+      if (tlsKeystore == null){
+        tlsKeystore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE);
+      }
+
+      String tlsKeystorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_SERVER_KEYSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD);
+      if (tlsKeystorePassword == null || tlsKeystorePassword.equals(QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD)) {
+        tlsKeystorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_KEYSTORE_PASSWORD);
+      }
+
+      String tlsTruststore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_SERVER_TRUSTSTORE);
+      if (tlsTruststore == null){
+        tlsTruststore = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE);
+      }
+
+      String tlsTruststorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_SERVER_TRUSTSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD);
+      if (tlsTruststorePassword == null || tlsTruststorePassword.equals(QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD)) {
+         tlsTruststorePassword = getConf().get(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD, QueryServerOptions.DEFAULT_QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD);
+      }
+
       if(tlsKeystore == null) {
         throw new Exception(String.format("if %s is enabled, %s must be specfified" , QueryServerProperties.QUERY_SERVER_TLS_ENABLED, QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE));
       }
