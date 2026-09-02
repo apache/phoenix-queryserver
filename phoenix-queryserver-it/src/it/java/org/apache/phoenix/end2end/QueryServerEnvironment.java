@@ -236,13 +236,13 @@ public class QueryServerEnvironment {
 
         if (tls) {
             conf.setBoolean(QueryServerProperties.QUERY_SERVER_TLS_ENABLED, true);
-            conf.set(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE,
+            conf.set(QueryServerProperties.QUERY_SERVER_TLS_SERVER_KEYSTORE,
                 TlsUtil.getKeyStoreFile().getAbsolutePath());
-            conf.set(QueryServerProperties.QUERY_SERVER_TLS_KEYSTORE_PASSWORD,
+            conf.set(QueryServerProperties.QUERY_SERVER_TLS_SERVER_KEYSTORE_PASSWORD,
                 TlsUtil.getKeyStorePassword());
-            conf.set(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE,
+            conf.set(QueryServerProperties.QUERY_SERVER_TLS_SERVER_TRUSTSTORE,
                 TlsUtil.getTrustStoreFile().getAbsolutePath());
-            conf.set(QueryServerProperties.QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD,
+            conf.set(QueryServerProperties.QUERY_SERVER_TLS_SERVER_TRUSTSTORE_PASSWORD,
                 TlsUtil.getTrustStorePassword());
         }
 

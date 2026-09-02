@@ -66,12 +66,20 @@ public class QueryServerProperties {
             "phoenix.queryserver.tls.enabled";
     public static final String QUERY_SERVER_TLS_KEYSTORE =
             "phoenix.queryserver.tls.keystore";
+    public static final String QUERY_SERVER_TLS_SERVER_KEYSTORE =
+            "phoenix.queryserver.tls.server.keystore";
     public static final String QUERY_SERVER_TLS_KEYSTORE_PASSWORD =
             "phoenix.queryserver.tls.keystore.password";
+    public static final String QUERY_SERVER_TLS_SERVER_KEYSTORE_PASSWORD =
+            "phoenix.queryserver.tls.server.keystore.password";
     public static final String QUERY_SERVER_TLS_TRUSTSTORE =
             "phoenix.queryserver.tls.truststore";
+    public static final String QUERY_SERVER_TLS_SERVER_TRUSTSTORE =
+            "phoenix.queryserver.tls.server.truststore";
     public static final String QUERY_SERVER_TLS_TRUSTSTORE_PASSWORD =
             "phoenix.queryserver.tls.truststore.password";
+    public static final String QUERY_SERVER_TLS_SERVER_TRUSTSTORE_PASSWORD =
+            "phoenix.queryserver.tls.server.truststore.password";
     public static final String QUERY_SERVER_TLS_ENABLED_PROTCOLS =
             "phoenix.queryserver.tls.protocols";
     public static final String QUERY_SERVER_TLS_ENABLED_CIPHERSUITES =
