@@ -2,3 +2,5 @@
 NEWS\.rst
 RELEASING\.rst
 README\.rst
+dev-support.*
+\.gitignore
