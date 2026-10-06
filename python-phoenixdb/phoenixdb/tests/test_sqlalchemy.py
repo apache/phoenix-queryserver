@@ -15,6 +15,7 @@
 
 import sys
 import unittest
+from unittest import mock
 
 import sqlalchemy as db
 from sqlalchemy import text
@@ -40,6 +41,40 @@ class SQLAlchemyTest(unittest.TestCase):
         metadata = db.MetaData()
         catalog = db.Table('CATALOG', metadata, schema='SYSTEM', autoload_with=engine)
         self.assertIn('TABLE_NAME', catalog.columns.keys())
+
+    def test_set_autocommit(self):
+        engine = self._create_engine()
+        with engine.connect() as conn:
+            self.assertFalse(conn.connection.connection.autocommit)
+
+        engine = self._create_engine(extra_connect_args={"autoCommit": True})
+        with engine.connect() as conn:
+            self.assertTrue(conn.connection.connection.autocommit)
+
+    @unittest.skipIf(db.__version__ < "2.0.43", "skip_autocommit_rollback added in 2.0.43")
+    def test_skip_autocommit_rollback_enabled(self):
+        engine = self._create_engine(
+            extra_connect_args={"autoCommit": True},
+            skip_autocommit_rollback=True
+        )
+        with engine.connect() as conn:
+            self.assertTrue(conn.connection.connection.autocommit)
+
+            client = conn.connection.connection._client
+            with mock.patch.object(client, "rollback", wraps=client.rollback) as check_rollback:
+                conn.close()
+            self.assertEqual(len(check_rollback.mock_calls), 0)
+
+    @unittest.skipIf(db.__version__ < "2.0.43", "skip_autocommit_rollback added in 2.0.43")
+    def test_skip_autocommit_rollback_disabled(self):
+        engine = self._create_engine(extra_connect_args={"autoCommit": True})
+        with engine.connect() as conn:
+            self.assertTrue(conn.connection.connection.autocommit)
+
+            client = conn.connection.connection._client
+            with mock.patch.object(client, "rollback", wraps=client.rollback) as check_rollback:
+                conn.close()
+            self.assertEqual(len(check_rollback.mock_calls), 1)
 
     def test_textual(self):
         engine = self._create_engine()
@@ -154,7 +189,7 @@ class SQLAlchemyTest(unittest.TestCase):
     def test_orm(self):
         pass
 
-    def _create_engine(self):
+    def _create_engine(self, extra_connect_args=None, **kw):
         ''''Massage the properties that we use for the DBAPI tests so that they apply to
         SQLAlchemy'''
 
@@ -173,5 +208,7 @@ class SQLAlchemyTest(unittest.TestCase):
             connect_args.update(avatica_password=TEST_DB_AVATICA_PASSWORD)
         if TEST_DB_TRUSTSTORE:
             connect_args.update(trustore=TEST_DB_TRUSTSTORE)
+        if extra_connect_args:
+            connect_args.update(**extra_connect_args)
 
-        return db.create_engine(urlunparse(url_parts), tls=tls, connect_args=connect_args)
+        return db.create_engine(urlunparse(url_parts), tls=tls, connect_args=connect_args, **kw)
