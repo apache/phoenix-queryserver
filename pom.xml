@@ -77,7 +77,7 @@
         <phoenix.client.artifactid>phoenix-client-embedded-hbase-2.5</phoenix.client.artifactid>
 
         <!-- Dependency versions -->
-        <zookeeper.version>3.8.4</zookeeper.version>
+        <zookeeper.version>3.8.6</zookeeper.version>
         <!-- Curator 4.2.0 supports ZK 3.8 runtime, but TestServer fails to start-->
         <curator.version>5.6.0</curator.version>
 
