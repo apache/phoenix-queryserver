@@ -14,8 +14,6 @@
 # limitations under the License.
 import sys
 
-import gssapi
-
 from phoenixdb import errors, types
 from phoenixdb.avatica import AvaticaClient
 from phoenixdb.connection import Connection
@@ -23,8 +21,6 @@ from phoenixdb.errors import *  # noqa: F401,F403
 from phoenixdb.types import *  # noqa: F401,F403
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-
-from requests_gssapi import HTTPSPNEGOAuth
 
 if sys.version_info.major == 3:
     from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
@@ -127,6 +123,17 @@ def connect(url, max_retries=None, auth=None, authentication=None, avatica_user=
 
 
 def _get_SPNEGOAuth():
+    if sys.platform == 'win32':
+        try:
+            from phoenixdb.sspi_auth import HTTPSPNEGOAuthSSPI
+        except ImportError:
+            # pyspnego needs Python 3.8+, fall back to requests_gssapi below
+            pass
+        else:
+            return HTTPSPNEGOAuthSSPI()
+
+    import gssapi
+    from requests_gssapi import HTTPSPNEGOAuth
     try:
         spnego = gssapi.mechs.Mechanism.from_sasl_name("SPNEGO")
     except AttributeError:

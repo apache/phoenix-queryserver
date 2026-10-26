@@ -18,4 +18,5 @@
 #
 protobuf>=3.0.0
 requests
-requests-gssapi
+requests-gssapi; sys_platform != "win32"
+pyspnego; sys_platform == "win32"

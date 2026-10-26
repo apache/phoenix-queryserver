@@ -43,6 +43,8 @@ if setuptools.__version__ < '20.8.1':
     ]
     if sys.version_info < (3,8):
         install_requires.append('requests-gssapi<1.3.0')
+    elif sys.platform == 'win32':
+        install_requires.append('pyspnego')
     else:
         install_requires.append('requests-gssapi')
     if sys.version_info < (3,6):
@@ -53,7 +55,8 @@ else:
     install_requires=[
         'protobuf>=3.0.0',
         'requests',
-        'requests-gssapi; python_version>="3.8.0"',
+        'requests-gssapi; python_version>="3.8.0" and sys_platform!="win32"',
+        'pyspnego; python_version>="3.8.0" and sys_platform=="win32"',
         'requests-gssapi<1.3.0; python_version<"3.8.0"',
         'gssapi<1.6.0; python_version<"3.6.0"',
     ]
